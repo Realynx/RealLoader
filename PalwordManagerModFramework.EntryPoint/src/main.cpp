@@ -32,15 +32,8 @@ int main(int args, char* argv[])
     {
         printf("Mods are being initalized Awoooo!\n");
 
-        StaticLibDecl staticLibDecl;
-        staticLibDecl.entryPointFuncName = "Hello";
-        staticLibDecl.name = "TestLib";
-        staticLibDecl.dir = "dfsd";
-        printf("AssebleRef Loading || Name: \"%s\", Func Entry Point: \"%s\"\n", staticLibDecl.name.c_str(), staticLibDecl.entryPointFuncName.c_str());
-
-        LoadManagedAssembly_AbsolutePath(L"C:\\Modding\\bin\\Debug-windows-x86_64\\PMMBootstrapper",
-           L"TestLib",
-           L"Hello");
+        CLRHost.LoadManagedAssembly_AbsolutePath(L"C:\\Modding\PalworldManagedModFramework\\PalworldManagedModFramework\\bin\Debug\\net8.0",
+            L"PalworldManagedModFramework");
 
         printf("Mods have been initalized!\n");
     }

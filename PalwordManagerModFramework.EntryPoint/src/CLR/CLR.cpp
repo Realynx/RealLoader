@@ -141,99 +141,169 @@ namespace Stuff
     // </SnippetInitialize>
 }
 
-//loads a managed assembly
-bool LoadManagedAssembly_AbsolutePath(const std::wstring _absoluteDir, const std::wstring _fileName, const std::wstring _entryFuncName)
+bool PalModManager::CLR::CLRHost::LoadManagedAssembly_AbsolutePath(const std::wstring _absoluteDir,
+    const std::wstring _fileName,
+    const std::wstring _namespace, const std::wstring _typeName, const std::wstring _entryFuncName)
 {
-    // STEP 1: Load HostFxr and get exported hosting functions
-     //
-    if (!Stuff::load_hostfxr(nullptr))
+    const std::wstring dllPath = L"C:\\Modding\\PalworldManagedModFramework\\PalworldManagedModFramework\\bin\\Debug\\net8.0\\PalworldManagedModFramework.dll"; //_absoluteDir + DIR_SEPARATOR + _fileName + PMM_WSTR(".dll");
+
+    if (!Stuff::load_hostfxr(dllPath.c_str()))
     {
         assert(false && "Failure: load_hostfxr()");
         return EXIT_FAILURE;
     }
 
-    //
-    // STEP 2: Initialize and start the .NET Core runtime
-    //
-    const std::wstring config_path = _absoluteDir + DIR_SEPARATOR + _fileName + STR(".runtimeconfig.json");
-    load_assembly_and_get_function_pointer_fn load_assembly_and_get_function_pointer = nullptr;
-    load_assembly_and_get_function_pointer = Stuff::get_dotnet_load_assembly(config_path.c_str());
-    assert(load_assembly_and_get_function_pointer != nullptr && "Failure: get_dotnet_load_assembly()");
-
-    //
-    // STEP 3: Load managed assembly and get function pointer to a managed method
-    //
-    const std::wstring dotnetlib_path = _absoluteDir /*std::wstring(STR("C:\\Modding\\bin\\Debug-windows-x86_64\\PMMBootstrapper"))*/ + DIR_SEPARATOR +
-        _fileName + STR(".dll");
-    const std::wstring dotnet_type = STR("TestLib.Lib, TestLib");
-    const std::wstring dotnet_type_method = STR("Hello");
-    // <SnippetLoadAndGet>
-    // Function pointer to managed delegate
-    component_entry_point_fn hello = nullptr;
-    int rc = load_assembly_and_get_function_pointer(
-        dotnetlib_path.c_str(),
-        dotnet_type.c_str(),
-        dotnet_type_method.c_str(),
-        nullptr /*delegate_type_name*/,
-        nullptr,
-        (void**)&hello);
-    // </SnippetLoadAndGet>
-    assert(rc == 0 && hello != nullptr && "Failure: load_assembly_and_get_function_pointer()");
-
-    //
-    // STEP 4: Run managed code
-    //
-    struct lib_args
+    // Load .NET Core
+    hostfxr_handle cxt = nullptr;
+    std::vector<const char_t*> args{ dllPath.c_str() };
+    int rc = Stuff::init_for_cmd_line_fptr(args.size(), args.data(), nullptr, &cxt);
+    if (rc != 0 || cxt == nullptr)
     {
-        const char_t* message;
-        int number;
-    };
-    for (int i = 0; i < 3; ++i)
-    {
-        // <SnippetCallManaged>
-        lib_args args
-        {
-            STR("from host!"),
-            i
-        };
-
-        hello(&args, sizeof(args));
-        // </SnippetCallManaged>
+        std::cerr << "Init failed: " << std::hex << std::showbase << rc << std::endl;
+        Stuff::close_fptr(cxt);
+        return EXIT_FAILURE;
     }
 
-    // Function pointer to managed delegate with non-default signature
-    typedef void (CORECLR_DELEGATE_CALLTYPE* custom_entry_point_fn)(lib_args args);
-    custom_entry_point_fn custom = nullptr;
-    lib_args args
-    {
-        STR("from host!"),
-        -1
-    };
+    // Get the function pointer to get function pointers
+    get_function_pointer_fn get_function_pointer;
+    rc = Stuff::get_delegate_fptr(
+        cxt,
+        hdt_get_function_pointer,
+        (void**)&get_function_pointer);
+    if (rc != 0 || get_function_pointer == nullptr)
+        std::cerr << "Get delegate failed: " << std::hex << std::showbase << rc << std::endl;
 
-    // UnmanagedCallersOnly
-    rc = load_assembly_and_get_function_pointer(
-        (wchar_t*)dotnetlib_path.c_str(),
-        (wchar_t*)dotnet_type.c_str(),
-        STR("CustomEntryPointUnmanagedCallersOnly") /*method_name*/,
+    //// Function pointer to App.IsWaiting
+    //typedef unsigned char (CORECLR_DELEGATE_CALLTYPE* is_waiting_fn)();
+    //is_waiting_fn is_waiting;
+    //rc = get_function_pointer(
+    //    STR("App, App"),
+    //    STR("IsWaiting"),
+    //    UNMANAGEDCALLERSONLY_METHOD,
+    //    nullptr, nullptr, (void**)&is_waiting);
+    //assert(rc == 0 && is_waiting != nullptr && "Failure: get_function_pointer()");
+
+    // Function pointer to App.Hello
+    typedef void (CORECLR_DELEGATE_CALLTYPE* hello_fn)(const char*);
+    hello_fn hello;
+    rc = get_function_pointer(
+        std::wstring(_namespace + PMM_WSTR(", ") + _typeName).c_str(),// STR("App, App"),
+        _entryFuncName.c_str(), //STR("Hello"),
         UNMANAGEDCALLERSONLY_METHOD,
-        nullptr,
-        (void**)&custom);
-    assert(rc == 0 && custom != nullptr && "Failure: load_assembly_and_get_function_pointer()");
-    custom(args);
+        nullptr, nullptr, (void**)&hello);
+    assert(rc == 0 && hello != nullptr && "Failure: get_function_pointer()");
 
-    // Custom delegate type
-    rc = load_assembly_and_get_function_pointer(
-        dotnetlib_path.c_str(),
-        dotnet_type.c_str(),
-        STR("CustomEntryPoint") /*method_name*/,
-        std::wstring(_fileName + std::wstring(L".Lib+CustomEntryPointDelegate, ") + _fileName).c_str(),
-        nullptr,
-        (void**)&custom);
-    assert(rc == 0 && custom != nullptr && "Failure: load_assembly_and_get_function_pointer()");
-    custom(args);
+    // Invoke the functions in a different thread from the main app
+    /*std::thread t([&]
+        {
+            while (is_waiting() != 1)
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
+            for (int i = 0; i < 3; ++i)
+                hello("from host!");
+        });*/
+
+    // Run the app
+    Stuff::run_app_fptr(cxt);
+    //t.join();
+
+    Stuff::close_fptr(cxt);
     return EXIT_SUCCESS;
 }
+//
+////loads a managed assembly
+//bool LoadManagedAssembly_AbsolutePath(const std::wstring _absoluteDir, const std::wstring _fileName, const std::wstring _entryFuncName)
+//{
+//    // STEP 1: Load HostFxr and get exported hosting functions
+//     //
+//    if (!Stuff::load_hostfxr(nullptr))
+//    {
+//        assert(false && "Failure: load_hostfxr()");
+//        return EXIT_FAILURE;
+//    }
+//
+//    //
+//    // STEP 2: Initialize and start the .NET Core runtime
+//    //
+//    const std::wstring config_path = _absoluteDir + DIR_SEPARATOR + _fileName + STR(".runtimeconfig.json");
+//    load_assembly_and_get_function_pointer_fn load_assembly_and_get_function_pointer = nullptr;
+//    load_assembly_and_get_function_pointer = Stuff::get_dotnet_load_assembly(config_path.c_str());
+//    assert(load_assembly_and_get_function_pointer != nullptr && "Failure: get_dotnet_load_assembly()");
+//
+//    //
+//    // STEP 3: Load managed assembly and get function pointer to a managed method
+//    //
+//    const std::wstring dotnetlib_path = _absoluteDir /*std::wstring(STR("C:\\Modding\\bin\\Debug-windows-x86_64\\PMMBootstrapper"))*/ + DIR_SEPARATOR +
+//        _fileName + STR(".dll");
+//    const std::wstring dotnet_type = STR("TestLib.Lib, TestLib");
+//    const std::wstring dotnet_type_method = STR("Hello");
+//    // <SnippetLoadAndGet>
+//    // Function pointer to managed delegate
+//    component_entry_point_fn hello = nullptr;
+//    int rc = load_assembly_and_get_function_pointer(
+//        dotnetlib_path.c_str(),
+//        dotnet_type.c_str(),
+//        dotnet_type_method.c_str(),
+//        nullptr /*delegate_type_name*/,
+//        nullptr,
+//        (void**)&hello);
+//    // </SnippetLoadAndGet>
+//    assert(rc == 0 && hello != nullptr && "Failure: load_assembly_and_get_function_pointer()");
+//
+//    //
+//    // STEP 4: Run managed code
+//    //
+//    struct lib_args
+//    {
+//        const char_t* message;
+//        int number;
+//    };
+//    for (int i = 0; i < 3; ++i)
+//    {
+//        // <SnippetCallManaged>
+//        lib_args args
+//        {
+//            STR("from host!"),
+//            i
+//        };
+//
+//        hello(&args, sizeof(args));
+//        // </SnippetCallManaged>
+//    }
+//
+//    // Function pointer to managed delegate with non-default signature
+//    typedef void (CORECLR_DELEGATE_CALLTYPE* custom_entry_point_fn)(lib_args args);
+//    custom_entry_point_fn custom = nullptr;
+//    lib_args args
+//    {
+//        STR("from host!"),
+//        -1
+//    };
+//
+//    // UnmanagedCallersOnly
+//    rc = load_assembly_and_get_function_pointer(
+//        (wchar_t*)dotnetlib_path.c_str(),
+//        (wchar_t*)dotnet_type.c_str(),
+//        STR("CustomEntryPointUnmanagedCallersOnly") /*method_name*/,
+//        UNMANAGEDCALLERSONLY_METHOD,
+//        nullptr,
+//        (void**)&custom);
+//    assert(rc == 0 && custom != nullptr && "Failure: load_assembly_and_get_function_pointer()");
+//    custom(args);
+//
+//    // Custom delegate type
+//    rc = load_assembly_and_get_function_pointer(
+//        dotnetlib_path.c_str(),
+//        dotnet_type.c_str(),
+//        STR("CustomEntryPoint") /*method_name*/,
+//        std::wstring(_fileName + std::wstring(L".Lib+CustomEntryPointDelegate, ") + _fileName).c_str(),
+//        nullptr,
+//        (void**)&custom);
+//    assert(rc == 0 && custom != nullptr && "Failure: load_assembly_and_get_function_pointer()");
+//    custom(args);
+//
+//    return EXIT_SUCCESS;
+//}
 //
 ////load a managed C# Assembly by a relative path
 //bool LoadManagedAssembly_RelativePath(const char* relativePath, const StaticLibDecl& staticLibDecl)
@@ -363,73 +433,73 @@ namespace Stuff
     //    return EXIT_SUCCESS;
     //}
 
-    int run_app_example(const string_t& root_path)
-    {
-        const string_t app_path = root_path + STR("App.dll");
+    //int run_app_example(const string_t& root_path)
+    //{
+    //    const string_t app_path = root_path + STR("App.dll");
 
-        if (!load_hostfxr(app_path.c_str()))
-        {
-            assert(false && "Failure: load_hostfxr()");
-            return EXIT_FAILURE;
-        }
+    //    if (!load_hostfxr(app_path.c_str()))
+    //    {
+    //        assert(false && "Failure: load_hostfxr()");
+    //        return EXIT_FAILURE;
+    //    }
 
-        // Load .NET Core
-        hostfxr_handle cxt = nullptr;
-        std::vector<const char_t*> args{ app_path.c_str(), STR("app_arg_1"), STR("app_arg_2") };
-        int rc = init_for_cmd_line_fptr(args.size(), args.data(), nullptr, &cxt);
-        if (rc != 0 || cxt == nullptr)
-        {
-            std::cerr << "Init failed: " << std::hex << std::showbase << rc << std::endl;
-            close_fptr(cxt);
-            return EXIT_FAILURE;
-        }
+    //    // Load .NET Core
+    //    hostfxr_handle cxt = nullptr;
+    //    std::vector<const char_t*> args{ app_path.c_str(), STR("app_arg_1"), STR("app_arg_2") };
+    //    int rc = init_for_cmd_line_fptr(args.size(), args.data(), nullptr, &cxt);
+    //    if (rc != 0 || cxt == nullptr)
+    //    {
+    //        std::cerr << "Init failed: " << std::hex << std::showbase << rc << std::endl;
+    //        close_fptr(cxt);
+    //        return EXIT_FAILURE;
+    //    }
 
-        // Get the function pointer to get function pointers
-        get_function_pointer_fn get_function_pointer;
-        rc = get_delegate_fptr(
-            cxt,
-            hdt_get_function_pointer,
-            (void**)&get_function_pointer);
-        if (rc != 0 || get_function_pointer == nullptr)
-            std::cerr << "Get delegate failed: " << std::hex << std::showbase << rc << std::endl;
+    //    // Get the function pointer to get function pointers
+    //    get_function_pointer_fn get_function_pointer;
+    //    rc = get_delegate_fptr(
+    //        cxt,
+    //        hdt_get_function_pointer,
+    //        (void**)&get_function_pointer);
+    //    if (rc != 0 || get_function_pointer == nullptr)
+    //        std::cerr << "Get delegate failed: " << std::hex << std::showbase << rc << std::endl;
 
-        // Function pointer to App.IsWaiting
-        typedef unsigned char (CORECLR_DELEGATE_CALLTYPE* is_waiting_fn)();
-        is_waiting_fn is_waiting;
-        rc = get_function_pointer(
-            STR("App, App"),
-            STR("IsWaiting"),
-            UNMANAGEDCALLERSONLY_METHOD,
-            nullptr, nullptr, (void**)&is_waiting);
-        assert(rc == 0 && is_waiting != nullptr && "Failure: get_function_pointer()");
+    //    // Function pointer to App.IsWaiting
+    //    typedef unsigned char (CORECLR_DELEGATE_CALLTYPE* is_waiting_fn)();
+    //    is_waiting_fn is_waiting;
+    //    rc = get_function_pointer(
+    //        STR("App, App"),
+    //        STR("IsWaiting"),
+    //        UNMANAGEDCALLERSONLY_METHOD,
+    //        nullptr, nullptr, (void**)&is_waiting);
+    //    assert(rc == 0 && is_waiting != nullptr && "Failure: get_function_pointer()");
 
-        // Function pointer to App.Hello
-        typedef void (CORECLR_DELEGATE_CALLTYPE* hello_fn)(const char*);
-        hello_fn hello;
-        rc = get_function_pointer(
-            STR("App, App"),
-            STR("Hello"),
-            UNMANAGEDCALLERSONLY_METHOD,
-            nullptr, nullptr, (void**)&hello);
-        assert(rc == 0 && hello != nullptr && "Failure: get_function_pointer()");
+    //    // Function pointer to App.Hello
+    //    typedef void (CORECLR_DELEGATE_CALLTYPE* hello_fn)(const char*);
+    //    hello_fn hello;
+    //    rc = get_function_pointer(
+    //        STR("App, App"),
+    //        STR("Hello"),
+    //        UNMANAGEDCALLERSONLY_METHOD,
+    //        nullptr, nullptr, (void**)&hello);
+    //    assert(rc == 0 && hello != nullptr && "Failure: get_function_pointer()");
 
-        // Invoke the functions in a different thread from the main app
-        std::thread t([&]
-            {
-                while (is_waiting() != 1)
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    //    // Invoke the functions in a different thread from the main app
+    //    std::thread t([&]
+    //        {
+    //            while (is_waiting() != 1)
+    //                std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-                for (int i = 0; i < 3; ++i)
-                    hello("from host!");
-            });
+    //            for (int i = 0; i < 3; ++i)
+    //                hello("from host!");
+    //        });
 
-        // Run the app
-        run_app_fptr(cxt);
-        t.join();
+    //    // Run the app
+    //    run_app_fptr(cxt);
+    //    t.join();
 
-        close_fptr(cxt);
-        return EXIT_SUCCESS;
-    }
+    //    close_fptr(cxt);
+    //    return EXIT_SUCCESS;
+    //}
 }
 
 
