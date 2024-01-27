@@ -7,7 +7,7 @@ using PalworldManagedModFramework.Services.Logging;
 
 namespace PalworldManagedModFramework {
     public static class Program {
-        public static void ManagedEntryPoint() {
+        public static void Main(string[] args) {
             Console.WriteLine($"Loading .NET DI Service Container...");
 
             var hostBuilder = new HostBuilder()
@@ -30,6 +30,8 @@ namespace PalworldManagedModFramework {
                 Services.GetRequiredService<GameExplorer>();
 
             gameExplorer.Entry();
+
+            Console.ReadLine();
         }
     }
 }
