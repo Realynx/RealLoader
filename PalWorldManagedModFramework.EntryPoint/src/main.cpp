@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <iostream>
-#include <thread>
 #include <vector>
+#include <filesystem>
 
 #include <CLR/CLR.hpp>
 
@@ -56,27 +56,48 @@ int __cdecl wmain(int argc, wchar_t* argv[])
 int main(int argc, char* argv[])
 #endif
 {
-    CLR::CLRHost host;
+    //checks for args
+    if (!argc)
+    {
+        printf("Pal Mod Manager Bootstraper Fatal Error || func: \"main\" || No Args were passed in, we can't get to the real application!\n");
+        return -1;
+    }
+    
+    // gets the path of the real game, and runs it with the needed arguments
+    std::filesystem::path absolutePath = argv[0];
+    absolutePath = absolutePath.replace_filename("Game-Palworld-Win64-Shipping").string() + ".exe";
+    std::string command = "\"" + absolutePath.string() + "\" " + std::string((char*)argv[1]);
 
-    // Get the current executable's directory
-    // This sample assumes the managed assembly to load and its runtime configuration file are next to the host
-    char_t host_path[MAX_PATH];
+    //if mods are enabled
+    bool isModded = !strcmp((char*)argv[2], "-modded");
+    if (isModded)
+    {
+        //the CLR Host
+        CLR::CLRHost host;
+
+        // Get the current executable's directory
+        // This sample assumes the managed assembly to load and its runtime configuration file are next to the host
+        char_t host_path[MAX_PATH];
 #if Window_Build
-    auto size = ::GetFullPathNameW(argv[0], sizeof(host_path) / sizeof(char_t), host_path, nullptr);
-    assert(size != 0);
+        auto size = ::GetFullPathNameW(argv[0], sizeof(host_path) / sizeof(char_t), host_path, nullptr);
+        assert(size != 0);
 #else
-    auto resolved = realpath(argv[0], host_path);
-    assert(resolved != nullptr);
+        auto resolved = realpath(argv[0], host_path);
+        assert(resolved != nullptr);
 #endif
 
-    string_t root_path = host_path;
-    auto pos = root_path.find_last_of(DIR_SEPARATOR);
-    assert(pos != string_t::npos);
-    root_path = root_path.substr(0, pos + 1);
-    
-    //set up .Net
-    run_app_example(&host, root_path);
+        string_t root_path = host_path;
+        auto pos = root_path.find_last_of(DIR_SEPARATOR);
+        assert(pos != string_t::npos);
+        root_path = root_path.substr(0, pos + 1);
 
-    getchar();
+        //set up .Net and initalize mods
+        run_app_example(&host, root_path);
+
+        system(command.c_str()); //execute the game
+    }
+
+    if(isModded) //hold console if the game is modded
+        getchar();
     return 0;
 }

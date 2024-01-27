@@ -35,9 +35,6 @@
 
 namespace CLR::Util
 {
-    // Forward declarations
-    void* load_library(const char_t*);
-    void* get_export(void*, const char*);
 
 #ifdef Window_Build
     void* load_library(const char_t* path)
