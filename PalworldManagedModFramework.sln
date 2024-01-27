@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldModInstaller", "PalworldModInstaller\PalworldModInstaller.csproj", "{20343058-887C-4BD8-A7BB-10D5EF81FB99}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PalworldManagedModFramework.EntryPoint", "PalwordManagerModFramework.EntryPoint\PMMBootstrapper.vcxproj", "{54594460-C0E4-B124-C9F5-341935000E25}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PalworldManagedModFramework.EntryPoint", "PalWorldManagedModFramework.EntryPoint\PMMBootstrapper.vcxproj", "{54594460-C0E4-B124-C9F5-341935000E25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
