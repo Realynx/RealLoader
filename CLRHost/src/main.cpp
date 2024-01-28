@@ -62,9 +62,7 @@ int run_app_example(CLR::CLRHost* host, const std::basic_string<char_t>& root_pa
 	return EXIT_SUCCESS;
 }
 
-
-
-__declspec(dllexport) void Load()
+__declspec(dllexport) void LoadCLRHost()
 {
 	// Get the current executable's directory
 	// This sample assumes the managed assembly to load and its runtime configuration file are next to the host

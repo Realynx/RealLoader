@@ -196,43 +196,49 @@ int main(int argc, char* argv[])
 	PROCESS_INFORMATION PI; ZeroMemory(&PI, sizeof(PI)); // Null the memory
 	STARTUPINFOA SI; ZeroMemory(&SI, sizeof(SI)); // Null the memory
 	if (!CreateProcessA(command.c_str(), NULL, NULL, NULL, FALSE,
-		/*DETACHED_PROCESS*/CREATE_SUSPENDED, NULL, NULL, &SI, &PI))
+		DETACHED_PROCESS /*CREATE_SUSPENDED*/, NULL, NULL, &SI, &PI))
 	{
 		printf("Failed to create a suspended process at \"%\"\n", command.c_str());
 		getchar();
 		return -1;
 	}
 
-	const char* dllPath = "CLRHost.dll";
-	LPVOID pDllPath = VirtualAllocEx(PI.hProcess, 0, strlen(dllPath) + 1, MEM_COMMIT, PAGE_READWRITE);
-	WriteProcessMemory(PI.hProcess, pDllPath, (LPVOID)dllPath, strlen(dllPath) + 1, 0);
-	
-	LPVOID pLoadLibrary = GetProcAddress(GetModuleHandle(L"kernel32.dll"), "LoadLibraryA");
-	HANDLE hThread = CreateRemoteThread(PI.hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibrary, pDllPath, 0, NULL);
-	
+	PI.hProcess = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, PI.dwProcessId);
+
 	//insert hook
-	
-	//resume thread
-	ResumeThread(hThread);
+	const char* functionName = "LoadCLRHost";
+	LPVOID pFunctionName = VirtualAllocEx(PI.hProcess, 0, strlen(functionName) + 1, MEM_COMMIT, PAGE_READWRITE);
+	WriteProcessMemory(PI.hProcess, pFunctionName, (LPVOID)functionName, strlen(functionName) + 1, 0);
 
-	////the CLR Host
-	//CLR::CLRHost host;
+	LPVOID pGetProcAddress = GetProcAddress(GetModuleHandle(L"kernel32.dll"), "GetProcAddress");
+	HANDLE hThread = CreateRemoteThread(PI.hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pGetProcAddress, pFunctionName, 0, NULL);
 
-	////if mods are enabled
-	
-	//	
-	//}
-	//bool isModded = !strcmp(modFlag.c_str(), "-modded");
-	//if (isModded)
-	//{
-	//if (isModded) //hold console if the game is modded
-	//{
-		getchar();
-	//}
+	if (hThread == NULL) {
+		std::cerr << "Failed to create remote thread" << std::endl;
+		return 1;
+	}
 
-	//clean up prog blob
-	//if (progBlob)
-		//free(progBlob);
+	// Wait for the remote thread to complete
+	WaitForSingleObject(hThread, INFINITE);
+
+	// Get the context of the thread
+	CONTEXT ctx;
+	ctx.ContextFlags = CONTEXT_FULL; // Retrieves all registers
+
+	if (GetThreadContext(hThread, &ctx)) {
+		// Successfully retrieved the thread context
+		std::cout << "RAX: " << ctx.Rax << std::endl;
+	}
+	else {
+		std::cerr << "Failed to get thread context" << std::endl;
+	}
+
+	DWORD64 exportedAddresss = ctx.Rax;
+	CloseHandle(hThread);
+
+	hThread = CreateRemoteThread(PI.hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)exportedAddresss, NULL, 0, NULL);
+
+	getchar();
 
 	return 0;
 }
