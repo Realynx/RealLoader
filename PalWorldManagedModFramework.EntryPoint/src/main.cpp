@@ -205,13 +205,24 @@ int main(int argc, char* argv[])
 
 	PI.hProcess = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, PI.dwProcessId);
 
-	//insert hook
+	const char* dllPath = "CLRHost.dll";
+	LPVOID pDllPath = VirtualAllocEx(PI.hProcess, 0, strlen(dllPath) + 1, MEM_COMMIT, PAGE_READWRITE);
+	WriteProcessMemory(PI.hProcess, pDllPath, (LPVOID)dllPath, strlen(dllPath) + 1, 0);
+
+	LPVOID pLoadLibrary = GetProcAddress(GetModuleHandle(L"kernel32.dll"), "LoadLibraryA");
+	HANDLE hThread = CreateRemoteThread(PI.hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibrary, pDllPath, 0, NULL);
+
+	// Wait for the remote thread to complete
+	WaitForSingleObject(hThread, INFINITE);
+	getchar();
+
+
 	const char* functionName = "LoadCLRHost";
 	LPVOID pFunctionName = VirtualAllocEx(PI.hProcess, 0, strlen(functionName) + 1, MEM_COMMIT, PAGE_READWRITE);
 	WriteProcessMemory(PI.hProcess, pFunctionName, (LPVOID)functionName, strlen(functionName) + 1, 0);
 
 	LPVOID pGetProcAddress = GetProcAddress(GetModuleHandle(L"kernel32.dll"), "GetProcAddress");
-	HANDLE hThread = CreateRemoteThread(PI.hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pGetProcAddress, pFunctionName, 0, NULL);
+	hThread = CreateRemoteThread(PI.hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pGetProcAddress, pFunctionName, 0, NULL);
 
 	if (hThread == NULL) {
 		std::cerr << "Failed to create remote thread" << std::endl;
@@ -220,6 +231,7 @@ int main(int argc, char* argv[])
 
 	// Wait for the remote thread to complete
 	WaitForSingleObject(hThread, INFINITE);
+	getchar();
 
 	// Get the context of the thread
 	CONTEXT ctx;
