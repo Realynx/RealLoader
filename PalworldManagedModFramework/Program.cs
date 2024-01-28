@@ -9,6 +9,7 @@ namespace PalworldManagedModFramework {
     public static class Program {
         public static void Main(string[] args) {
             Console.WriteLine($"Loading .NET DI Service Container...");
+            Thread.Sleep(TimeSpan.FromSeconds(4));
 
             var hostBuilder = new HostBuilder()
             .UseConsoleLifetime();

@@ -1,4 +1,6 @@
 ﻿
+using System.Diagnostics;
+
 using PalworldManagedModFramework.Services.Logging;
 
 namespace PalworldManagedModFramework.Services {
@@ -9,8 +11,17 @@ namespace PalworldManagedModFramework.Services {
             _logger = logger;
         }
 
-        internal void Entry() {
+        internal unsafe void Entry() {
             _logger.Info("Begin memory explorer...");
+
+            var palWorldProcess = Process.GetCurrentProcess();
+            foreach (ProcessModule processModule in palWorldProcess.Modules) {
+                _logger.Info(@$"Symbol Name: {processModule.ModuleName}
+Base Address: 0x{processModule.BaseAddress:X},
+Symbol Length: {processModule.ModuleMemorySize:X}
+File: {processModule.FileName}
+");
+            }
         }
     }
 }
