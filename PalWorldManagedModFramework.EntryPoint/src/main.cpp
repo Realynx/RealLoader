@@ -42,7 +42,15 @@ int run_app_example(CLR::CLRHost* host, const string_t& root_path)
 		return EXIT_FAILURE;
 	}
 
-	host->run_app_fptr(cxt);
+	// Create and start the thread
+	std::thread clrThread([&]
+		{
+			host->run_app_fptr(cxt);
+		
+			printf("from host!\n");
+		});
+
+	clrThread.detach();
 
 	//host.close_fptr(cxt);
 	return EXIT_SUCCESS;
@@ -92,11 +100,12 @@ int main(int argc, char* argv[])
 		assert(pos != string_t::npos);
 		root_path = root_path.substr(0, pos + 1);
 
-		// Create and start the thread
-		std::thread clrThread([&]() { run_app_example(&host, root_path); });
+		run_app_example(&host, root_path);
+
+		
 
 		// Detach the thread to run independently
-		clrThread.detach();
+		//clrThread.detach();
 	}
 
 	system(command.c_str()); //execute the game

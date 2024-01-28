@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\poofi\source\repos\PalworldManagedModFramework\bin\Debug-windows-x86_64\PMMBootstrapper\PMMBootstrapper.exe</FullPath>
+      <FullPath>C:\Modding\PalworldManagedModFramework\bin\Debug-windows-x86_64\PMMBootstrapper\PMMBootstrapper.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />
