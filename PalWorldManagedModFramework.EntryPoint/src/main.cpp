@@ -2,6 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#include <iostream> // Standard C++ library for console I/O
+#include <fstream>
+#include <string> // Standard C++ Library for string manip
+
+#include <Windows.h> // WinAPI Header
+#include <winnt.h>
+#include <TlHelp32.h> //WinAPI Process API
+
 // Standard headers
 #include <stdio.h>
 #include <stdint.h>
@@ -15,57 +23,151 @@
 #include "comutil.h"
 #include <thread>
 
-#include <CLR/CLR.hpp>
+//
+//
+//#include <CLR/CLR.hpp>
+//
+//static inline void CLRRun(CLR::CLRHost* host, const std::basic_string<char_t>& app_path)
+//{
+//	std::this_thread::sleep_for(std::chrono::seconds(2));
+//
+//	// Load .NET Core
+//	std::vector<const char_t*> args{ app_path.c_str() };
+//	int rc = host->init_for_cmd_line_fptr(args.size(), args.data(), nullptr, &host->cxt);
+//
+//	//run the CLR
+//	host->run_app_fptr(host->cxt);
+//	
+//	//clean up CLR when done
+//	host->close_fptr(host->cxt);
+//}
+//
+////the main bulk of code for the actually running of DLLs and such
+//int run_app_example(CLR::CLRHost* host, const std::basic_string<char_t>& root_path)
+//{
+//	const std::basic_string<char_t> app_path = root_path + STR("ManagedModFramework\\PalworldManagedModFramework.dll");
+//
+//	//init the function pointers
+//	if (!host->Init(app_path.c_str()))
+//	{
+//		assert(false && "Failure: load_hostfxr()");
+//		return EXIT_FAILURE;
+//	}
+//
+//	// Load .NET Core
+//	//std::vector<const char_t*> args{ app_path.c_str() };
+//	//int rc = host->init_for_cmd_line_fptr(args.size(), args.data(), nullptr, &host->cxt);
+//	//if (rc != 0 || host->cxt == nullptr)
+//	//{
+//	//	std::cerr << "Init failed: " << std::hex << std::showbase << rc << std::endl;
+//	//	host->close_fptr(host->cxt);
+//	//	return EXIT_FAILURE;
+//	//}
+//
+//	// Create and start the thread
+//	std::thread clrThread(CLRRun, host, app_path);
+//
+//	clrThread.detach();
+//
+//	//host->run_app_fptr(host->cxt);
+//	
+//
+//	return EXIT_SUCCESS;
+//}
 
-using string_t = std::basic_string<char_t>;
+//// use this if you want to read the executable from disk
+//HANDLE MapFileToMemory(LPCSTR filename)
+//{
+//	std::streampos size;
+//	std::fstream file;
+//	file = std::fstream(filename, std::ios::in | std::ios::binary | std::ios::ate);
+//
+//	if (file.is_open())
+//	{
+//		size = file.tellg();
+//
+//		char* Memblock = new char[size]();
+//
+//		file.seekg(0, std::ios::beg);
+//		file.read(Memblock, size);
+//		file.close();
+//
+//		return Memblock;
+//	}
+//
+//	printf("Failed to find file at \"%s\"\n", filename);
+//	getchar();
+//	return 0;
+//}
 
-static inline void CLRRun(CLR::CLRHost* host, const string_t& app_path)
-{
-	std::this_thread::sleep_for(std::chrono::seconds(2));
-
-	// Load .NET Core
-	std::vector<const char_t*> args{ app_path.c_str() };
-	int rc = host->init_for_cmd_line_fptr(args.size(), args.data(), nullptr, &host->cxt);
-
-	//run the CLR
-	host->run_app_fptr(host->cxt);
-	
-	//clean up CLR when done
-	host->close_fptr(host->cxt);
-}
-
-//the main bulk of code for the actually running of DLLs and such
-int run_app_example(CLR::CLRHost* host, const string_t& root_path)
-{
-	const string_t app_path = root_path + STR("ManagedModFramework\\PalworldManagedModFramework.dll");
-
-	//init the function pointers
-	if (!host->Init(app_path.c_str()))
-	{
-		assert(false && "Failure: load_hostfxr()");
-		return EXIT_FAILURE;
-	}
-
-	// Load .NET Core
-	//std::vector<const char_t*> args{ app_path.c_str() };
-	//int rc = host->init_for_cmd_line_fptr(args.size(), args.data(), nullptr, &host->cxt);
-	//if (rc != 0 || host->cxt == nullptr)
-	//{
-	//	std::cerr << "Init failed: " << std::hex << std::showbase << rc << std::endl;
-	//	host->close_fptr(host->cxt);
-	//	return EXIT_FAILURE;
-	//}
-
-	// Create and start the thread
-	std::thread clrThread(CLRRun, host, app_path);
-
-	clrThread.detach();
-
-	//host->run_app_fptr(host->cxt);
-	
-
-	return EXIT_SUCCESS;
-}
+//int RunPortableExecutable(void* Image)
+//{
+//	IMAGE_DOS_HEADER* DOSHeader; // For Nt DOS Header symbols
+//	IMAGE_NT_HEADERS* NtHeader; // For Nt PE Header objects & symbols
+//	IMAGE_SECTION_HEADER* SectionHeader;
+//
+//	PROCESS_INFORMATION PI;
+//	STARTUPINFOA SI;
+//
+//	CONTEXT* CTX;
+//
+//	DWORD* ImageBase; //Base address of the image
+//	void* pImageBase; // Pointer to the image base
+//
+//	int count;
+//	char CurrentFilePath[1024];
+//
+//	DOSHeader = PIMAGE_DOS_HEADER(Image); // Initialize Variable
+//	NtHeader = PIMAGE_NT_HEADERS(DWORD(Image) + DOSHeader->e_lfanew); // Initialize
+//
+//	GetModuleFileNameA(0, CurrentFilePath, 1024); // path to current executable
+//
+//	if (NtHeader->Signature == IMAGE_NT_SIGNATURE) // Check if image is a PE File.
+//	{
+//		ZeroMemory(&PI, sizeof(PI)); // Null the memory
+//		ZeroMemory(&SI, sizeof(SI)); // Null the memory
+//
+//		printf("Signeture found!\n");
+//
+//		if (CreateProcessA(CurrentFilePath, NULL, NULL, NULL, FALSE,
+//			CREATE_SUSPENDED, NULL, NULL, &SI, &PI)) // Create a new instance of current
+//			//process in suspended state, for the new image.
+//		{
+//			// Allocate memory for the context.
+//			CTX = LPCONTEXT(VirtualAlloc(NULL, sizeof(CTX), MEM_COMMIT, PAGE_READWRITE));
+//			CTX->ContextFlags = CONTEXT_FULL; // Context is allocated
+//
+//			if (GetThreadContext(PI.hThread, LPCONTEXT(CTX))) //if context is in thread
+//			{
+//				// Read instructions
+//				ReadProcessMemory(PI.hProcess, LPCVOID(CTX->Rbx +8), LPVOID(&ImageBase), 4, 0);
+//
+//				pImageBase = VirtualAllocEx(PI.hProcess, LPVOID(NtHeader->OptionalHeader.ImageBase),
+//					NtHeader->OptionalHeader.SizeOfImage, 0x3000, PAGE_EXECUTE_READWRITE);
+//
+//				// Write the image to the process
+//				WriteProcessMemory(PI.hProcess, pImageBase, Image, NtHeader->OptionalHeader.SizeOfHeaders, NULL);
+//
+//				for (count = 0; count < NtHeader->FileHeader.NumberOfSections; count++)
+//				{
+//					SectionHeader = PIMAGE_SECTION_HEADER(DWORD(Image) + DOSHeader->e_lfanew + 248 + (count * 40));
+//
+//					WriteProcessMemory(PI.hProcess, LPVOID(DWORD(pImageBase) + SectionHeader->VirtualAddress),
+//						LPVOID(DWORD(Image) + SectionHeader->PointerToRawData), SectionHeader->SizeOfRawData, 0);
+//				}
+//				WriteProcessMemory(PI.hProcess, LPVOID(CTX->Rbx + 8),
+//					LPVOID(&NtHeader->OptionalHeader.ImageBase), 4, 0);
+//
+//				// Move address of entry point to the eax register
+//				CTX->Rax = DWORD(pImageBase) + NtHeader->OptionalHeader.AddressOfEntryPoint;
+//				SetThreadContext(PI.hThread, LPCONTEXT(CTX)); // Set the context
+//				ResumeThread(PI.hThread); //´Start the process/call main()
+//
+//				return 0; // Operation was successful.
+//			}
+//		}
+//	}
+//}
 
 //the entry point
 #if defined(Window_Build)
@@ -87,41 +189,50 @@ int main(int argc, char* argv[])
 	std::filesystem::path absolutePath = path;
 	absolutePath = absolutePath.replace_filename("Game-Palworld-Win64-Shipping").string() + ".exe";
 
-	std::string command = std::string("\"") + absolutePath.string() + std::string("\"");
+	std::string command = /*std::string("\"") +*/ absolutePath.string(); /*+ std::string("\"");*/
+	printf("%s\n", command.c_str());
 
-	//the CLR Host
-	CLR::CLRHost host;
-
-	//if mods are enabled
-	bool isModded = !strcmp(modFlag.c_str(), "-modded");
-	if (isModded)
+	//starts Pal World on a remote thread
+	PROCESS_INFORMATION PI; ZeroMemory(&PI, sizeof(PI)); // Null the memory
+	STARTUPINFOA SI; ZeroMemory(&SI, sizeof(SI)); // Null the memory
+	if (!CreateProcessA(command.c_str(), NULL, NULL, NULL, FALSE,
+		/*DETACHED_PROCESS*/CREATE_SUSPENDED, NULL, NULL, &SI, &PI))
 	{
-		// Get the current executable's directory
-		// This sample assumes the managed assembly to load and its runtime configuration file are next to the host
-		char_t host_path[MAX_PATH];
-#if Window_Build
-		auto size = ::GetFullPathNameW(argv[0], sizeof(host_path) / sizeof(char_t), host_path, nullptr);
-		assert(size != 0);
-#else
-		auto resolved = realpath(argv[0], host_path);
-		assert(resolved != nullptr);
-#endif
-
-		string_t root_path = host_path;
-		auto pos = root_path.find_last_of(DIR_SEPARATOR);
-		assert(pos != string_t::npos);
-		root_path = root_path.substr(0, pos + 1);
-
-		run_app_example(&host, root_path);
-	}
-
-	system(command.c_str()); //execute the game
-
-	if (isModded) //hold console if the game is modded
-	{
-		
+		printf("Failed to create a suspended process at \"%\"\n", command.c_str());
 		getchar();
+		return -1;
 	}
+
+	const char* dllPath = "CLRHost.dll";
+	LPVOID pDllPath = VirtualAllocEx(PI.hProcess, 0, strlen(dllPath) + 1, MEM_COMMIT, PAGE_READWRITE);
+	WriteProcessMemory(PI.hProcess, pDllPath, (LPVOID)dllPath, strlen(dllPath) + 1, 0);
+	
+	LPVOID pLoadLibrary = GetProcAddress(GetModuleHandle(L"kernel32.dll"), "LoadLibraryA");
+	HANDLE hThread = CreateRemoteThread(PI.hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)pLoadLibrary, pDllPath, 0, NULL);
+	
+	//insert hook
+	
+	//resume thread
+	ResumeThread(hThread);
+
+	////the CLR Host
+	//CLR::CLRHost host;
+
+	////if mods are enabled
+	
+	//	
+	//}
+	//bool isModded = !strcmp(modFlag.c_str(), "-modded");
+	//if (isModded)
+	//{
+	//if (isModded) //hold console if the game is modded
+	//{
+		getchar();
+	//}
+
+	//clean up prog blob
+	//if (progBlob)
+		//free(progBlob);
 
 	return 0;
 }

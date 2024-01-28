@@ -9,7 +9,7 @@
 #include <coreclr_delegates.h>
 #include <hostfxr.h>
 
-#ifdef Window_Build
+//#ifdef Window_Build
 #include <Windows.h>
 
 #define STR(s) L ## s
@@ -18,25 +18,25 @@
 
 #define string_compare wcscmp
 
-#else
-#include <dlfcn.h>
-#include <limits.h>
+//#else
+//#include <dlfcn.h>
+//#include <limits.h>
+//
+//#define STR(s) s
+//#define CH(c) c
+//#define DIR_SEPARATOR '/'
+//#define MAX_PATH PATH_MAX
+//
+//#define string_compare strcmp
 
-#define STR(s) s
-#define CH(c) c
-#define DIR_SEPARATOR '/'
-#define MAX_PATH PATH_MAX
-
-#define string_compare strcmp
-
-#endif
+//#endif
 
  //------------------------------------Function used to load and activate .NET Core-------------------------//
 
 namespace CLR::Util
 {
 
-#ifdef Window_Build
+//#ifdef Window_Build
     void* load_library(const char_t* path)
     {
         HMODULE h = ::LoadLibraryW(path);
@@ -49,20 +49,20 @@ namespace CLR::Util
         assert(f != nullptr);
         return f;
     }
-#else
-    void* load_library(const char_t* path)
-    {
-        void* h = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
-        assert(h != nullptr);
-        return h;
-    }
-    void* get_export(void* h, const char* name)
-    {
-        void* f = dlsym(h, name);
-        assert(f != nullptr);
-        return f;
-    }
-#endif
+//#else
+//    void* load_library(const char_t* path)
+//    {
+//        void* h = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
+//        assert(h != nullptr);
+//        return h;
+//    }
+//    void* get_export(void* h, const char* name)
+//    {
+//        void* f = dlsym(h, name);
+//        assert(f != nullptr);
+//        return f;
+//    }
+//#endif
 }
 
 //----------------------------------MAIN CLR-----------------------//
