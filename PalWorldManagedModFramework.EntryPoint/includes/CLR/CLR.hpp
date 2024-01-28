@@ -78,6 +78,7 @@ namespace CLR
         hostfxr_get_runtime_delegate_fn get_delegate_fptr;
         hostfxr_run_app_fn run_app_fptr;
         hostfxr_close_fn close_fptr;
+        hostfxr_handle cxt = nullptr;
 
         //inits the CLR Host
         inline bool Init(const char_t* assembly_path)
