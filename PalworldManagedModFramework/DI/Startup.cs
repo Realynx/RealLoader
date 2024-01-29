@@ -4,6 +4,8 @@ using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.Models.Config;
 using PalworldManagedModFramework.Services;
+using PalworldManagedModFramework.Services.AssemblyLoading;
+using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 using PalworldManagedModFramework.Services.Logging;
 
 namespace PalworldManagedModFramework.DI {
@@ -18,10 +20,13 @@ namespace PalworldManagedModFramework.DI {
         internal static void ConfigureServices(HostBuilderContext context, IServiceCollection services) {
 
             services
-                .AddSingleton<LoggerConfig>();
+                .AddSingleton<LoggerConfig>()
+                .AddSingleton<ModLoaderConfig>();
 
             services
                 .AddSingleton<ILogger, Logger>()
+                .AddSingleton<IAssemblyDiscovery, AssemblyDiscovery>()
+                .AddSingleton<IModLoader, ModLoader>()
                 .AddSingleton<GameExplorer>();
         }
     }

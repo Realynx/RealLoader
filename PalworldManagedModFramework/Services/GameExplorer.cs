@@ -15,9 +15,14 @@ namespace PalworldManagedModFramework.Services {
             _logger.Info("Begin memory explorer...");
 
             var palWorldProcess = Process.GetCurrentProcess();
+            ProcessModule palWorldGameModule = null;
             foreach (ProcessModule processModule in palWorldProcess.Modules) {
                 if (!processModule.ModuleName.Contains("pal", StringComparison.OrdinalIgnoreCase)) {
                     continue;
+                }
+
+                if (processModule.ModuleName.Equals("Game-Palworld-Win64-Shipping.exe", StringComparison.OrdinalIgnoreCase)) {
+                    palWorldGameModule = processModule;
                 }
 
                 _logger.Info(@$"Symbol Name: {processModule.ModuleName}
@@ -25,6 +30,8 @@ Base Address: 0x{processModule.BaseAddress:X},
 Symbol Length: {processModule.ModuleMemorySize:X}
 File: {processModule.FileName}
 ");
+
+
             }
         }
     }

@@ -1,12 +1,9 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-using PalworldManagedModFramework;
 using PalworldManagedModFramework.DI;
 using PalworldManagedModFramework.Services;
+using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.Logging;
 
 namespace PalworldManagedModFramework {
@@ -16,18 +13,10 @@ namespace PalworldManagedModFramework {
             try {
                 AppDomainMonitor.MonitorDomain();
 
-                var assembly = Assembly.GetExecutingAssembly();
-                var clrDirectory = Path.GetDirectoryName(assembly.Location);
-                Console.WriteLine(clrDirectory);
-
-                var baseDir = AppContext.BaseDirectory;
-                Console.WriteLine(AppContext.BaseDirectory);
                 Console.WriteLine($"Loading .NET DI Service Container...");
 
-                Environment.CurrentDirectory = clrDirectory;
-
                 var hostBuilder = new HostBuilder()
-                .UseConsoleLifetime();
+                    .UseConsoleLifetime();
 
                 // Call startup functions to configure DI Container.
                 hostBuilder.ConfigureAppConfiguration(Startup.Configure);
@@ -42,12 +31,11 @@ namespace PalworldManagedModFramework {
 
                 loggerInstance.Info("DI Container Setup!");
 
-                var gameExplorer = host.
-                    Services.GetRequiredService<GameExplorer>();
+                var modLoader = host.Services.GetRequiredService<ModLoader>();
+                modLoader.LoadMods();
 
-                gameExplorer.Entry();
-
-                Console.ReadLine();
+                for (; ; )
+                    Console.ReadLine();
             }
             catch (Exception e) {
                 Console.WriteLine(e);

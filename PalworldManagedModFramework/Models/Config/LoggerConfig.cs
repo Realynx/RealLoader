@@ -5,6 +5,7 @@ namespace PalworldManagedModFramework.Models.Config {
         public LoggerConfig(IConfiguration configuration) {
             configuration.GetSection(nameof(LoggerConfig)).Bind(this);
         }
+
         public string LogFile { get; set; }
         public bool DebugLogs { get; set; }
         public bool WriteFile { get; set; }
