@@ -12,7 +12,7 @@ namespace PalworldManagedModFramework.DI {
 
         internal static void Configure(HostBuilderContext context, IConfigurationBuilder configurationBuilder) {
             configurationBuilder
-               .AddJsonFile("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Palworld\\Pal\\Binaries\\Win64\\ManagedModFramework\\AppSettings.json", true);
+               .AddJsonFile("AppSettings.json", false);
         }
 
         internal static void ConfigureServices(HostBuilderContext context, IServiceCollection services) {

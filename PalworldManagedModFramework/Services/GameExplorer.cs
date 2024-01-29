@@ -16,6 +16,10 @@ namespace PalworldManagedModFramework.Services {
 
             var palWorldProcess = Process.GetCurrentProcess();
             foreach (ProcessModule processModule in palWorldProcess.Modules) {
+                if (!processModule.ModuleName.Contains("pal", StringComparison.OrdinalIgnoreCase)) {
+                    continue;
+                }
+
                 _logger.Info(@$"Symbol Name: {processModule.ModuleName}
 Base Address: 0x{processModule.BaseAddress:X},
 Symbol Length: {processModule.ModuleMemorySize:X}

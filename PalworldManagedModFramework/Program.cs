@@ -16,12 +16,6 @@ namespace PalworldManagedModFramework {
             try {
                 AppDomainMonitor.MonitorDomain();
 
-                while (!Debugger.IsAttached) {
-                    Thread.Sleep(100);
-                }
-
-                Debugger.Break();
-
                 var assembly = Assembly.GetExecutingAssembly();
                 var clrDirectory = Path.GetDirectoryName(assembly.Location);
                 Console.WriteLine(clrDirectory);
@@ -51,7 +45,7 @@ namespace PalworldManagedModFramework {
                 var gameExplorer = host.
                     Services.GetRequiredService<GameExplorer>();
 
-                //gameExplorer.Entry();
+                gameExplorer.Entry();
 
                 Console.ReadLine();
             }
