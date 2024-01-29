@@ -1,5 +1,7 @@
+#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+// Windows Header Files
+#include <windows.h>
 
-#include <Windows.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -14,73 +16,61 @@
 
 #include "CLR.hpp"
 
-static inline void CLRRun(CLR::CLRHost* host, const std::basic_string<char_t>& app_path)
+//defines a struct for passing parameters
+struct CLRHostRun_Params
 {
-	std::this_thread::sleep_for(std::chrono::seconds(2));
-
-	// Load .NET Core
-	std::vector<const char_t*> args{ app_path.c_str() };
-	int rc = host->init_for_cmd_line_fptr(args.size(), args.data(), nullptr, &host->cxt);
-
-	//run the CLR
-	host->run_app_fptr(host->cxt);
-
-	//clean up CLR when done
-	host->close_fptr(host->cxt);
-}
+	CLR::CLRHost* host = nullptr;
+	std::basic_string<char_t> app_path;
+};
 
 //the main bulk of code for the actually running of DLLs and such
-int run_app_example(CLR::CLRHost* host, const std::basic_string<char_t>& root_path)
+int LoadCLRHost(CLRHostRun_Params* params)
 {
-	const std::basic_string<char_t> app_path = root_path + STR("ManagedModFramework\\PalworldManagedModFramework.dll");
+	//const std::basic_string<char_t> app_path = root_path + STR("ManagedModFramework\\PalworldManagedModFramework.dll");
 
 	//init the function pointers
-	if (!host->Init(app_path.c_str()))
+	auto configPath = STR("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Palworld\\Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.runtimeconfig.json");
+	if (!params->host->Init(configPath))
 	{
-		assert(false && "Failure: load_hostfxr()");
-		return EXIT_FAILURE;
+		std::cout << "Failed To Init ^2" << std::endl;
+		return 1;
 	}
 
-	// Load .NET Core
-	//std::vector<const char_t*> args{ app_path.c_str() };
-	//int rc = host->init_for_cmd_line_fptr(args.size(), args.data(), nullptr, &host->cxt);
-	//if (rc != 0 || host->cxt == nullptr)
-	//{
-	//	std::cerr << "Init failed: " << std::hex << std::showbase << rc << std::endl;
-	//	host->close_fptr(host->cxt);
-	//	return EXIT_FAILURE;
-	//}
+	std::cout << "Init ClrHost Done" << std::endl;
 
-	// Create and start the thread
-	std::thread clrThread(CLRRun, host, app_path);
+	params->host->StartAssembly(params->app_path.c_str());
+	std::cout << "After Start Assembly" << std::endl;
 
-	clrThread.detach();
-
-	//host->run_app_fptr(host->cxt);
-
-
-	return EXIT_SUCCESS;
+	return 0;
 }
 
-__declspec(dllexport) void LoadCLRHost()
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  reason, LPVOID lpReserved)
 {
-	// Get the current executable's directory
-	// This sample assumes the managed assembly to load and its runtime configuration file are next to the host
-//	char_t host_path[MAX_PATH];
-//#if Window_Build
-//	auto size = ::GetFullPathNameW(argv[0], sizeof(host_path) / sizeof(char_t), host_path, nullptr);
-//	assert(size != 0);
-//#else
-//	auto resolved = realpath("ManagedModFramework\\", host_path);
-//	assert(resolved != nullptr);
-//#endif
-
-	//load the DLL into the CLR Host
 	CLR::CLRHost host;
-	std::basic_string<char_t> root_path = L"ManagedModFramework\\PalworldManagedModFramework.dll";
-	auto pos = root_path.find_last_of(DIR_SEPARATOR);
-	assert(pos != std::basic_string<char_t>::npos);
-	root_path = root_path.substr(0, pos + 1);
+	CLRHostRun_Params runParams;
+	runParams.host = &host;
+	runParams.app_path = L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Palworld\\Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.dll";
 
-	run_app_example(&host, root_path);
+	switch (reason)
+	{
+	case DLL_PROCESS_ATTACH:
+		AllocConsole();
+		freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+		std::cout << "Injected" << std::endl;
+
+		LoadCLRHost(&runParams);
+
+		break;
+
+	case DLL_THREAD_ATTACH:
+		break;
+	case DLL_THREAD_DETACH:
+		break;
+
+	case DLL_PROCESS_DETACH:
+		FreeConsole();
+		break;
+	}
+
+	return TRUE;
 }

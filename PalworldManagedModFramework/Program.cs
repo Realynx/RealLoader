@@ -1,15 +1,24 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using PalworldManagedModFramework;
 using PalworldManagedModFramework.DI;
 using PalworldManagedModFramework.Services;
 using PalworldManagedModFramework.Services.Logging;
 
+public static class UnmanagedInterface {
+    public delegate void VoidDelegateSignature();
+    public static void UnmanagedEntrypoint() {
+        Program.EntryPoint();
+    }
+}
+
 namespace PalworldManagedModFramework {
     public static class Program {
-        public static void Main(string[] args) {
+        public static void EntryPoint() {
+            File.WriteAllText(@"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Binaries\Win64\noticeFile.txt", "uwu");
+
             Console.WriteLine($"Loading .NET DI Service Container...");
-            Thread.Sleep(TimeSpan.FromSeconds(4));
 
             var hostBuilder = new HostBuilder()
             .UseConsoleLifetime();
