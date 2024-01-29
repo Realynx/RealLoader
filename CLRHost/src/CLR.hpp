@@ -117,16 +117,6 @@ namespace CLR
 
 			hostfxr_set_runtime_propery = (hostfxr_set_runtime_property_value_fn)Util::get_export(lib, "hostfxr_set_runtime_property_value");
 
-			//calculate and set up the base directory for the app context
-			std::string baseAppContextDir = std::string(CStringA(config_Path).GetString());
-			auto pos = baseAppContextDir.find_last_of(DIR_SEPARATOR);
-			//assert(pos != string_t::npos);
-			baseAppContextDir = baseAppContextDir.substr(0, pos + 1);
-
-			std::cout << "Setting Property \"APP_CONTEXT_BASE_DIRECTORY\" to: \"" << baseAppContextDir << "\"\n";
-			CA2W s(baseAppContextDir.c_str());
-			std::wstring ws = s.m_psz;
-			hostfxr_set_runtime_propery(cxt, L"APP_CONTEXT_BASE_DIRECTORY", ws.c_str());
 
 			//initalizes the config
 			auto runtimeConfig = std::string(CStringA(config_Path).GetString());
@@ -138,8 +128,23 @@ namespace CLR
 				return false;
 			}
 
+			SetAppContextBase(config_Path);
 
-			return (init_for_config_fptr && hostfxr_get_runtime_delegate); 
+			return (init_for_config_fptr && hostfxr_get_runtime_delegate);
+		}
+
+		void SetAppContextBase(const char_t* config_Path)
+		{
+			//calculate and set up the base directory for the app context
+			std::string baseAppContextDir = std::string(CStringA(config_Path).GetString());
+			auto pos = baseAppContextDir.find_last_of(DIR_SEPARATOR);
+			//assert(pos != string_t::npos);
+			baseAppContextDir = baseAppContextDir.substr(0, pos + 1);
+
+			std::cout << "Setting Property \"APP_CONTEXT_BASE_DIRECTORY\" to: \"" << baseAppContextDir << "\"\n";
+			CA2W s(baseAppContextDir.c_str());
+			std::wstring ws = s.m_psz;
+			hostfxr_set_runtime_propery(cxt, L"APP_CONTEXT_BASE_DIRECTORY", ws.c_str());
 		}
 
 		typedef int (*GetManagedFunctionPointer)(const char_t*, const char_t*, const char_t*, void*, void*, void**);

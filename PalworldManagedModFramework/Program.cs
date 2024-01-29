@@ -26,8 +26,6 @@ namespace PalworldManagedModFramework {
                 var clrDirectory = Path.GetDirectoryName(assembly.Location);
                 Console.WriteLine(clrDirectory);
 
-                Environment.SetEnvironmentVariable("APP_CONTEXT_BASE_DIRECTORY", clrDirectory);
-
                 var baseDir = AppContext.BaseDirectory;
                 Console.WriteLine(AppContext.BaseDirectory);
                 Console.WriteLine($"Loading .NET DI Service Container...");
