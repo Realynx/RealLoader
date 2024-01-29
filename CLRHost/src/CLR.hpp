@@ -1,59 +1,39 @@
 #pragma once
 
 //defines a CLR Host for initalizing C# code and executing it
-#pragma warning(push)
-#pragma warning(disable: 4995)
-#include <AtlBase.h>
-#include <atlconv.h>
-#pragma warning(pop)
 
+//include a stripped windows.h
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
+//assert and output
 #include <assert.h>
 #include <iostream>
 
+//Host CLR
 #include <nethost.h>
 #include <coreclr_delegates.h>
 #include <hostfxr.h>
-#include <locale>
-#include <codecvt>
-#include <AtlBase.h>
-#include <atlconv.h>
 
-//#ifdef Window_Build
-#include <Windows.h>
+//custom string for thick and C char arrays
+#include <String.hpp>
 
-#define STR(s) L ## s
-#define CH(c) L ## c
-#define DIR_SEPARATOR L'\\'
-
-#define string_compare wcscmp
-
-//#else
-//#include <dlfcn.h>
-//#include <limits.h>
-//
-//#define STR(s) s
-//#define CH(c) c
-//#define DIR_SEPARATOR '/'
-//#define MAX_PATH PATH_MAX
-//
-//#define string_compare strcmp
-
-//#endif
-
- //------------------------------------Function used to load and activate .NET Core-------------------------//
+//-------------------------UTILS FOR LOADING LIBRARIES AT RUNTIME FROM DLLS-------------------------------//
 
 namespace CLR::Util
 {
-
 	//#ifdef Window_Build
-	void* load_library(const char_t* path)
+	
+	//loads a library
+	void* LoadDLLibrary(const char_t* path)
 	{
 		HMODULE h = ::LoadLibraryW(path);
 		assert(h != nullptr);
 		return (void*)h;
 	}
-	void* get_export(void* h, const char* name)
+
+	//gets a exported DLL function
+	void* GetDLLExportedFunction(void* h, const char* name)
 	{
 		void* f = ::GetProcAddress((HMODULE)h, name);
 		assert(f != nullptr);
@@ -82,85 +62,109 @@ namespace CLR
 	//defines a CLR Host
 	struct CLRHost
 	{
-		// Globals to hold hostfxr exports
-		/*hostfxr_initialize_for_dotnet_command_line_fn init_for_cmd_line_fptr;*/
-		hostfxr_handle cxt = nullptr;
+		hostfxr_handle cxt = nullptr; //the context for the CLR Host
 
-		hostfxr_initialize_for_runtime_config_fn init_for_config_fptr;
-		hostfxr_get_runtime_delegate_fn hostfxr_get_runtime_delegate;
+		//the function pointer handles
+		hostfxr_initialize_for_runtime_config_fn hostfxr_funcPtr_initConfig; //initalizes the runtime and it's config data
+		
+		hostfxr_set_runtime_property_value_fn hostfxr_funcPtr_SetRuntimePropery; //sets the runtime property
+		hostfxr_get_runtime_delegate_fn hostfxr_funcPtr_GetRuntimeDelegate; //gets a function from managed C# land
 
-		hostfxr_set_runtime_property_value_fn hostfxr_set_runtime_propery;
+		hostfxr_close_fn hostfxr_funcPtr_Close; //closes the CLR, we don't use it as far as this comment knows (dated 01-29-24)
 
-		hostfxr_run_app_fn run_app_fptr;
-		hostfxr_close_fn close_fptr;
+	public:
 
 		//inits the CLR Host
 		inline bool Init(const char_t* config_Path)
 		{
+			//gets the hostfxr path automatically
 			get_hostfxr_parameters params{ sizeof(get_hostfxr_parameters), nullptr, nullptr };
-			// Pre-allocate a large buffer for the path to hostfxr
 			char_t buffer[MAX_PATH];
 			size_t buffer_size = sizeof(buffer) / sizeof(char_t);
-
-			int rc = get_hostfxr_path(buffer, &buffer_size, &params);
-			if (rc != 0)
+			if (get_hostfxr_path(buffer, &buffer_size, &params) != 0)
+			{
+				std::cout << "Failed to find HostFXR on your system! Please make sure you have the Dot Net SDK or Runtime installed. Thank you.\n";
 				return false;
+			}
 
-			// Load hostfxr and get desired exports
-			void* lib = Util::load_library(buffer);
+			//loads hostfxr
+			void* hostfxr_lib = Util::LoadDLLibrary(buffer);
 
-			init_for_config_fptr = (hostfxr_initialize_for_runtime_config_fn)Util::get_export(lib, "hostfxr_initialize_for_runtime_config");
-			hostfxr_get_runtime_delegate = (hostfxr_get_runtime_delegate_fn)Util::get_export(lib, "hostfxr_get_runtime_delegate");
+			//gets the desired functions from the Hostfxr DLL
+			hostfxr_funcPtr_SetRuntimePropery = (hostfxr_set_runtime_property_value_fn)Util::GetDLLExportedFunction(hostfxr_lib, "hostfxr_set_runtime_property_value");
 
-			run_app_fptr = (hostfxr_run_app_fn)Util::get_export(lib, "hostfxr_run_app");
-			close_fptr = (hostfxr_close_fn)Util::get_export(lib, "hostfxr_close");
+			hostfxr_funcPtr_initConfig = (hostfxr_initialize_for_runtime_config_fn)Util::GetDLLExportedFunction(hostfxr_lib, "hostfxr_initialize_for_runtime_config");
+			hostfxr_funcPtr_GetRuntimeDelegate = (hostfxr_get_runtime_delegate_fn)Util::GetDLLExportedFunction(hostfxr_lib, "hostfxr_get_runtime_delegate");
 
-			hostfxr_set_runtime_propery = (hostfxr_set_runtime_property_value_fn)Util::get_export(lib, "hostfxr_set_runtime_property_value");
-
+			hostfxr_funcPtr_Close = (hostfxr_close_fn)Util::GetDLLExportedFunction(hostfxr_lib, "hostfxr_close");
 
 			//initalizes the config
 			auto runtimeConfig = std::string(CStringA(config_Path).GetString());
 			std::cout << "Using config: " << runtimeConfig << std::endl;
-			rc = init_for_config_fptr(config_Path, nullptr, &cxt);
-			if (rc != 0 || cxt == nullptr)
+			int rc = hostfxr_funcPtr_initConfig(config_Path, nullptr, &cxt);
+			if (cxt == nullptr || rc != 0)
 			{
 				std::cerr << "Init failed: " << std::hex << std::showbase << rc << std::endl;
 				return false;
 			}
 
+			//sets the app base config
 			SetAppContextBase(config_Path);
 
-			return (init_for_config_fptr && hostfxr_get_runtime_delegate);
+			return (hostfxr_funcPtr_SetRuntimePropery && hostfxr_funcPtr_initConfig && hostfxr_funcPtr_GetRuntimeDelegate && hostfxr_funcPtr_Close);
 		}
 
-		void SetAppContextBase(const char_t* config_Path)
+		//sets a property in the CLR
+		inline void SetCLRProperty(const wchar_t* propertyStr, const wchar_t* newValue, bool ignoreLogging = false)
+		{
+			if (!hostfxr_funcPtr_SetRuntimePropery)
+			{
+				if (!ignoreLogging)
+					std::cout << "Pal World Modding Framework Error: CLR || Func: \"SetCLRProperty\" || Failed to set \"" << propertyStr << "\" to Value \"" << newValue << "\" due to hostfxr_funcPtr_SetRuntimePropery being NULL. Please check that HostFXR hasen't failed at being found on your system. And any other previous CLR initalize states are running as expected.\n";
+
+				return;
+			}
+
+			std::cout << "OwO Property Setting: \"" << PalMM::Util::ConvertThickStringToCString(propertyStr) << "\" || \"" << PalMM::Util::ConvertThickStringToCString(newValue) << "\"\n";
+			hostfxr_funcPtr_SetRuntimePropery(cxt, propertyStr, newValue);
+		}
+
+		//sets a property in the CLR
+		inline void SetCLRProperty(const char* propertyStr, const char* newValue, bool ignoreLogging = false)
+		{
+			SetCLRProperty(PalMM::Util::ConvertCStringToThickString(propertyStr).c_str(), PalMM::Util::ConvertCStringToThickString(newValue).c_str(), ignoreLogging);
+		}
+
+		//sets the base app context || takes in a file to the config path, we strip out the file name and just use the directory
+		inline void SetAppContextBase(const char_t* configPath)
 		{
 			//calculate and set up the base directory for the app context
-			std::string baseAppContextDir = std::string(CStringA(config_Path).GetString());
-			auto pos = baseAppContextDir.find_last_of(DIR_SEPARATOR);
-			//assert(pos != string_t::npos);
+			std::string baseAppContextDir = PalMM::Util::ConvertThickStringToCString(configPath);
+			auto pos = baseAppContextDir.find_last_of("\\");
 			baseAppContextDir = baseAppContextDir.substr(0, pos + 1);
 
-			std::cout << "Setting Property \"APP_CONTEXT_BASE_DIRECTORY\" to: \"" << baseAppContextDir << "\"\n";
-			CA2W s(baseAppContextDir.c_str());
-			std::wstring ws = s.m_psz;
-			hostfxr_set_runtime_propery(cxt, L"APP_CONTEXT_BASE_DIRECTORY", ws.c_str());
+			SetCLRProperty("APP_CONTEXT_BASE_DIRECTORY", baseAppContextDir.c_str());
 		}
 
-		typedef int (*GetManagedFunctionPointer)(const char_t*, const char_t*, const char_t*, void*, void*, void**);
-		typedef int (*LoadAssembly)(const char_t*, void*, void*);
-		typedef void(*ManagedEntrypoint)();
+		//function pointer types for handling DLLs and their managed code
+		typedef int (*LoadAssembly)(const char_t*, void*, void*); //loads a DLL
+		typedef int (*GetManagedFunctionPointer)(const char_t*, const char_t*, const char_t*, void*, void*, void**); //gets a function from C# land
+		typedef void(*ManagedEntrypoint)(); //calls a C# function
 
-		void StartAssembly(const char_t* assemblyPath) {
-			if (!hostfxr_get_runtime_delegate) {
+		//loads a assembly and calls it's entry point
+		inline void StartAssembly(const char_t* assemblyPath) {
+			
+			//can't do anything if the function from Hostfxr for loading C# functions isn't found
+			if (!hostfxr_funcPtr_GetRuntimeDelegate) {
 				std::cout << "hostfxr_get_runtime_delegate was null" << std::endl;
 				return;
 			}
 
-			std::cout << "Top Start Assembly" << std::endl;
+			std::cout << "Initalizing...starting the process of loading a Assembly" << std::endl;
 
+			//loads a Assembly
 			LoadAssembly loadAssembly = nullptr;
-			hostfxr_get_runtime_delegate(cxt, hdt_load_assembly, (void**)&loadAssembly);
+			hostfxr_funcPtr_GetRuntimeDelegate(cxt, hdt_load_assembly, (void**)&loadAssembly);
 			if (!loadAssembly) {
 				std::cout << "Load Assembly not found" << std::endl;
 
@@ -170,8 +174,9 @@ namespace CLR
 			}
 			std::cout << "Load Assembly found" << std::endl;
 
+			//gets the C# function
 			GetManagedFunctionPointer getManagedFunctionPtr = nullptr;
-			hostfxr_get_runtime_delegate(cxt, hdt_get_function_pointer, (void**)&getManagedFunctionPtr);
+			hostfxr_funcPtr_GetRuntimeDelegate(cxt, hdt_get_function_pointer, (void**)&getManagedFunctionPtr);
 			if (!getManagedFunctionPtr) {
 				std::cout << "managedEntryPoint not found" << std::endl;
 
@@ -180,16 +185,11 @@ namespace CLR
 				return;
 			}
 			std::cout << "managedEntryPoint found" << std::endl;
-
-
-			std::cout << "Calling loadAssembly" << std::endl;
 			loadAssembly(assemblyPath, NULL, NULL);
-			std::cout << "Called loadAssembly" << std::endl;
 
+			//calls the C# function
 			ManagedEntrypoint managedEntrypoint = nullptr;
-			std::cout << "Calling managedEntryPoint" << std::endl;
 			getManagedFunctionPtr(STR("PalworldManagedModFramework.Program, PalworldManagedModFramework"), STR("EntryPoint"), STR("PalworldManagedModFramework.Program+VoidDelegateSignature, PalworldManagedModFramework"), NULL, NULL, (void**)&managedEntrypoint);
-			std::cout << "Called managedEntryPoint" << std::endl;
 
 			if (!managedEntrypoint) {
 				std::cout << "UnmanagedEntrypoint EntryPoint was NULL :'(" << std::endl;
@@ -198,13 +198,9 @@ namespace CLR
 				std::cout << rc << std::endl;
 				return;
 			}
-			std::cout << "UnmanagedEntrypoint EntryPoint was FOUND!!!" << std::endl;
-
-			std::cout << "Calling C# Code: 0x" << std::hex << (int)managedEntrypoint << std::endl;
 			managedEntrypoint();
-			std::cout << "Called" << std::endl;
 
-			close_fptr(cxt);
+			hostfxr_funcPtr_Close(cxt); //closes the CLR
 		}
 	};
 }

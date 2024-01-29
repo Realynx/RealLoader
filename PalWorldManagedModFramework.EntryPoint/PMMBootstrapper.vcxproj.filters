@@ -16,4 +16,7 @@
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\Cpp\String.hpp" />
+  </ItemGroup>
 </Project>

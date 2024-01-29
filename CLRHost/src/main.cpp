@@ -1,72 +1,44 @@
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
-// Windows Header Files
-#include <windows.h>
-
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream>
-#include <vector>
-#include <filesystem>
-#include "atlbase.h"
-#include "atlstr.h"
-#include "comutil.h"
-#include <thread>
+/*
+DLL entry point for running C#
+*/
 
 #include "CLR.hpp"
 
-//defines a struct for passing parameters
-struct CLRHostRun_Params
-{
-	CLR::CLRHost* host = nullptr;
-	std::basic_string<char_t> app_path;
-};
+#include <thread>
 
-//the main bulk of code for the actually running of DLLs and such
-int LoadCLRHost(CLRHostRun_Params* params)
-{
-	//const std::basic_string<char_t> app_path = root_path + STR("ManagedModFramework\\PalworldManagedModFramework.dll");
-
-	//init the function pointers
-	auto configPath = STR("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Palworld\\Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.runtimeconfig.json");
-	if (!params->host->Init(configPath))
-	{
-		std::cout << "Failed To Init ^2" << std::endl;
-		return 1;
-	}
-
-	std::cout << "Init ClrHost Done" << std::endl;
-
-	params->host->StartAssembly(params->app_path.c_str());
-	std::cout << "After Start Assembly" << std::endl;
-
-	return 0;
-}
-
-//runs the CLR
+//runs the CLR thread and DLL
 void RUNCLR()
 {
-	CLR::CLRHost host;
-	CLRHostRun_Params runParams;
-	runParams.host = &host;
-	runParams.app_path = L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Palworld\\Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.dll";
+	CLR::CLRHost host;;
+	std::basic_string<char_t> app_path = L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Palworld\\Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.dll";
 
-	LoadCLRHost(&runParams);
+	//init the CLR
+	auto configPath = STR("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Palworld\\Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.runtimeconfig.json");
+	if (!host.Init(configPath))
+	{
+		std::cout << "Failed To Init ^2\n";
+		return;
+	}
+	std::cout << "Finished Initalizing CLR\n";
+
+	//starts the main Assembly
+	host.StartAssembly(app_path.c_str());
 }
 
 void SpawnClrThread() {
+
+	//inits console
 	AllocConsole();
 	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
-	std::cout << "Injected" << std::endl;
 
+	//starts thread and detachtes it
 	std::thread worker(RUNCLR);
 	worker.detach();
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  reason, LPVOID lpReserved)
 {
-
+	//checks the state of the DLL
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH:
@@ -82,7 +54,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  reason, LPVOID lpReserved)
 		FreeConsole();
 		break;
 	}
-
 
 	return TRUE;
 }
