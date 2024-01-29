@@ -44,33 +44,43 @@ int LoadCLRHost(CLRHostRun_Params* params)
 	return 0;
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD  reason, LPVOID lpReserved)
+//runs the CLR
+void RUNCLR()
 {
 	CLR::CLRHost host;
 	CLRHostRun_Params runParams;
 	runParams.host = &host;
 	runParams.app_path = L"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Palworld\\Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.dll";
 
-	switch (reason)
+	LoadCLRHost(&runParams);
+}
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  reason, LPVOID lpReserved)
+{
+	
+	//switch (reason)
+	//{
+	if (reason == DLL_PROCESS_ATTACH)
 	{
-	case DLL_PROCESS_ATTACH:
 		AllocConsole();
 		freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 		std::cout << "Injected" << std::endl;
 
-		LoadCLRHost(&runParams);
+		std::thread worker(RUNCLR);
+		worker.detach();
 
-		break;
-
-	case DLL_THREAD_ATTACH:
-		break;
-	case DLL_THREAD_DETACH:
-		break;
-
-	case DLL_PROCESS_DETACH:
-		FreeConsole();
-		break;
 	}
+
+	//case DLL_THREAD_ATTACH:
+	//	break;
+	//case DLL_THREAD_DETACH:
+	//	break;
+
+	else if (reason == DLL_PROCESS_DETACH)
+	{
+		FreeConsole();
+	}
+	//}
 
 	return TRUE;
 }
