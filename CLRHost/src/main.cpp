@@ -55,32 +55,34 @@ void RUNCLR()
 	LoadCLRHost(&runParams);
 }
 
+void SpawnClrThread() {
+	AllocConsole();
+	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+	std::cout << "Injected" << std::endl;
+
+	std::thread worker(RUNCLR);
+	worker.detach();
+}
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  reason, LPVOID lpReserved)
 {
-	
-	//switch (reason)
-	//{
-	if (reason == DLL_PROCESS_ATTACH)
+
+	switch (reason)
 	{
-		AllocConsole();
-		freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
-		std::cout << "Injected" << std::endl;
+	case DLL_PROCESS_ATTACH:
+		SpawnClrThread();
+		break;
 
-		std::thread worker(RUNCLR);
-		worker.detach();
+	case DLL_THREAD_ATTACH:
+		break;
+	case DLL_THREAD_DETACH:
+		break;
 
-	}
-
-	//case DLL_THREAD_ATTACH:
-	//	break;
-	//case DLL_THREAD_DETACH:
-	//	break;
-
-	else if (reason == DLL_PROCESS_DETACH)
-	{
+	case DLL_PROCESS_DETACH:
 		FreeConsole();
+		break;
 	}
-	//}
+
 
 	return TRUE;
 }

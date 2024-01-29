@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Diagnostics;
+using System.Reflection;
+
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework;
@@ -6,42 +9,57 @@ using PalworldManagedModFramework.DI;
 using PalworldManagedModFramework.Services;
 using PalworldManagedModFramework.Services.Logging;
 
-public static class UnmanagedInterface {
-    public delegate void VoidDelegateSignature();
-    public static void UnmanagedEntrypoint() {
-        Program.EntryPoint();
-    }
-}
-
 namespace PalworldManagedModFramework {
     public static class Program {
+        public delegate void VoidDelegateSignature();
         public static void EntryPoint() {
-            File.WriteAllText(@"C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Binaries\Win64\noticeFile.txt", "uwu");
+            try {
+                AppDomainMonitor.MonitorDomain();
 
-            Console.WriteLine($"Loading .NET DI Service Container...");
+                while (!Debugger.IsAttached) {
+                    Thread.Sleep(100);
+                }
 
-            var hostBuilder = new HostBuilder()
-            .UseConsoleLifetime();
+                Debugger.Break();
 
-            // Call startup functions to configure DI Container.
-            hostBuilder.ConfigureAppConfiguration(Startup.Configure);
-            hostBuilder.ConfigureAppConfiguration((_, config) => Startup.Configuration = config.Build());
-            hostBuilder.ConfigureServices(Startup.ConfigureServices);
+                var assembly = Assembly.GetExecutingAssembly();
+                var clrDirectory = Path.GetDirectoryName(assembly.Location);
+                Console.WriteLine(clrDirectory);
 
-            var host = hostBuilder
-                .Build();
+                Environment.SetEnvironmentVariable("APP_CONTEXT_BASE_DIRECTORY", clrDirectory);
 
-            var loggerInstance = host.
-                Services.GetRequiredService<ILogger>();
+                var baseDir = AppContext.BaseDirectory;
+                Console.WriteLine(AppContext.BaseDirectory);
+                Console.WriteLine($"Loading .NET DI Service Container...");
 
-            loggerInstance.Info("DI Container Setup!");
+                Environment.CurrentDirectory = clrDirectory;
 
-            var gameExplorer = host.
-                Services.GetRequiredService<GameExplorer>();
+                var hostBuilder = new HostBuilder()
+                .UseConsoleLifetime();
 
-            gameExplorer.Entry();
+                // Call startup functions to configure DI Container.
+                hostBuilder.ConfigureAppConfiguration(Startup.Configure);
+                hostBuilder.ConfigureAppConfiguration((_, config) => Startup.Configuration = config.Build());
+                hostBuilder.ConfigureServices(Startup.ConfigureServices);
 
-            Console.ReadLine();
+                var host = hostBuilder
+                    .Build();
+
+                var loggerInstance = host.
+                    Services.GetRequiredService<ILogger>();
+
+                loggerInstance.Info("DI Container Setup!");
+
+                var gameExplorer = host.
+                    Services.GetRequiredService<GameExplorer>();
+
+                //gameExplorer.Entry();
+
+                Console.ReadLine();
+            }
+            catch (Exception e) {
+                Console.WriteLine(e);
+            }
         }
     }
 }

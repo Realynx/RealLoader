@@ -9,6 +9,7 @@
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
 	<ItemGroup>

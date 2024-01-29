@@ -158,7 +158,7 @@ namespace CLR
 
 			ManagedEntrypoint managedEntrypoint = nullptr;
 			std::cout << "Calling managedEntryPoint" << std::endl;
-			getManagedFunctionPtr(STR("UnmanagedInterface, PalworldManagedModFramework"), STR("UnmanagedEntrypoint"), STR("UnmanagedInterface+VoidDelegateSignature, PalworldManagedModFramework"), NULL, NULL, (void**)&managedEntrypoint);
+			getManagedFunctionPtr(STR("PalworldManagedModFramework.Program, PalworldManagedModFramework"), STR("EntryPoint"), STR("PalworldManagedModFramework.Program+VoidDelegateSignature, PalworldManagedModFramework"), NULL, NULL, (void**)&managedEntrypoint);
 			std::cout << "Called managedEntryPoint" << std::endl;
 
 			if (!managedEntrypoint) {
@@ -170,7 +170,7 @@ namespace CLR
 			}
 			std::cout << "UnmanagedEntrypoint EntryPoint was FOUND!!!" << std::endl;
 
-			std::cout << "Calling C#" << std::hex << (int)managedEntrypoint << std::endl;
+			std::cout << "Calling C# Code: 0x" << std::hex << (int)managedEntrypoint << std::endl;
 			managedEntrypoint();
 			std::cout << "Called" << std::endl;
 
