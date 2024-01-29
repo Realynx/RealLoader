@@ -1,6 +1,12 @@
 #pragma once
 
 //defines a CLR Host for initalizing C# code and executing it
+#pragma warning(push)
+#pragma warning(disable: 4995)
+#include <AtlBase.h>
+#include <atlconv.h>
+#pragma warning(pop)
+
 
 #include <assert.h>
 #include <iostream>
@@ -8,6 +14,10 @@
 #include <nethost.h>
 #include <coreclr_delegates.h>
 #include <hostfxr.h>
+#include <locale>
+#include <codecvt>
+#include <AtlBase.h>
+#include <atlconv.h>
 
 //#ifdef Window_Build
 #include <Windows.h>
@@ -79,6 +89,8 @@ namespace CLR
 		hostfxr_initialize_for_runtime_config_fn init_for_config_fptr;
 		hostfxr_get_runtime_delegate_fn hostfxr_get_runtime_delegate;
 
+		hostfxr_set_runtime_property_value_fn hostfxr_set_runtime_propery;
+
 		hostfxr_run_app_fn run_app_fptr;
 		hostfxr_close_fn close_fptr;
 
@@ -103,6 +115,20 @@ namespace CLR
 			run_app_fptr = (hostfxr_run_app_fn)Util::get_export(lib, "hostfxr_run_app");
 			close_fptr = (hostfxr_close_fn)Util::get_export(lib, "hostfxr_close");
 
+			hostfxr_set_runtime_propery = (hostfxr_set_runtime_property_value_fn)Util::get_export(lib, "hostfxr_set_runtime_property_value");
+
+			//calculate and set up the base directory for the app context
+			std::string baseAppContextDir = std::string(CStringA(config_Path).GetString());
+			auto pos = baseAppContextDir.find_last_of(DIR_SEPARATOR);
+			//assert(pos != string_t::npos);
+			baseAppContextDir = baseAppContextDir.substr(0, pos + 1);
+
+			std::cout << "Setting Property \"APP_CONTEXT_BASE_DIRECTORY\" to: \"" << baseAppContextDir << "\"\n";
+			CA2W s(baseAppContextDir.c_str());
+			std::wstring ws = s.m_psz;
+			hostfxr_set_runtime_propery(cxt, L"APP_CONTEXT_BASE_DIRECTORY", ws.c_str());
+
+			//initalizes the config
 			auto runtimeConfig = std::string(CStringA(config_Path).GetString());
 			std::cout << "Using config: " << runtimeConfig << std::endl;
 			rc = init_for_config_fptr(config_Path, nullptr, &cxt);
@@ -113,7 +139,7 @@ namespace CLR
 			}
 
 
-			return (init_for_config_fptr && hostfxr_get_runtime_delegate);
+			return (init_for_config_fptr && hostfxr_get_runtime_delegate); 
 		}
 
 		typedef int (*GetManagedFunctionPointer)(const char_t*, const char_t*, const char_t*, void*, void*, void**);
@@ -138,7 +164,6 @@ namespace CLR
 				return;
 			}
 			std::cout << "Load Assembly found" << std::endl;
-
 
 			GetManagedFunctionPointer getManagedFunctionPtr = nullptr;
 			hostfxr_get_runtime_delegate(cxt, hdt_get_function_pointer, (void**)&getManagedFunctionPtr);
