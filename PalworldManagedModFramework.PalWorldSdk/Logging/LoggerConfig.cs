@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace PalworldManagedModFramework.Models.Config {
-    internal class LoggerConfig {
+namespace PalworldManagedModFramework.PalWorldSdk.Logging {
+    public class LoggerConfig {
         public LoggerConfig(IConfiguration configuration) {
             configuration.GetSection(nameof(LoggerConfig)).Bind(this);
         }

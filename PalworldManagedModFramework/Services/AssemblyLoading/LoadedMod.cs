@@ -1,9 +1,6 @@
-﻿
-using System.Threading;
-
-using PalworldManagedModFramework.Models;
+﻿using PalworldManagedModFramework.Models;
 using PalworldManagedModFramework.PalWorldSdk.Interfaces;
-using PalworldManagedModFramework.Services.Logging;
+using PalworldManagedModFramework.PalWorldSdk.Logging;
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading {
     public class LoadedMod {
@@ -47,7 +44,8 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
                 return;
             }
 
-            (_entryPointInstance as IPalworldMod).Load(CancelTokenSource.Token);
+            (_entryPointInstance as IPalworldMod).Load(CancelTokenSource.Token, _logger);
+            _logger.Debug($"[{_clrMod.PalworldModAttribute.ModName}] has relinquished thread execution. Holding until unload event.");
 
             while (!CancelTokenSource.Token.IsCancellationRequested) {
                 Thread.Sleep(500);

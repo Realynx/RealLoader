@@ -1,10 +1,7 @@
-﻿
-using System.Reflection;
-
-using PalworldManagedModFramework.Models.Config;
+﻿using PalworldManagedModFramework.Models.Config;
 using PalworldManagedModFramework.PalWorldSdk.Interfaces;
+using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
-using PalworldManagedModFramework.Services.Logging;
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading {
     public class ModLoader : IModLoader {
@@ -25,7 +22,7 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
             }
 
             _logger.Info("Loading mods");
-            var validMods = _assemblyDiscovery.DiscoverValidModAssembies();
+            var validMods = _assemblyDiscovery.DiscoverValidModAsselblies();
             foreach (var mod in validMods) {
                 if (_modLoaderConfig.EnableModWhiteList && !_modLoaderConfig.ModWhiteList.Contains(mod.PalworldModAttribute.ModName)) {
                     continue;

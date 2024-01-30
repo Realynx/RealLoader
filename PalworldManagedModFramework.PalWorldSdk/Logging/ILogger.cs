@@ -2,7 +2,7 @@
 
 using Microsoft.Extensions.Configuration;
 
-namespace PalworldManagedModFramework.Services.Logging {
+namespace PalworldManagedModFramework.PalWorldSdk.Logging {
     public interface ILogger {
         LogLevel Level { get; set; }
 

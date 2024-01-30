@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.DI;
-using PalworldManagedModFramework.Services;
+using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading;
-using PalworldManagedModFramework.Services.Logging;
+using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 
 namespace PalworldManagedModFramework {
     public static class Program {
@@ -31,7 +31,7 @@ namespace PalworldManagedModFramework {
 
                 loggerInstance.Info("DI Container Setup!");
 
-                var modLoader = host.Services.GetRequiredService<ModLoader>();
+                var modLoader = host.Services.GetRequiredService<IModLoader>();
                 modLoader.LoadMods();
 
                 for (; ; )

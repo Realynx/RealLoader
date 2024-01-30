@@ -1,13 +1,11 @@
-﻿using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
 using PalworldManagedModFramework.Models;
 using PalworldManagedModFramework.Models.Config;
 using PalworldManagedModFramework.PalWorldSdk.Attributes;
+using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
-using PalworldManagedModFramework.Services.Logging;
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading {
     public class AssemblyDiscovery : IAssemblyDiscovery {
@@ -19,7 +17,7 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
             _modLoaderConfig = modLoaderConfig;
         }
 
-        public IEnumerable<ClrMod> DiscoverValidModAssembies() {
+        public IEnumerable<ClrMod> DiscoverValidModAsselblies() {
             var modFolderPath = Path.GetFullPath(_modLoaderConfig.ModFolder);
             if (!Directory.Exists(modFolderPath)) {
                 _logger.Error($"The mod's folder does not exist. '{modFolderPath}'");
@@ -40,7 +38,14 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
                     _logger.Debug($"[{fileName}] Loading Assembly Context.");
 
                     //var assembly = metadataLoadContext.LoadFromAssemblyPath(dllAssembly);
-                    var assembly = Assembly.LoadFrom(dllAssembly);
+                    Assembly assembly;
+                    try {
+                        assembly = Assembly.LoadFrom(dllAssembly);
+                    }
+                    catch (FileLoadException) {
+                        _logger.Error($"[{fileName}] Failed to reflect/load assembly.");
+                        continue;
+                    }
 
                     var modAttributeParent = assembly.GetTypes().FirstOrDefault(i => i.GetCustomAttribute<PalworldModAttribute>() is not null);
                     if (modAttributeParent == null) {

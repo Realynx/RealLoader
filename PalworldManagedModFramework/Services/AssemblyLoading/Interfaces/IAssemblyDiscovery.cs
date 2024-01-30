@@ -2,6 +2,6 @@
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading.Interfaces {
     public interface IAssemblyDiscovery {
-        IEnumerable<ClrMod> DiscoverValidModAssembies();
+        IEnumerable<ClrMod> DiscoverValidModAsselblies();
     }
 }

@@ -3,10 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.Models.Config;
+using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.Services;
 using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
-using PalworldManagedModFramework.Services.Logging;
 
 namespace PalworldManagedModFramework.DI {
     public static class Startup {
@@ -26,8 +26,7 @@ namespace PalworldManagedModFramework.DI {
             services
                 .AddSingleton<ILogger, Logger>()
                 .AddSingleton<IAssemblyDiscovery, AssemblyDiscovery>()
-                .AddSingleton<IModLoader, ModLoader>()
-                .AddSingleton<GameExplorer>();
+                .AddSingleton<IModLoader, ModLoader>();
         }
     }
 }

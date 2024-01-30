@@ -1,8 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-using PalworldManagedModFramework.Models.Config;
-
-namespace PalworldManagedModFramework.Services.Logging {
+namespace PalworldManagedModFramework.PalWorldSdk.Logging {
     [Flags]
     public enum LogLevel {
         Debugging = 1,
@@ -10,7 +8,7 @@ namespace PalworldManagedModFramework.Services.Logging {
         Warnings = 4,
         Info = 8
     }
-    internal class Logger : ILogger {
+    public class Logger : ILogger {
         public LogLevel Level { get; set; }
 
         private readonly string _logLocation;
