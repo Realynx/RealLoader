@@ -45,13 +45,13 @@ namespace CLR::Util
 	}
 
 #elif defined(__linux__)
-	void* load_library(const char_t* path)
+	void* LoadDLLibrary(const char_t* path)
 	{
 		void* h = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
 		assert(h != nullptr);
 		return h;
 	}
-	void* get_export(void* h, const char* name)
+	void* GetDLLExportedFunction(void* h, const char* name)
 	{
 		void* f = dlsym(h, name);
 		assert(f != nullptr);
@@ -84,7 +84,7 @@ namespace CLR
 		{
 			//gets the hostfxr path automatically
 			get_hostfxr_parameters params{ sizeof(get_hostfxr_parameters), nullptr, nullptr };
-			char_t buffer[MAX_PATH];
+			char_t buffer[999];
 			size_t buffer_size = sizeof(buffer) / sizeof(char_t);
 			if (get_hostfxr_path(buffer, &buffer_size, &params) != 0)
 			{
@@ -104,7 +104,7 @@ namespace CLR
 			hostfxr_funcPtr_Close = (hostfxr_close_fn)Util::GetDLLExportedFunction(hostfxr_lib, "hostfxr_close");
 
 			//initalizes the config
-			auto runtimeConfig = std::string(CStringA(config_Path).GetString());
+			auto runtimeConfig = PalMM::Util::ConvertThickStringToCString(config_Path);
 			std::cout << "Using config: " << runtimeConfig << std::endl;
 			int rc = hostfxr_funcPtr_initConfig(config_Path, nullptr, &cxt);
 			if (cxt == nullptr || rc != 0)
