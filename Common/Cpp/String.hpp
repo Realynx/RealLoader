@@ -39,7 +39,7 @@ namespace PalMM::Util
 #else
 
     //defines a string literal for wide chars
-#define STR(s) 
+#define STR(s) s
 
     std::string ConvertCStringToThickString(const std::string& str)
     {

@@ -22,6 +22,11 @@
 //custom string for thick and C char arrays
 #include <String.hpp>
 
+//since GetLastError doesn't exit on Linux we define it
+#if defined(__linux__)
+int GetLastError() { return 0; }
+#endif
+
 //-------------------------UTILS FOR LOADING LIBRARIES AT RUNTIME FROM DLLS-------------------------------//
 
 namespace CLR::Util
@@ -151,7 +156,13 @@ namespace CLR
 		{
 			//calculate and set up the base directory for the app context
 			std::string baseAppContextDir = PalMM::Util::ConvertThickStringToCString(configPath);
+			
+#if defined(_WIN32)
 			auto pos = baseAppContextDir.find_last_of("\\");
+#else
+			auto pos = baseAppContextDir.find_last_of("/");
+#endif
+
 			baseAppContextDir = baseAppContextDir.substr(0, pos + 1);
 
 			SetCLRProperty("APP_CONTEXT_BASE_DIRECTORY", baseAppContextDir.c_str());
