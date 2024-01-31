@@ -375,3 +375,7 @@ bin-obj/Debug-windows-x86_64/PMMBootstrapper/vc143.idb
 bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/link.read.1.tlog
 bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/link.command.1.tlog
 bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/CL.command.1.tlog
+
+## C++ --------------------
+
+**/bin-obj/
