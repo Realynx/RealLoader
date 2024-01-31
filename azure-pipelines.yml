@@ -1,0 +1,14 @@
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  major: 1
+  minor: $[counter(variables['major'], 10)]
+
+steps:
+- task: CMake@1
+  inputs:
+    cmakeArgs: 
