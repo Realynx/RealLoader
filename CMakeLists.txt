@@ -5,15 +5,14 @@ project(CLRHost)
 
 # Create the executable
 add_executable(${PROJECT_NAME}
-    "CLRHost/src/main.cpp")
+    "CLRHost/src/*.cpp" "CLRHost/src/*.hpp" "CLRHost/src/*.h")
     
 #force it to use C++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 #set the include directories
-target_include_directories(${PROJECT_NAME}
-                           "CLRHost/src")
+target_include_directories(${PROJECT_NAME} PRIVATE "CLRHost/src")
 
 #link library
 target_link_libraries(${PROJECT_NAME} 
