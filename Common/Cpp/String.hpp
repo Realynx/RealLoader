@@ -6,7 +6,9 @@
 #include <locale>
 #include <string>
 
+#if defined(_WIN32)
 #include <Windows.h>
+#endif
 
 namespace PalMM::Util
 {
