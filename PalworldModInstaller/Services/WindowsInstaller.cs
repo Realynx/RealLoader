@@ -22,7 +22,7 @@ namespace PalworldModInstaller.Services {
             }
 
             if (!installerOptions.CheckUpdates && File.Exists(renamePELocation)) {
-                AnsiConsole.WriteLine("Renamed PE was found during install process! Are you sure mod loader is not already installed?");
+                AnsiConsole.WriteLine("Renamed PE was found during install process! Are you sure mod loader is not already installed? If you would like to update run with the -u flag.");
                 AnsiConsole.WriteLine("Aborting...");
                 return;
             }
