@@ -119,7 +119,7 @@ namespace PalMM::Util
         }
 
         //gets the thick char array
-        inline const wchar_t* GetWideCharArray() { return charData.c_str(); } //{ return thickCharData.c_str(); }
+        inline const char_t* GetWideCharArray() { return charData.c_str(); } //{ return thickCharData.c_str(); }
 
         //gets the char array
         inline const char* GetCharArray() { return charData.c_str(); }

@@ -14,7 +14,7 @@ void RUNCLR()
 	PalMM::Util::String appPath; appPath.SetCharData(STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.dll"));
 	PalMM::Util::String configPath; configPath.SetCharData(STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.runtimeconfig.json"));
 #elif defined(__linux__)
-	PalMM::Util::String appPath; appPath.SetCharData(Str("Pal/Binaries/Win64/ManagedModFramework/PalworldManagedModFramework.dll"));
+	PalMM::Util::String appPath; appPath.SetCharData(STR("Pal/Binaries/Win64/ManagedModFramework/PalworldManagedModFramework.dll"));
 	PalMM::Util::String configPath = STR("Pal/Binaries/Win64/ManagedModFramework/PalworldManagedModFramework.runtimeconfig.json");
 #endif
 
