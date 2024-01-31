@@ -127,11 +127,11 @@ namespace CLR
 #if defined(_WIN32)
 		//sets a property in the CLR
 		inline void SetCLRProperty(const wchar_t* propertyStr, const wchar_t* newValue, bool ignoreLogging = false)
+		
 #else
 		//sets a property in the CLR
-		inline void SetCLRProperty(const char_t* propertyStr, const char_t* newValue, bool ignoreLogging = false)
+		inline void SetCLRProperty(const char* propertyStr, const char* newValue, bool ignoreLogging = false)
 #endif
-
 		{
 			if (!hostfxr_funcPtr_SetRuntimePropery)
 			{
@@ -143,12 +143,6 @@ namespace CLR
 
 			std::cout << "OwO Property Setting: \"" << PalMM::Util::ConvertThickStringToCString(propertyStr) << "\" || \"" << PalMM::Util::ConvertThickStringToCString(newValue) << "\"\n";
 			hostfxr_funcPtr_SetRuntimePropery(cxt, propertyStr, newValue);
-		}
-
-		//sets a property in the CLR
-		inline void SetCLRProperty(const char* propertyStr, const char* newValue, bool ignoreLogging = false)
-		{
-			SetCLRProperty(PalMM::Util::ConvertCStringToThickString(propertyStr).c_str(), PalMM::Util::ConvertCStringToThickString(newValue).c_str(), ignoreLogging);
 		}
 
 		//sets the base app context || takes in a file to the config path, we strip out the file name and just use the directory
@@ -165,7 +159,7 @@ namespace CLR
 
 			baseAppContextDir = baseAppContextDir.substr(0, pos + 1);
 
-			SetCLRProperty("APP_CONTEXT_BASE_DIRECTORY", baseAppContextDir.c_str());
+			SetCLRProperty(STR("APP_CONTEXT_BASE_DIRECTORY"), PalMM::Util::ConvertCStringToThickString(baseAppContextDir).c_str());
 		}
 
 		//function pointer types for handling DLLs and their managed code
