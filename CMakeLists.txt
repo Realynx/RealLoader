@@ -23,6 +23,9 @@ target_link_libraries(${PROJECT_NAME}
 #defines a Linux Macro for build
 add_compile_definitions("__linux__")
 
+#sets the output
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME CLRHost.so)
+
 # Set up the different compilers for different platforms
 #if(WIN32)
 #    # Use MinGW for Windows
