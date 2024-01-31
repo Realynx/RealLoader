@@ -1,41 +1,15 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.12) #CMake ver
 
-#CLR Host
-project(CLRHost)
+#option for platforms
+option(BUILD_WINDOWS "Performs a build for Windows" OFF)
+option(BUILD_LINUX "Performs a build for Linux" OFF)
 
-# Create the executable
-ADD_LIBRARY( ${PROJECT_NAME} SHARED
-    "CLRHost/src/main.cpp" "CLRHost/src/CLR.hpp" "CLRHost/src/coreclr_delegates.h" "CLRHost/src/hostfxr.h")
-    
-#force it to use C++17
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+project(PMMF_OWO)
 
-#set the include directories
-target_include_directories(${PROJECT_NAME} PRIVATE "CLRHost/src"
-"/usr/share/dotnet/packs/Microsoft.NETCore.App.Host.linux-x64/8.0.1/runtimes/linux-x64/native" 
-"Common/Cpp")
-
-#link library
-target_link_libraries(${PROJECT_NAME} 
-"/usr/share/dotnet/packs/Microsoft.NETCore.App.Host.linux-x64/8.0.1/runtimes/linux-x64/native/libnethost.a")
-
-#defines a Linux Macro for build
-add_compile_definitions("__linux__")
-
-#sets the output name
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME CLRHost)
-
-#sets output directory
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "GithubSymbols/Linux")
-
-# Set up the different compilers for different platforms
-#if(WIN32)
-#    # Use MinGW for Windows
-#    set(CMAKE_C_COMPILER "gcc")
-#    set(CMAKE_CXX_COMPILER "g++")
-#elseif(UNIX)
-# Use GCC for Linux
-set(CMAKE_C_COMPILER "gcc")
-set(CMAKE_CXX_COMPILER "g++")
-#endif()
+#adds the sub projects for building
+add_subdirectory(CLRHost)
+#add_subdirectory(PalWorldManagedModFramework.EntryPoint)
+#add_subdirectory(PalWorldManagedModFramework)
+#add_subdirectory(PalWorldManagedModFramework.PalWorldSDK)
+#add_subdirectory(PalWorldManagedModFramework.UnrealSDK)
+#add_subdirectory(PalWorldModInstaller)
