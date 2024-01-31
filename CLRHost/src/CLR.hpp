@@ -119,8 +119,14 @@ namespace CLR
 			return (hostfxr_funcPtr_SetRuntimePropery && hostfxr_funcPtr_initConfig && hostfxr_funcPtr_GetRuntimeDelegate && hostfxr_funcPtr_Close);
 		}
 
+#if defined(_WIN32)
 		//sets a property in the CLR
 		inline void SetCLRProperty(const wchar_t* propertyStr, const wchar_t* newValue, bool ignoreLogging = false)
+#else
+		//sets a property in the CLR
+		inline void SetCLRProperty(const char_t* propertyStr, const char_t* newValue, bool ignoreLogging = false)
+#endif
+
 		{
 			if (!hostfxr_funcPtr_SetRuntimePropery)
 			{

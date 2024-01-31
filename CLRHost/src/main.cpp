@@ -11,19 +11,19 @@ DLL entry point for running C#
 void RUNCLR()
 {
 #if defined(_WIN32)
-	std::basic_string<char_t> appPath = STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.dll");
-	auto configPath = STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.runtimeconfig.json");
+	PalMM::Util::String appPath; appPath.SetCharData(STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.dll"));
+	PalMM::Util::String configPath; configPath.SetCharData(STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.runtimeconfig.json"));
 #elif defined(__linux__)
-	std::basic_string<char_t> appPath = STR("Pal/Binaries/Win64/ManagedModFramework/PalworldManagedModFramework.dll");
-	auto configPath = STR("Pal/Binaries/Win64/ManagedModFramework/PalworldManagedModFramework.runtimeconfig.json");
+	PalMM::Util::String appPath; appPath.SetCharData(Str("Pal/Binaries/Win64/ManagedModFramework/PalworldManagedModFramework.dll"));
+	PalMM::Util::String configPath = STR("Pal/Binaries/Win64/ManagedModFramework/PalworldManagedModFramework.runtimeconfig.json");
 #endif
 
-	auto fullAppPath = std::filesystem::absolute(appPath).wstring();
-	auto fullConfigPath = std::filesystem::absolute(configPath).wstring();
+	PalMM::Util::String fullAppPath; fullAppPath.SetThickCharData(std::filesystem::absolute(appPath.GetCharArray()).string().c_str());
+	PalMM::Util::String fullConfigPath; fullConfigPath.SetThickCharData(std::filesystem::absolute(configPath.GetCharArray()).string().c_str());
 
 	//init the CLR
 	CLR::CLRHost host;
-	if (!host.Init(fullConfigPath.c_str())) {
+	if (!host.Init(fullConfigPath.GetWideCharArray())) {
 		std::cout << "Failed To Init Host" << std::endl;
 		return;
 	}
@@ -31,7 +31,7 @@ void RUNCLR()
 	std::cout << "Finished Initializing CLR" << std::endl;
 
 	//starts the main Assembly
-	host.StartAssembly(fullAppPath.c_str());
+	host.StartAssembly(fullAppPath.GetWideCharArray());
 }
 
 void SpawnClrThread() {
