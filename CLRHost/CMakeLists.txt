@@ -24,7 +24,8 @@ if(BUILD_WINDOWS)
 
     #link library
     target_link_libraries(${PROJECT_NAME} 
-    "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Host.win-x64\\8.0.1\\runtimes\\win-x64\\native\\libnethost.lib")
+    "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Host.win-x64\\8.0.1\\runtimes\\win-x64\\native\\libnethost.lib"
+    "kernal32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "oleaut32.lib" "uuid.lib" "odbccp32.lib")
 
     #defines a Linux Macro for build
     add_compile_definitions("__WIN32")
@@ -33,8 +34,8 @@ if(BUILD_WINDOWS)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "GithubSymbols/Windows")
 
     # Use GCC for Linux
-    #set(CMAKE_C_COMPILER "gcc")
-    #set(CMAKE_CXX_COMPILER "g++")
+    set(CMAKE_C_COMPILER "gcc")
+    set(CMAKE_CXX_COMPILER "g++")
     
 endif()
 
