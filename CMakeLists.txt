@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 3.12)
 project(CLRHost)
 
 # Create the executable
-#add_executable(${PROJECT_NAME}
 ADD_LIBRARY( ${PROJECT_NAME} SHARED
     "CLRHost/src/main.cpp" "CLRHost/src/CLR.hpp" "CLRHost/src/coreclr_delegates.h" "CLRHost/src/hostfxr.h")
     
