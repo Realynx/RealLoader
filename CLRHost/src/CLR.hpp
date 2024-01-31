@@ -24,6 +24,10 @@
 
 //since GetLastError doesn't exit on Linux we define it
 #if defined(__linux__)
+#include <stdlib.h>
+#include <stdio.h>
+#include <dlfcn.h>
+
 int GetLastError() { return 0; }
 #endif
 

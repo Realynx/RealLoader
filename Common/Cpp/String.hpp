@@ -5,6 +5,7 @@
 #include <codecvt>
 #include <locale>
 #include <string>
+#include <cstring>
 
 #if defined(_WIN32)
 #include <Windows.h>
