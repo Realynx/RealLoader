@@ -12,7 +12,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 #set the include directories
-target_include_directories(${PROJECT_NAME} PRIVATE "CLRHost/src")
+target_include_directories(${PROJECT_NAME} PRIVATE "CLRHost/src"
+"/usr/share/dotnet/packs/Microsoft.NETCore.App.Host.linux-x64/8.0.1/runtimes/linux-x64/native")
 
 #link library
 target_link_libraries(${PROJECT_NAME} 
