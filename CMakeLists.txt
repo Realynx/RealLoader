@@ -24,8 +24,11 @@ target_link_libraries(${PROJECT_NAME}
 #defines a Linux Macro for build
 add_compile_definitions("__linux__")
 
-#sets the output
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME CLRHost.so)
+#sets the output name
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME CLRHost)
+
+#sets output directory
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "GithubSymbols/Linux")
 
 # Set up the different compilers for different platforms
 #if(WIN32)
