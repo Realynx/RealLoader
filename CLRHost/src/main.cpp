@@ -11,11 +11,11 @@ DLL entry point for running C#
 void RUNCLR()
 {
 #if defined(_WIN32)
-	std::basic_string<char_t> appPath = L"Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.dll";
+	std::basic_string<char_t> appPath = STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.dll");
 	auto configPath = STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.runtimeconfig.json");
 #elif defined(__linux__)
-	std::basic_string<char_t> appPath = L"Pal\\Binaries\\Linux\\ManagedModFramework\\PalworldManagedModFramework.dll";
-	auto configPath = STR("Pal\\Binaries\\Linux\\ManagedModFramework\\PalworldManagedModFramework.runtimeconfig.json");
+	std::basic_string<char_t> appPath = STR("Pal/Binaries/Win64/ManagedModFramework/PalworldManagedModFramework.dll");
+	auto configPath = STR("Pal/Binaries/Win64/ManagedModFramework/PalworldManagedModFramework.runtimeconfig.json");
 #endif
 
 	auto fullAppPath = std::filesystem::absolute(appPath).wstring();
