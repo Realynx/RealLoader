@@ -22,8 +22,8 @@
 
 namespace CLR::Util
 {
-	//#ifdef Window_Build
-	
+#if defined(_WIN32)
+
 	//loads a library
 	void* LoadDLLibrary(const char_t* path)
 	{
@@ -39,20 +39,21 @@ namespace CLR::Util
 		assert(f != nullptr);
 		return f;
 	}
-	//#else
-	//    void* load_library(const char_t* path)
-	//    {
-	//        void* h = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
-	//        assert(h != nullptr);
-	//        return h;
-	//    }
-	//    void* get_export(void* h, const char* name)
-	//    {
-	//        void* f = dlsym(h, name);
-	//        assert(f != nullptr);
-	//        return f;
-	//    }
-	//#endif
+
+#elif defined(__linux__)
+	void* load_library(const char_t* path)
+	{
+		void* h = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
+		assert(h != nullptr);
+		return h;
+	}
+	void* get_export(void* h, const char* name)
+	{
+		void* f = dlsym(h, name);
+		assert(f != nullptr);
+		return f;
+	}
+#endif
 }
 
 //----------------------------------MAIN CLR-----------------------//
@@ -66,7 +67,7 @@ namespace CLR
 
 		//the function pointer handles
 		hostfxr_initialize_for_runtime_config_fn hostfxr_funcPtr_initConfig; //initalizes the runtime and it's config data
-		
+
 		hostfxr_set_runtime_property_value_fn hostfxr_funcPtr_SetRuntimePropery; //sets the runtime property
 		hostfxr_get_runtime_delegate_fn hostfxr_funcPtr_GetRuntimeDelegate; //gets a function from managed C# land
 
@@ -151,9 +152,9 @@ namespace CLR
 		typedef int (*GetManagedFunctionPointer)(const char_t*, const char_t*, const char_t*, void*, void*, void**); //gets a function from C# land
 		typedef void(*ManagedEntrypoint)(); //calls a C# function
 
-		//loads a assembly and calls it's entry point
+		//loads an assembly and calls it's entry point
 		inline void StartAssembly(const char_t* assemblyPath) {
-			
+
 			//can't do anything if the function from Hostfxr for loading C# functions isn't found
 			if (!hostfxr_funcPtr_GetRuntimeDelegate) {
 				std::cout << "hostfxr_get_runtime_delegate was null" << std::endl;
@@ -189,7 +190,8 @@ namespace CLR
 
 			//calls the C# function
 			ManagedEntrypoint managedEntrypoint = nullptr;
-			getManagedFunctionPtr(STR("PalworldManagedModFramework.Program, PalworldManagedModFramework"), STR("EntryPoint"), STR("PalworldManagedModFramework.Program+VoidDelegateSignature, PalworldManagedModFramework"), NULL, NULL, (void**)&managedEntrypoint);
+			getManagedFunctionPtr(STR("PalworldManagedModFramework.Program, PalworldManagedModFramework"), STR("EntryPoint"),
+				STR("PalworldManagedModFramework.Program+VoidDelegateSignature, PalworldManagedModFramework"), NULL, NULL, (void**)&managedEntrypoint);
 
 			if (!managedEntrypoint) {
 				std::cout << "UnmanagedEntrypoint EntryPoint was NULL :'(" << std::endl;
