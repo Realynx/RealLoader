@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.12)
 project(CLRHost)
 
 # Create the executable
-add_executable(${PROJECT_NAME}
+ADD_LIBRARY( ${PROJECT_NAME} SHARED
     "CLRHost/src/main.cpp" "CLRHost/src/CLR.hpp" "CLRHost/src/coreclr_delegates.h" "CLRHost/src/hostfxr.h")
     
 #force it to use C++17
@@ -22,6 +22,12 @@ target_link_libraries(${PROJECT_NAME}
 
 #defines a Linux Macro for build
 add_compile_definitions("__linux__")
+
+#sets the output name
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME CLRHost)
+
+#sets output directory
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "GithubSymbols/Linux")
 
 # Set up the different compilers for different platforms
 #if(WIN32)
