@@ -34,6 +34,8 @@ namespace PalworldModInstaller.Services {
             Directory.Delete(modsFolder, true);
             RestoreLaunchScript(launchScript);
             Directory.Delete(dotnetDependanciesFolder, true);
+
+            AnsiConsole.WriteLine($"Modloader uninstalled!");
         }
 
         public void InstallFiles(InstallerOptions installerOptions) {
