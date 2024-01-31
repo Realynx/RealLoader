@@ -2,9 +2,8 @@
 
 //defines a common struct for handling thick and c strings
 
-#include "atlbase.h"
-#include "atlstr.h"
-#include "comutil.h"
+#include <codecvt>
+#include <locale>
 #include <string>
 
 namespace PalMM::Util
@@ -12,11 +11,17 @@ namespace PalMM::Util
     //defines a string literal for wide chars
 #define STR(s) L ## s
 
-    //converts a char array to a thick char array
-    inline static std::wstring ConvertCStringToThickString(const char* data) { return std::wstring(CA2W(data).m_psz); }
+    std::wstring ConvertCStringToThickString(const std::string& str)
+    {
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converterX;
+        return converterX.from_bytes(str);
+    }
 
-    //converts a thick char array to a char array
-    inline static std::string ConvertThickStringToCString(const wchar_t* data) { return std::string(CStringA(data).GetString()); }
+    std::string ConvertThickStringToCString(const std::wstring& wstr)
+    {
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converterX;
+        return converterX.to_bytes(wstr);
+    }
 
     //compares two char arrays
     inline bool IsSameString(const char* s1, const char* s2) { return strcmp(s1, s2); }
