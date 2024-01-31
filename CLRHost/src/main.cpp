@@ -32,7 +32,7 @@ void RUNCLR()
 
 	//starts the main Assembly
 	host.StartAssembly(fullAppPath.c_str());
-	}
+}
 
 void SpawnClrThread() {
 
