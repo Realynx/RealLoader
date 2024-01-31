@@ -3,7 +3,7 @@ using PalworldManagedModFramework.PalWorldSdk.Interfaces;
 using PalworldManagedModFramework.PalWorldSdk.Logging;
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading {
-    public class LoadedMod {
+    internal class LoadedMod {
         public CancellationTokenSource CancelTokenSource { get; set; }
 
 

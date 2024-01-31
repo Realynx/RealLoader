@@ -8,7 +8,7 @@ using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading {
-    public class AssemblyDiscovery : IAssemblyDiscovery {
+    internal class AssemblyDiscovery : IAssemblyDiscovery {
         private readonly ILogger _logger;
         private readonly ModLoaderConfig _modLoaderConfig;
 

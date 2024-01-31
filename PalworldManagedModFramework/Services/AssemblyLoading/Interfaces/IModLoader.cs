@@ -1,5 +1,5 @@
 ﻿namespace PalworldManagedModFramework.Services.AssemblyLoading.Interfaces {
-    public interface IModLoader {
+    internal interface IModLoader {
         void LoadMods();
     }
 }

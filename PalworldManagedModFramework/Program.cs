@@ -3,12 +3,12 @@ using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.DI;
 using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 
 namespace PalworldManagedModFramework {
-    public static class Program {
-        public delegate void VoidDelegateSignature();
+    internal static class Program {
+
+        internal delegate void VoidDelegateSignature();
         public static void EntryPoint() {
             try {
                 AppDomainMonitor.MonitorDomain();

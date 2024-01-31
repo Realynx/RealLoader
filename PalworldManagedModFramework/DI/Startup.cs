@@ -4,13 +4,14 @@ using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.Models.Config;
 using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.Services;
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
 using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
+using PalworldManagedModFramework.Services.MemoryScanning;
 
 namespace PalworldManagedModFramework.DI {
-    public static class Startup {
-        public static IConfigurationRoot Configuration { get; internal set; }
+    internal static class Startup {
+        internal static IConfigurationRoot Configuration { get; set; }
 
         internal static void Configure(HostBuilderContext context, IConfigurationBuilder configurationBuilder) {
             configurationBuilder
@@ -24,6 +25,7 @@ namespace PalworldManagedModFramework.DI {
                 .AddSingleton<ModLoaderConfig>();
 
             services
+                .AddSingleton<UReflectionPointerScanner>()
                 .AddSingleton<ILogger, Logger>()
                 .AddSingleton<IAssemblyDiscovery, AssemblyDiscovery>()
                 .AddSingleton<IModLoader, ModLoader>();

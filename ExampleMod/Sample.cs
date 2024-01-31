@@ -6,7 +6,7 @@ using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.PalWorldSdk.Services;
 
 namespace ExampleMod {
-    [PalworldMod("Sample", "poofyfox", ".poofyfox", "1.0.0")]
+    [PalworldMod("Sample", "poofyfox", ".poofyfox", "1.0.0", serverMod: false)]
     public unsafe class Sample : IPalworldMod {
         private CancellationToken _cancellationToken;
         private ILogger _logger;
@@ -15,20 +15,19 @@ namespace ExampleMod {
             _cancellationToken = cancellationToken;
             _logger = logger;
 
-            while (!Debugger.IsAttached) {
-                Thread.Sleep(100);
-            }
-
             // Windows Bytecode Pattern
-            var gameObjectManagerPtr = SequenceScanner.SingleSequenceScan("49 ?? ?? ?? 48 ?? ?? ?? ?? ?? ?? 49 ?? ?? ?? f6");
-
-            var allPotentialReflectionStructs = SequenceScanner.SingleSequenceScan("?? ?? ?? ?? 00 00 00 ?? ?? ?? ?? 00 00 00");
-
-            var gobalWorldAddress = gameObjectManagerPtr + 5;
+            var gWorld = SequenceScanner.SingleSequenceScan("49 ?? ?? ?? 48 ?? ?? ?? ?? ?? ?? 49 ?? ?? ?? f6");
+            var gobalWorldAddress = gWorld + 5;
             _logger.Info($"Found Global World Instance: 0x{gobalWorldAddress:X}");
 
+            var gObjects = SequenceScanner.SingleSequenceScan("48 8B 05 ?? ?? ?? ?? 48 8B 0C C8 4C 8D 04 D1 EB 03");
+            _logger.Info($"Found Global Objects Instance: 0x{gObjects:X}");
 
-            SequenceScanner.SingleSequenceScan("");
+            var fNames = SequenceScanner.SingleSequenceScan("48 8D 05 ?? ?? ?? ?? EB 13 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? C6 05 ?? ?? ?? ?? ?? 0F 10");
+            _logger.Info($"Found F Names Instance: 0x{fNames:X}");
+
+            // Abusing the fact that these pointers are
+
 
             //UnrealHook.HookFunction<int>("/Engine/Pal/SomeClass:FunctionName", (rax => {
             //    return 5;

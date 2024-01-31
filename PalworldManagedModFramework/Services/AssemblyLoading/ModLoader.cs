@@ -2,24 +2,33 @@
 using PalworldManagedModFramework.PalWorldSdk.Interfaces;
 using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
+using PalworldManagedModFramework.Services.MemoryScanning;
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading {
-    public class ModLoader : IModLoader {
+    internal class ModLoader : IModLoader {
         private readonly ILogger _logger;
         private readonly IAssemblyDiscovery _assemblyDiscovery;
         private readonly ModLoaderConfig _modLoaderConfig;
+        private readonly UReflectionPointerScanner _uReflectionPointerScanner;
 
-        public ModLoader(ILogger logger, IAssemblyDiscovery assemblyDiscovery, ModLoaderConfig modLoaderConfig) {
+        public ModLoader(ILogger logger, IAssemblyDiscovery assemblyDiscovery, ModLoaderConfig modLoaderConfig, UReflectionPointerScanner uReflectionPointerScanner) {
             _logger = logger;
             _assemblyDiscovery = assemblyDiscovery;
             _modLoaderConfig = modLoaderConfig;
+            _uReflectionPointerScanner = uReflectionPointerScanner;
         }
 
         public void LoadMods() {
+            if (Environment.OSVersion.Platform == PlatformID.Unix) {
+                _logger.Info("Detected Server environment. Loading Server mods only.");
+            }
+
             if (!_modLoaderConfig.EnableMods) {
                 _logger.Warning("Mod loading has been disabled in config! Not loading any mods");
                 return;
             }
+
+            ScanRuntime();
 
             _logger.Info("Loading mods");
             var validMods = _assemblyDiscovery.DiscoverValidModAsselblies();
@@ -40,6 +49,11 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
 
                 var loadedMod = new LoadedMod(modEntryPoint, mod, _logger);
             }
+        }
+
+        internal void ScanRuntime() {
+            _logger.Debug("Scanning for reflected functions.");
+            _uReflectionPointerScanner.ScanMemoryForUnrealReflectionPointers();
         }
     }
 }
