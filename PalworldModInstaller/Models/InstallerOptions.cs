@@ -41,7 +41,6 @@ namespace PalworldModInstaller.Models {
                 errorMessageBuilder.AppendLine("Backup location does not exist!");
             }
 
-
             var aggregateErrorMessage = errorMessageBuilder.ToString();
             if (string.IsNullOrWhiteSpace(aggregateErrorMessage)) {
                 return ValidationResult.Success();

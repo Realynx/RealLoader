@@ -61,7 +61,13 @@ namespace PalworldModInstaller.Commands {
                 throw exception;
             }
 
-            modloaderInstaller.InstallFiles(settings);
+            if (settings.Uninstall) {
+                modloaderInstaller.UninstallFiles(settings);
+            }
+            else {
+                modloaderInstaller.InstallFiles(settings);
+            }
+
             return 0;
         }
     }
