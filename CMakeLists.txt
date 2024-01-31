@@ -5,7 +5,7 @@ project(CLRHost)
 
 # Create the executable
 add_executable(${PROJECT_NAME}
-    "CLRHost/src/*.cpp" "CLRHost/src/*.hpp" "CLRHost/src/*.h")
+    "CLRHost/src/main.cpp" "CLRHost/src/CLR.hpp" "CLRHost/src/coreclr_delegates.h" "CLRHost/src/hostfxr.h")
     
 #force it to use C++17
 set(CMAKE_CXX_STANDARD 17)
