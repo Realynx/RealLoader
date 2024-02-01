@@ -18,24 +18,24 @@ set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME CLRHost)
 if(BUILD_WINDOWS)
 
     #set the include directories
-    target_include_directories(${PROJECT_NAME} PRIVATE "src"
-    "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Host.win-x64\\8.0.1\\runtimes\\win-x64\\native" 
-    "Common/Cpp")
+    #target_include_directories(${PROJECT_NAME} PRIVATE "src"
+    #"C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Host.win-x64\\8.0.1\\runtimes\\win-x64\\native" 
+    #"Common/Cpp")
 
     #link library
-    target_link_libraries(${PROJECT_NAME} 
-    "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Host.win-x64\\8.0.1\\runtimes\\win-x64\\native\\libnethost.lib"
-    "kernal32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "oleaut32.lib" "uuid.lib" "odbccp32.lib")
+    #target_link_libraries(${PROJECT_NAME} 
+    #"C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Host.win-x64\\8.0.1\\runtimes\\win-x64\\native\\libnethost.lib"
+    #"kernal32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "oleaut32.lib" "uuid.lib" "odbccp32.lib")
 
     #defines a Linux Macro for build
-    add_compile_definitions("__WIN32")
+    #add_compile_definitions("__WIN32")
 
     #sets output directory
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "GithubSymbols/Windows")
+    #set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "GithubSymbols/Windows")
 
     # Use GCC for Linux
-    set(CMAKE_C_COMPILER "gcc")
-    set(CMAKE_CXX_COMPILER "g++")
+   # set(CMAKE_C_COMPILER "gcc")
+  #  set(CMAKE_CXX_COMPILER "g++")
     
 endif()
 
