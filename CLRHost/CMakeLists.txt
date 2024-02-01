@@ -56,7 +56,7 @@ endif()
 
     #sets output directory
     
-    set_target_properties(${PROJECT_NAME} LIBRARY_OUTPUT_DIRECTORY, "${CMAKE_BINARY_DIR}/../GithubSymbols/Linux")
+    set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../GithubSymbols/Linux")
 
     # Use GCC for Linux
     set(CMAKE_C_COMPILER "gcc")
