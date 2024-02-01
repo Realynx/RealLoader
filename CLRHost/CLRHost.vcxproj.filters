@@ -15,6 +15,9 @@
     <ClInclude Include="C:\Modding\PalworldManagedModFramework\CLRHost\src\hostfxr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="C:\Modding\PalworldManagedModFramework\CLRHost\src\nethost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Modding\PalworldManagedModFramework\CLRHost\CMakeLists.txt" />
