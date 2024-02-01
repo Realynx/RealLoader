@@ -15,7 +15,7 @@
 #include <iostream>
 
 //Host CLR
-#include <nethost.h>
+#include <native/nethost.h>
 #include <coreclr_delegates.h>
 #include <hostfxr.h>
 

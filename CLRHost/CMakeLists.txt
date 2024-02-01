@@ -40,7 +40,7 @@ if(BUILD_WINDOWS)
 endif()
 
 #if it's Linux
-if(BUILD_LINUX)
+#if(BUILD_LINUX)
 
     #set the include directories
     target_include_directories(${PROJECT_NAME} PRIVATE "src"
@@ -61,4 +61,4 @@ if(BUILD_LINUX)
     set(CMAKE_C_COMPILER "gcc")
     set(CMAKE_CXX_COMPILER "g++")
 
-endif()
+#endif()
