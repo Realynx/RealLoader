@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12) #CMake ver
+cmake_minimum_required(VERSION 3.25) #CMake ver
 
 #CLR Host
 project(CLRHost)
@@ -40,7 +40,7 @@ if(BUILD_WINDOWS)
 endif()
 
 #if it's Linux
-#if(BUILD_LINUX)
+if(BUILD_LINUX)
 
     #set the include directories
     target_include_directories(${PROJECT_NAME} PRIVATE "src"
@@ -55,11 +55,10 @@ endif()
     add_compile_definitions("__linux__")
 
     #sets output directory
-    
     set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/GithubSymbols/Linux")
 
     # Use GCC for Linux
     set(CMAKE_C_COMPILER "gcc")
     set(CMAKE_CXX_COMPILER "g++")
 
-#endif()
+endif()

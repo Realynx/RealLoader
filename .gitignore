@@ -447,3 +447,13 @@ ZERO_CHECK.vcxproj.filters
 OwOBuild.bat
 CLRHost/CLRHost.vcxproj.filters
 CLRHost/CLRHost.vcxproj
+CLRHost/CLRHost.vcxproj
+CLRHost/CLRHost.vcxproj.filters
+CMakeFiles/3.28.2/CMakeCSharpCompiler.cmake
+CMakeFiles/3.28.2/CompilerIdCSharp/CMakeCSharpCompilerId.cs
+CMakeFiles/3.28.2/CompilerIdCSharp/CompilerIdCSharp.csproj
+PalworldManagedModFramework/CMakeFiles/generate.stamp
+PalworldManagedModFramework/CMakeFiles/generate.stamp.depend
+PalworldManagedModFramework/PMMFramework.csproj
+PalworldManagedModFramework/PMMFramework.sln
+PMMF_OWO.sln
