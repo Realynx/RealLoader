@@ -45,7 +45,7 @@ endif()
     #set the include directories
     target_include_directories(${PROJECT_NAME} PRIVATE "src"
     "/usr/share/dotnet/packs/Microsoft.NETCore.App.Host.linux-x64/8.0.1/runtimes/linux-x64/native" 
-    "Common/Cpp")
+    "../Common/Cpp")
 
     #link library
     target_link_libraries(${PROJECT_NAME} 
