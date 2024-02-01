@@ -55,7 +55,7 @@ endif()
     add_compile_definitions("__linux__")
 
     #sets output directory
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "GithubSymbols/Linux")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "../GithubSymbols/Linux")
 
     # Use GCC for Linux
     set(CMAKE_C_COMPILER "gcc")
