@@ -2,34 +2,44 @@
 using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.DI;
-using PalworldManagedModFramework.Services;
-using PalworldManagedModFramework.Services.Logging;
+using PalworldManagedModFramework.PalWorldSdk.Logging;
+using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 
 namespace PalworldManagedModFramework {
-    public static class Program {
-        public static void ManagedEntryPoint() {
-            Console.WriteLine($"Loading .NET DI Service Container...");
+    internal static class Program {
 
-            var hostBuilder = new HostBuilder()
-            .UseConsoleLifetime();
+        internal delegate void VoidDelegateSignature();
+        public static void EntryPoint() {
+            try {
+                AppDomainMonitor.MonitorDomain();
 
-            // Call startup functions to configure DI Container.
-            hostBuilder.ConfigureAppConfiguration(Startup.Configure);
-            hostBuilder.ConfigureAppConfiguration((_, config) => Startup.Configuration = config.Build());
-            hostBuilder.ConfigureServices(Startup.ConfigureServices);
+                Console.WriteLine($"Loading .NET DI Service Container...");
 
-            var host = hostBuilder
-                .Build();
+                var hostBuilder = new HostBuilder()
+                    .UseConsoleLifetime();
 
-            var loggerInstance = host.
-                Services.GetRequiredService<ILogger>();
+                // Call startup functions to configure DI Container.
+                hostBuilder.ConfigureAppConfiguration(Startup.Configure);
+                hostBuilder.ConfigureAppConfiguration((_, config) => Startup.Configuration = config.Build());
+                hostBuilder.ConfigureServices(Startup.ConfigureServices);
 
-            loggerInstance.Info("DI Container Setup!");
+                var host = hostBuilder
+                    .Build();
 
-            var gameExplorer = host.
-                Services.GetRequiredService<GameExplorer>();
+                var loggerInstance = host.
+                    Services.GetRequiredService<ILogger>();
 
-            gameExplorer.Entry();
+                loggerInstance.Info("DI Container Setup!");
+
+                var modLoader = host.Services.GetRequiredService<IModLoader>();
+                modLoader.LoadMods();
+
+                for (; ; )
+                    Console.ReadLine();
+            }
+            catch (Exception e) {
+                Console.WriteLine(e);
+            }
         }
     }
 }

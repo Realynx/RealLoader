@@ -361,3 +361,65 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.exe.recipe
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/CL.command.1.tlog
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/Cl.items.tlog
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/CL.read.1.tlog
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/CL.write.1.tlog
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/link.command.1.tlog
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/link.read.1.tlog
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/link.write.1.tlog
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/PMMBootstrapper.lastbuildstate
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/vc143.idb
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/vc143.idb
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/link.read.1.tlog
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/link.command.1.tlog
+bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/CL.command.1.tlog
+
+## C++ --------------------
+
+**/bin-obj/
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps

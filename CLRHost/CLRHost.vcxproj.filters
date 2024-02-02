@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{2C290D67-4C70-3BFC-AB05-4A00E4576126}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6D0C007B-E986-35ED-9E37-669F61F2A97B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\CLR.hpp" />
+    <ClInclude Include="src\coreclr_delegates.h" />
+    <ClInclude Include="src\hostfxr.h" />
+    <ClInclude Include="src\nethost.h" />
+  </ItemGroup>
+</Project>
