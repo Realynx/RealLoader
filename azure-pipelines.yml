@@ -131,9 +131,9 @@ stages:
 
     - task: ArchiveFiles@2
       inputs:
-      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/Net/PalWorldManagedModFramework/Release'
-      archiveType: 'zip'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/ManagedModFramework.zip'
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/Net/PalWorldManagedModFramework/Release'
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/ManagedModFramework.zip'
 
     - task: GitHubRelease@1
       displayName: 'Create GitHub Release'
