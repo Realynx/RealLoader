@@ -64,8 +64,12 @@ stages:
       pool: 
         name: 'PoofyHost'
       steps:
-      - task: CMake@2
-        displayName: 'Building native code with Cmake'
+      - task: CMake@1
+        displayName: 'CMake Configure'
         inputs:
-          workingDirectory: 'path/to/your/source/build'
+          cmakeArgs: '.'
+
+      - task: CMake@1
+        displayName: 'CMake Build'
+        inputs:
           cmakeArgs: '--build .'
