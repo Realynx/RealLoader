@@ -67,9 +67,9 @@ stages:
       - task: CMake@1
         displayName: 'CMake Configure'
         inputs:
-          cmakeArgs: '.'
+          cmakeArgs: '$(Build.SourcesDirectory)'
 
       - task: CMake@1
         displayName: 'CMake Build'
         inputs:
-          cmakeArgs: '--build .'
+          cmakeArgs: '--build $(Build.SourcesDirectory)'
