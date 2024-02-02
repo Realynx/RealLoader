@@ -7,7 +7,7 @@ variables:
 
 stages:
 - stage: UnitTesting
-  displayName: 'Execute all the unit tests.'
+  displayName: 'Run all unit tests.'
   jobs:
   - job: DotnetTesting
     displayName: 'Test the .NET code'
@@ -66,6 +66,13 @@ stages:
           configuration: 'Release'
           msbuildArguments: '/target:Rebuild'
 
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact: drop'
+        inputs:
+          PathtoPublish: '$(Build.SourcesDirectory)/build'
+          ArtifactName: 'windows_artifacts'
+          publishLocation: 'Container'
+
     - job: BuildLinux
       displayName: 'Build on Linux'
       pool: 
@@ -86,3 +93,15 @@ stages:
         displayName: 'CMake Build'
         inputs:
           cmakeArgs: '--build $(Build.SourcesDirectory)/build'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifact: drop'
+        inputs:
+          PathtoPublish: '$(Build.SourcesDirectory)/build'
+          ArtifactName: 'linux_artifacts'
+          publishLocation: 'Container'
+
+
+  - stage: Deploy
+    displayName: 'Deploy built artifacts to github'
+    jobs:
