@@ -2,10 +2,6 @@ trigger:
 - '*'
 
 variables:
-  isMainBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
-  isDevBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/developer')]
-  isTestingBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/testing')]
-  isBuildingSymbols: $[or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/developer')), eq(variables['Build.SourceBranch'], 'refs/heads/testing'))]
   major: 1
   minor: $[counter(variables['major'], 10)]
 
@@ -30,7 +26,7 @@ stages:
         command: 'test'
         projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
 
-- ${{ if variables.isBuildingSymbols }}:
+- ${{ if $[or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/developer')), eq(variables['Build.SourceBranch'], 'refs/heads/testing'))] }}:
   - stage: Build
     displayName: 'Build all artifacts for windows and linux'
     jobs:
