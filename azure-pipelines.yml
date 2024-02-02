@@ -28,7 +28,7 @@ stages:
       displayName: 'Running dotnet unit tests'
       inputs:
         command: 'test'
-        project: '$(Build.SourcesDirectory)/*.csproj'
+        project: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
 
 - ${{ if variables.isBuildingSymbols }}:
   - stage: Build
