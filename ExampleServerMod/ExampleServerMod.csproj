@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <BaseOutputPath>../GithubSymbols/Net/ExampleServerMod</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.PalWorldSdk.csproj" />
+    <ProjectReference Include="..\PalworldManagedModFramework.UnrealSdk\PalworldManagedModFramework.UnrealSdk.csproj" />
+  </ItemGroup>
+
+</Project>
