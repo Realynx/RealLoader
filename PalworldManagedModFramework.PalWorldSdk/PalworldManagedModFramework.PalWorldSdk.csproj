@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <BaseOutputPath>../GithubSymbols/Net/PWMMF_PalWorldSDK</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
