@@ -135,7 +135,7 @@ stages:
         action: 'create'
         gitHubConnection: 'PoofimafoxPAT'
         repository: 'PoofImaFox/PalworldManagedModFramework'
-        tag: '$(version)'
+        tag: 'v$(version)-ci'
         title: 'Release $(version)'
         assets: |
           $(System.ArtifactsDirectory)/windows_artifacts/*
