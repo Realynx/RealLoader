@@ -18,7 +18,7 @@ Bootstrapper for hyjacking Unreal Engine's normal lilly-padding of EXEs. Injects
 #include <filesystem>
 
 //the entry point
-#if defined(Window_Build)
+#if defined(_WIN32)
 int __cdecl wmain(int argc, wchar_t* argv[])
 #else
 int main(int argc, char* argv[])
