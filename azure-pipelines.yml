@@ -102,7 +102,7 @@ stages:
           ArtifactName: 'linux_artifacts'
           publishLocation: 'Container'
 
-${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
   - stage: Deploy
     displayName: 'Deploy built artifacts to github'
     dependsOn: Build
