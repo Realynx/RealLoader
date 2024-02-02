@@ -22,13 +22,13 @@ stages:
       displayName: 'Restoring nuget packages'
       inputs:
         command: 'restore'
-        project: 'PalworldManagedModFramework.sln'
+        projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
 
     - task: DotNetCoreCLI@2
       displayName: 'Running dotnet unit tests'
       inputs:
         command: 'test'
-        project: '**/*.csproj'
+        project: '$(Build.SourcesDirectory)/*.csproj'
 
 - ${{ if variables.isBuildingSymbols }}:
   - stage: Build
@@ -52,7 +52,7 @@ stages:
       - task: MSBuild@1
         displayName: 'Build Palworld Managed Mod Framework Solution'
         inputs:
-          solution: 'PalworldManagedModFramework.sln'
+          solution: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
           msbuildArchitecture: 'x64'
           platform: 'x64'
           configuration: 'Release'
