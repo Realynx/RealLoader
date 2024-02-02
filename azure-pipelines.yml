@@ -142,6 +142,7 @@ stages:
         gitHubConnection: 'PoofimafoxPAT'
         repository: 'PoofImaFox/PalworldManagedModFramework'
         tagSource: 'gitTag'
+        tagPattern: 'v*'
         title: 'Release $(version)-ci'
         assets: |
           $(System.ArtifactsDirectory)/ManagedModFramework.zip
