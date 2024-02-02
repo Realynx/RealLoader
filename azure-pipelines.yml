@@ -102,6 +102,6 @@ stages:
           publishLocation: 'Container'
 
 
-  - stage: Deploy
-    displayName: 'Deploy built artifacts to github'
-    jobs:
+  # - stage: Deploy
+  #   displayName: 'Deploy built artifacts to github'
+  #   jobs:
