@@ -4,7 +4,8 @@ trigger:
 variables:
   major: 1
   minor: $[counter(variables['major'], 10)]
-  version: $[format('{0}.{1}', variables.major, variables.minor)]
+  build: $[counter(variables['minor'], 1000)]
+  version: $[format('{0}.{1}.{2}', variables.major, variables.minor, variables.build)]
 
 stages:
 - stage: UnitTesting
