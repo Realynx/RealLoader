@@ -30,63 +30,63 @@ stages:
         command: 'test'
         projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
 
-# - ${{ if variables.isBuildingSymbols }}:
-- stage: Build
-  displayName: 'Build all artifacts for windows and linux'
-  jobs:
-  - job: BuildWindows
-    displayName: 'Build on Windows'
-    pool: 
-      name: 'Windows'
-    steps:
-    - task: UseDotNet@2
-      displayName: 'Use .NET Core sdk'
-      inputs:
-        packageType: sdk
-        version: 8.x
-        installationPath: $(Agent.ToolsDirectory)/dotnet
+- ${{ if variables.isBuildingSymbols }}:
+  - stage: Build
+    displayName: 'Build all artifacts for windows and linux'
+    jobs:
+    - job: BuildWindows
+      displayName: 'Build on Windows'
+      pool: 
+        name: 'Windows'
+      steps:
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core sdk'
+        inputs:
+          packageType: sdk
+          version: 8.x
+          installationPath: $(Agent.ToolsDirectory)/dotnet
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Restoring nuget packages'
-      inputs:
-        command: 'restore'
-        projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
-      
-    - task: MSBuild@1
-      displayName: 'Build C++ Windows Solution'
-      inputs:
-        solution: '$(Build.SourcesDirectory)/C++WindowsBuild.sln'
-        msbuildArchitecture: 'x64'
-        platform: 'x64'
-        configuration: 'Dist'
-        msbuildArguments: '/target:Rebuild'
+      - task: DotNetCoreCLI@2
+        displayName: 'Restoring nuget packages'
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
+        
+      - task: MSBuild@1
+        displayName: 'Build C++ Windows Solution'
+        inputs:
+          solution: '$(Build.SourcesDirectory)/C++WindowsBuild.sln'
+          msbuildArchitecture: 'x64'
+          platform: 'x64'
+          configuration: 'Dist'
+          msbuildArguments: '/target:Rebuild'
 
-    - task: MSBuild@1
-      displayName: 'Build Palworld Managed Mod Framework Solution'
-      inputs:
-        solution: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
-        msbuildArchitecture: 'x64'
-        platform: 'x64'
-        configuration: 'Release'
-        msbuildArguments: '/target:Rebuild'
+      - task: MSBuild@1
+        displayName: 'Build Palworld Managed Mod Framework Solution'
+        inputs:
+          solution: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
+          msbuildArchitecture: 'x64'
+          platform: 'x64'
+          configuration: 'Release'
+          msbuildArguments: '/target:Rebuild'
 
-  - job: BuildLinux
-    displayName: 'Build on Linux'
-    pool: 
-      name: 'PoofyHost'
-    steps:
-    - task: DotNetCoreCLI@2
-      displayName: 'Restoring nuget packages'
-      inputs:
-        command: 'restore'
-        projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
+    - job: BuildLinux
+      displayName: 'Build on Linux'
+      pool: 
+        name: 'PoofyHost'
+      steps:
+      - task: DotNetCoreCLI@2
+        displayName: 'Restoring nuget packages'
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
 
-    - task: CMake@1
-      displayName: 'CMake Configure'
-      inputs:
-        cmakeArgs: '$(Build.SourcesDirectory)'
+      - task: CMake@1
+        displayName: 'CMake Configure'
+        inputs:
+          cmakeArgs: '$(Build.SourcesDirectory)'
 
-    - task: CMake@1
-      displayName: 'CMake Build'
-      inputs:
-        cmakeArgs: '--build $(Build.SourcesDirectory)/build'
+      - task: CMake@1
+        displayName: 'CMake Build'
+        inputs:
+          cmakeArgs: '--build $(Build.SourcesDirectory)/build'
