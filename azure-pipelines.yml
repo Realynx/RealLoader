@@ -39,6 +39,13 @@ stages:
     pool: 
       name: 'Windows'
     steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk'
+      inputs:
+        packageType: sdk
+        version: 8.x
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
     - task: DotNetCoreCLI@2
       displayName: 'Restoring nuget packages'
       inputs:
