@@ -70,7 +70,7 @@ stages:
       - task: PublishBuildArtifacts@1
         displayName: 'Publish Artifact: drop'
         inputs:
-          PathtoPublish: '$(Build.SourcesDirectory)/build'
+          PathtoPublish: '$(Build.SourcesDirectory)/GithubSymbols'
           ArtifactName: 'windows_artifacts'
           publishLocation: 'Container'
 
