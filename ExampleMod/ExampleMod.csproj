@@ -14,8 +14,4 @@
     <ProjectReference Include="..\PalworldManagedModFramework.UnrealSdk\PalworldManagedModFramework.UnrealSdk.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y &quot;$(TargetDir)*.*&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Palworld\ClrMods\ExampleMod\&quot;" />
-  </Target>
-
 </Project>
