@@ -129,14 +129,22 @@ stages:
         artifactName: 'linux_artifacts'
         downloadPath: '$(System.ArtifactsDirectory)'
 
+    - task: ArchiveFiles@2
+      inputs:
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/Net/PalWorldManagedModFramework/Release'
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/ManagedModFramework.zip'
+
     - task: GitHubRelease@1
       displayName: 'Create GitHub Release'
       inputs:
         action: 'create'
         gitHubConnection: 'PoofimafoxPAT'
         repository: 'PoofImaFox/PalworldManagedModFramework'
-        tag: 'v$(version)-ci'
-        title: 'Release $(version)'
+        tagSource: 'gitTag'
+        title: 'Release $(version)-ci'
         assets: |
-          $(System.ArtifactsDirectory)/windows_artifacts/*
-          $(System.ArtifactsDirectory)/linux_artifacts/*
+          $(System.ArtifactsDirectory)/ManagedModFramework.zip
+          $(System.ArtifactsDirectory)/windows_artifacts/Windows/Bootstrapper.exe
+          $(System.ArtifactsDirectory)/windows_artifacts/Windows/CLRHost.dll
+          $(System.ArtifactsDirectory)/linux_artifacts/GithubSymbols/Linux/libCLRHost.so
