@@ -43,7 +43,7 @@ stages:
       - task: MSBuild@1
         displayName: 'Build C++ Windows Solution'
         inputs:
-          solution: 'C++WindowsBuild.sln'
+          solution: '$(Build.SourcesDirectory)/C++WindowsBuild.sln'
           msbuildArchitecture: 'x64'
           platform: 'x64'
           configuration: 'Dist'
