@@ -17,7 +17,7 @@ namespace PalworldModInstaller.Commands {
         public override int Execute(CommandContext context, InstallerOptions settings) {
             var currentPlatform = Environment.OSVersion.Platform;
 
-            Installer modloaderInstaller = null;
+            IInstaller modloaderInstaller = null;
             switch (currentPlatform) {
 
                 // Windows 3.1 that provided partial Win32 API support

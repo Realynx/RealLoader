@@ -1,7 +1,7 @@
 ﻿using PalworldModInstaller.Models;
 
 namespace PalworldModInstaller.Services {
-    internal interface Installer {
+    public interface IInstaller {
         void InstallFiles(InstallerOptions installerOptions);
         void UninstallFiles(InstallerOptions installerOptions);
     }

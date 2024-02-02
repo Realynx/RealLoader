@@ -21,9 +21,8 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
         public void ScanMemoryForUnrealReflectionPointers() {
 
             // DebugUtilities.WaitForDebuggerAttach();
-            var allPotentialReflectionStructs = SequenceScanner.SequenceScan("?? ?? ?? ?? ?? 00 00 00 ?? ?? ?? ?? ?? 00 00 00");
-
-
+            //var allPotentialReflectionStructs = SequenceScanner.SequenceScan("?? ?? ?? ?? ?? 00 00 00 ?? ?? ?? ?? ?? 00 00 00");
+            //_logger.Info($"Found {allPotentialReflectionStructs.Length} patterns OwO");
 
 
             //foreach (UFunctionStruct* uFunction in allPotentialReflectionStructs) {

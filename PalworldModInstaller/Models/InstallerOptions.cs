@@ -5,7 +5,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 
 namespace PalworldModInstaller.Models {
-    internal class InstallerOptions : CommandSettings {
+    public class InstallerOptions : CommandSettings {
         [CommandOption("-l|--location")]
         [DefaultValue("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Palworld")]
         [Description("This is the directory that your game is installed.")]

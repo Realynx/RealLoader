@@ -3,7 +3,7 @@
 using Spectre.Console;
 
 namespace PalworldModInstaller.Services {
-    internal class WindowsInstaller : Installer {
+    public class WindowsInstaller : IInstaller {
         public void UninstallFiles(InstallerOptions installerOptions) {
             var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
             var dotnetDependanciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Win64", "ManagedModFramework");

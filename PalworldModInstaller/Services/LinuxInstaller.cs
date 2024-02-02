@@ -3,7 +3,7 @@
 using Spectre.Console;
 
 namespace PalworldModInstaller.Services {
-    internal class LinuxInstaller : Installer {
+    public class LinuxInstaller : IInstaller {
         public void UninstallFiles(InstallerOptions installerOptions) {
             var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
             var dotnetDependanciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "ManagedModFramework");
@@ -92,7 +92,7 @@ chmod +x ""$UE_PROJECT_ROOT/Pal/Binaries/Linux/PalServer-Linux-Test""
 ""$UE_PROJECT_ROOT/Pal/Binaries/Linux/PalServer-Linux-Test"" Pal ""$@"" 
 
 # Run PalServer-Linux-Test with LD_PRELOAD set only for this command
-LD_PRELOAD=""$UE_PROJECT_ROOT/pal/Binaries/Linux/ManagedModFramework/CLRHost.so"" ""$UE_PROJECT_ROOT/Pal/Binaries/Linux/PalServer-Linux-Test"" Pal ""$@""
+LD_PRELOAD=""$UE_PROJECT_ROOT/Pal/Binaries/Linux/ManagedModFramework/CLRHost.so"" ""$UE_PROJECT_ROOT/Pal/Binaries/Linux/PalServer-Linux-Test"" Pal ""$@""
 ");
         }
     }

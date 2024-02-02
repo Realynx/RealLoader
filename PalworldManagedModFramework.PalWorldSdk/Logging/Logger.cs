@@ -12,7 +12,6 @@ namespace PalworldManagedModFramework.PalWorldSdk.Logging {
         public LogLevel Level { get; set; }
 
         private readonly string _logLocation;
-        private readonly Semaphore _semaphore;
         private readonly LoggerConfig _loggerConfig;
 
         private string TimeStamp {
@@ -23,10 +22,8 @@ namespace PalworldManagedModFramework.PalWorldSdk.Logging {
 
         public Logger(LoggerConfig loggerConfig) {
             _loggerConfig = loggerConfig;
-
             _logLocation = loggerConfig.LogFile;
 
-            _semaphore = new Semaphore(1, 1);
             Level = LogLevel.Info | LogLevel.Warnings | LogLevel.Errors;
 
             if (loggerConfig.DebugLogs) {
@@ -71,9 +68,18 @@ namespace PalworldManagedModFramework.PalWorldSdk.Logging {
             }
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private void LogOutput(ConsoleColor color, string log, string classFile, int lineNumber, string callerName) {
-            _semaphore.WaitOne();
-            var className = Path.GetFileNameWithoutExtension(classFile);
+            // If the binary was compiled on windows the constant class filenames will have windows path seperators, and vice versa for linux.
+            // So we must check for this manually.
+            var directorySeparatorChar = classFile.Contains('/') ? '/' : '\\';
+
+            var className = classFile;
+            if (className.Contains(directorySeparatorChar)) {
+                className = className.Split(directorySeparatorChar)[^1];
+            }
+            className = Path.GetFileNameWithoutExtension(className);
+
             var logPreamble = $"[{TimeStamp}][{className}::{callerName};{lineNumber}]: ";
 
             Console.ForegroundColor = color;
@@ -85,8 +91,6 @@ namespace PalworldManagedModFramework.PalWorldSdk.Logging {
             if (_loggerConfig.WriteFile) {
                 File.WriteAllText(_logLocation, log);
             }
-
-            _semaphore.Release();
         }
     }
 }

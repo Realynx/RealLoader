@@ -7,9 +7,10 @@ using PalworldManagedModFramework.PalWorldSdk.Services;
 
 namespace ExampleMod {
     [PalworldMod("Sample", "poofyfox", ".poofyfox", "1.0.0", serverMod: false)]
-    public unsafe class Sample : IPalworldMod {
+    public class Sample : IPalworldMod {
         private CancellationToken _cancellationToken;
         private ILogger _logger;
+
 
         public void Load(CancellationToken cancellationToken, ILogger logger) {
             _cancellationToken = cancellationToken;

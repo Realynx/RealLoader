@@ -1,14 +1,71 @@
 trigger:
-- master
-
-pool:
-  vmImage: ubuntu-latest
+- *
 
 variables:
+  isMainBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  isDevBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/developer')]
+  isTestingBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/testing')]
+  isBuildingSymbols: $[or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/developer')), eq(variables['Build.SourceBranch'], 'refs/heads/testing'))]
   major: 1
   minor: $[counter(variables['major'], 10)]
 
-steps:
-- task: CMake@1
-  inputs:
-    cmakeArgs: 
+stages:
+- stage: UnitTesting
+  displayName: 'Execute all the unit tests.'
+  jobs:
+  - job: DotnetTesting
+    displayName: 'Test the .NET code'
+    pool: 
+      name: 'PoofyHost'
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'Restoring nuget packages'
+      inputs:
+        command: 'restore'
+        project: '**/*.csproj'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Running dotnet unit tests'
+      inputs:
+        command: 'test'
+        project: '**/*.csproj'
+
+- ${{ if variables.isBuildingSymbols }}:
+  - stage: Build
+    displayName: 'Build all artifacts for windows and linux'
+    jobs:
+    - job: BuildWindows
+      displayName: 'Build on Windows'
+      condition: or(variables.isMainBranch, variables.isDevBranch)
+      pool: 
+        name: 'Windows'
+      steps:
+      - task: MSBuild@1
+        displayName: 'Build C++ Windows Solution'
+        inputs:
+          solution: 'C++WindowsBuild.sln'
+          msbuildArchitecture: 'x64'
+          platform: 'x64'
+          configuration: 'Dist'
+          msbuildArguments: '/target:Rebuild'
+
+      - task: MSBuild@1
+        displayName: 'Build Palworld Managed Mod Framework Solution'
+        inputs:
+          solution: 'PalworldManagedModFramework.sln'
+          msbuildArchitecture: 'x64'
+          platform: 'x64'
+          configuration: 'Release'
+          msbuildArguments: '/target:Rebuild'
+
+    - job: BuildLinux
+      displayName: 'Build on Linux'
+      condition: or(variables.isMainBranch, variables.isTestingBranch)
+      pool: 
+        name: 'PoofyHost'
+      steps:
+      - task: CMake@2
+        displayName: 'Building native code with Cmake'
+        inputs:
+          workingDirectory: 'path/to/your/source/build'
+          cmakeArgs: '--build .'
