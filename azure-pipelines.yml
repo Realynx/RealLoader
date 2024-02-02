@@ -40,6 +40,12 @@ stages:
       pool: 
         name: 'Windows'
       steps:
+      - task: DotNetCoreCLI@2
+        displayName: 'Restoring nuget packages'
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
+        
       - task: MSBuild@1
         displayName: 'Build C++ Windows Solution'
         inputs:
@@ -64,6 +70,12 @@ stages:
       pool: 
         name: 'PoofyHost'
       steps:
+      - task: DotNetCoreCLI@2
+        displayName: 'Restoring nuget packages'
+        inputs:
+          command: 'restore'
+          projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
+
       - task: CMake@1
         displayName: 'CMake Configure'
         inputs:
