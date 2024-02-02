@@ -11,4 +11,10 @@
       <UniqueIdentifier>{6D0C007B-E986-35ED-9E37-669F61F2A97B}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\CLR.hpp" />
+    <ClInclude Include="src\coreclr_delegates.h" />
+    <ClInclude Include="src\hostfxr.h" />
+    <ClInclude Include="src\nethost.h" />
+  </ItemGroup>
 </Project>

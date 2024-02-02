@@ -10,6 +10,7 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<BaseOutputPath>../GithubSymbols/Net/PalWorldManagedModFramework</BaseOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -37,9 +38,5 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy /Y &quot;$(TargetDir)*.*&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Palworld\Pal\Binaries\Win64\ManagedModFramework\&quot;" />
-	</Target>
 
 </Project>

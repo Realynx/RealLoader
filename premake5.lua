@@ -14,18 +14,19 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 --CLRHost for injecting
 project "CLRHost"
 location "CLRHost"
-kind "StaticLib"
+kind "SharedLib"
 language "C++"
             
-targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+--targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+targetdir("GithubSymbols\\Windows")
 objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
     
     
 files 
 {
-    "CLRHost\\includes\\**.h",
+    "CLRHost\\src\\**.h",
     "CLRHost\\src\\**.c",
-    "CLRHost\\includes\\**.hpp",
+    "CLRHost\\src\\**.hpp",
     "CLRHost\\src\\**.cpp",
 }
 
@@ -37,7 +38,7 @@ includedirs
 
 links
 {
-    "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Host.win-x64\\8.0.1\\runtimes\\win-x64\\native\\libnethost.lib"
+    "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Host.win-x64\\8.0.1\\runtimes\\win-x64\\native\\nethost.lib"
 }
     
 flags
@@ -55,7 +56,7 @@ systemversion "latest"
 
 defines
 {
-    "__WIN32"
+    "_WIN32"
 }
 
 --configs
@@ -77,7 +78,8 @@ location "PalWorldManagedModFramework.EntryPoint"
 kind "ConsoleApp"
 language "C++"
             
-targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+--targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+targetdir("GithubSymbols\\Windows")
 objdir ("bin-obj/" .. outputdir .. "/%{prj.name}")
     
     
@@ -114,7 +116,7 @@ systemversion "latest"
 
 defines
 {
-    "__Win32"
+    "_WIN32"
 }
 
 --configs
