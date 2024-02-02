@@ -22,7 +22,7 @@ stages:
       displayName: 'Restoring nuget packages'
       inputs:
         command: 'restore'
-        project: '**/*.csproj'
+        project: 'PalworldManagedModFramework.sln'
 
     - task: DotNetCoreCLI@2
       displayName: 'Running dotnet unit tests'
