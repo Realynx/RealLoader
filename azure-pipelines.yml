@@ -72,4 +72,4 @@ stages:
       - task: CMake@1
         displayName: 'CMake Build'
         inputs:
-          cmakeArgs: '--build $(Build.SourcesDirectory)'
+          cmakeArgs: '--build $(Build.SourcesDirectory)/build'
