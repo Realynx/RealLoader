@@ -4,6 +4,7 @@ trigger:
 variables:
   major: 1
   minor: $[counter(variables['major'], 10)]
+  version: $[format('{0}.{1}', variables.major, variables.minor)]
 
 stages:
 - stage: UnitTesting
@@ -101,7 +102,39 @@ stages:
           ArtifactName: 'linux_artifacts'
           publishLocation: 'Container'
 
+${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+  - stage: Deploy
+    displayName: 'Deploy built artifacts to github'
+    dependsOn: Build
+    jobs:
+    - job: DeployJob
+      displayName: 'Deploy Artifacts'
+      pool:
+        name: 'PoofyHost'
+      steps:
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Download Windows Artifacts'
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'windows_artifacts'
+          downloadPath: '$(System.ArtifactsDirectory)'
 
-  # - stage: Deploy
-  #   displayName: 'Deploy built artifacts to github'
-  #   jobs:
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Download Linux Artifacts'
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'linux_artifacts'
+          downloadPath: '$(System.ArtifactsDirectory)'
+
+      - task: GitHubRelease@1
+        displayName: 'Create GitHub Release'
+        inputs:
+          gitHubConnection: 'PoofImaFox'
+          repository: 'PoofImaFox/PalworldManagedModFramework'
+          tag: '$(version)'
+          title: 'Release $(version)'
+          assets: |
+            $(System.ArtifactsDirectory)/windows_artifacts/*
+            $(System.ArtifactsDirectory)/linux_artifacts/*
