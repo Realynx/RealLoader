@@ -4,10 +4,13 @@ using PalworldModInstaller.Commands;
 using PalworldModInstaller.DI;
 using PalworldModInstaller.Services;
 
+using Spectre.Console;
 using Spectre.Console.Cli;
 
 namespace PalworldModInstaller {
     internal class Program {
+        internal const string LATEST_GITHUB_ADDRESS = "https://github.com/PoofImaFox/PalworldManagedModFramework/releases/latest/download/";
+
         internal static void Main(string[] args) {
             var registrar = ConfigureServiceRegistry();
 
@@ -27,6 +30,17 @@ namespace PalworldModInstaller {
             serviceDescriptors
                 .AddSingleton<LinuxInstaller>()
                 .AddSingleton<WindowsInstaller>();
+        }
+
+        public static async Task<byte[]> DownloadGithubRelease(string githubFileName) {
+            var httpClient = new HttpClient();
+            var httpFileResponse = await httpClient.GetAsync($"{Program.LATEST_GITHUB_ADDRESS}{githubFileName}");
+            if (!httpFileResponse.IsSuccessStatusCode) {
+                AnsiConsole.WriteLine($"Failed to download '{githubFileName}'...");
+            }
+
+            var httpFileBytes = await httpFileResponse.Content.ReadAsByteArrayAsync();
+            return httpFileBytes;
         }
     }
 }

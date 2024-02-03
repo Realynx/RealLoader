@@ -2,7 +2,8 @@
 
 using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.PalWorldSdk.Services;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
+using PalworldManagedModFramework.PalWorldSdk.Services.Interfaces;
+using PalworldManagedModFramework.Services.MemoryScanning.EnginePatterns;
 
 namespace PalworldManagedModFramework.Services.MemoryScanning {
     [StructLayout(LayoutKind.Sequential)]
@@ -13,37 +14,27 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
 
     internal unsafe class UReflectionPointerScanner {
         private readonly ILogger _logger;
+        private readonly ISequenceScanner _sequenceScanner;
 
-        public UReflectionPointerScanner(ILogger logger) {
+        public UReflectionPointerScanner(ILogger logger, ISequenceScanner sequenceScanner) {
             _logger = logger;
+            _sequenceScanner = sequenceScanner;
         }
 
         public void ScanMemoryForUnrealReflectionPointers() {
 
-            // DebugUtilities.WaitForDebuggerAttach();
-            //var allPotentialReflectionStructs = SequenceScanner.SequenceScan("?? ?? ?? ?? ?? 00 00 00 ?? ?? ?? ?? ?? 00 00 00");
-            //_logger.Info($"Found {allPotentialReflectionStructs.Length} patterns OwO");
+            IEnginePattern enginePatterns = Environment.OSVersion.Platform == PlatformID.Unix
+                ? new LinuxServerPattern()
+                : new WindowsClientPattern();
 
 
-            //foreach (UFunctionStruct* uFunction in allPotentialReflectionStructs) {
-            //    if (uFunction == null) {
-            //        // Skip if the pointer is null
-            //        continue;
-            //    }
+            DebugUtilities.WaitForDebuggerAttach();
 
-            //    if (uFunction->uFunctionName != null) {
-            //        string functionName = new string(*uFunction->uFunctionName);
-            //        _logger.Debug($"0x{(long)uFunction:x} - {functionName}");
+            var guObjectsArrayOffset = _sequenceScanner.SequenceScan(enginePatterns.GUObjectArray);
+            _logger.Info($"Found {nameof(enginePatterns.GUObjectArray)} pattern.");
 
-            //        if (functionName == "SelfDeathEvent") {
-            //            _logger.Info("Found Valid Struct!");
-            //        }
-            //    }
-            //    else {
-            //        _logger.Debug("uFunctionName is null");
-            //    }
-            //}
-
+            var namePoolDataOffset = _sequenceScanner.SequenceScan(enginePatterns.NamePoolData);
+            _logger.Info($"Found {nameof(enginePatterns.NamePoolData)} pattern.");
         }
     }
 }

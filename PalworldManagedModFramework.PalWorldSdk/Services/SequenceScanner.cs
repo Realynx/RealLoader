@@ -2,17 +2,26 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
+using PalworldManagedModFramework.PalWorldSdk.Services.Interfaces;
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
+
 namespace PalworldManagedModFramework.PalWorldSdk.Services {
     // TODO: Make this Singleton pattern using instance, Ex: Mkaes this unit-testable and interchangble.
-    public static unsafe class SequenceScanner {
+    public class SequenceScanner : ISequenceScanner {
         private static readonly Regex _hexRegex = new(@"[0-9a-fA-F]{2}");
+
+        private readonly IMemoryMapper _memoryMapper;
+
+        public SequenceScanner(IMemoryMapper memoryMapper) {
+            _memoryMapper = memoryMapper;
+        }
 
         /// <summary>
         /// Returns the memory position of a found signature, from the main process module.
         /// </summary>
         /// <param name="signature"></param>
         /// <returns></returns>
-        public static IntPtr? SingleSequenceScan(string signature) {
+        public IntPtr? SingleSequenceScan(string signature) {
             return SequenceScan(signature, Process.GetCurrentProcess().MainModule
                 ?? throw new Exception("Main module was null")).FirstOrDefault();
         }
@@ -22,7 +31,7 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services {
         /// </summary>
         /// <param name="signature"></param>
         /// <returns></returns>
-        public static IntPtr[] SequenceScan(string signature) {
+        public IntPtr[] SequenceScan(string signature) {
             return SequenceScan(signature, Process.GetCurrentProcess().MainModule
                 ?? throw new Exception("Main module was null"));
         }
@@ -34,69 +43,95 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services {
         /// <param name="processModule">The process module to scan.</param>
         /// <param name="findCount">The number of matches to find before stopping the scan. Default is 1.</param>
         /// <returns>An array of memory addresses where the signature was found.</returns>
-        public static IntPtr[] SequenceScan(string signature, ProcessModule processModule, int findCount = 0) {
-            var patternMask = DeriveMask(signature); // Ensure this handles '??' as wildcards.
-            var baseAddress = (byte*)processModule.BaseAddress.ToPointer();
-            var patternLength = patternMask.pattern.Length;
+        public nint[] SequenceScan(string signature, ProcessModule processModule) {
+            var memoryRegions = _memoryMapper.FindMemoryRegions(processModule).Where(i => i.ReadFlag);
+            var foundSequences = new List<nint>();
 
-            var foundSequences = new List<IntPtr>();
-
-            try {
-                var scanPtr = baseAddress;
-                var endPtr = baseAddress + processModule.ModuleMemorySize - patternLength;
-                var patternPtr = 0;
-
-                while (scanPtr < endPtr) {
-                    if (patternMask.mask[patternPtr] == '?' || patternMask.pattern[patternPtr] == scanPtr[patternPtr]) {
-                        patternPtr++;
-                        if (patternPtr == patternLength) {
-                            foundSequences.Add(new IntPtr(scanPtr));
-                            if (foundSequences.Count >= findCount && findCount > 0) {
-                                break;
-                            }
-
-                            scanPtr++; // Move scanPtr forward by one byte instead of the pattern length
-                            patternPtr = 0; // Reset patternPtr
-                        }
-                    }
-                    else {
-                        scanPtr += Math.Max(1, patternPtr); // Move scanPtr forward, skipping checked bytes
-                        patternPtr = 0; // Reset patternPtr
-                    }
+            var loopResult = Parallel.ForEach(memoryRegions, (scanRegion) => {
+                var foundAddresses = ScanMemoryRegion(signature, scanRegion);
+                if (foundAddresses.Length < 1) {
+                    return;
                 }
 
+                lock (foundSequences) {
+                    foundSequences.AddRange(foundAddresses);
+                }
+            });
+
+
+            while (!loopResult.IsCompleted) {
+                Thread.Sleep(100);
             }
-            catch (Exception ex) {
-                // Log the exception
-                // Example: Console.WriteLine("An error occurred: " + ex.Message);
-                return foundSequences.ToArray();
+
+            return foundSequences.ToArray();
+        }
+
+        private unsafe nint[] ScanMemoryRegion(string signature, MemoryRegion memoryRegion) {
+            var patternMask = DeriveMask(signature);
+            var patternLength = patternMask.pattern.Length;
+
+            var foundSequences = new List<nint>();
+
+            var scanPtr = (nint)memoryRegion.StartAddress;
+            var endPtr = (nint)memoryRegion.EndAddress;
+            var patternPtr = 0;
+
+            while (scanPtr < endPtr) {
+                var matchedValue = patternMask.mask[patternPtr] == '?' || patternMask.pattern[patternPtr] == ((byte*)scanPtr)[patternPtr];
+                if (matchedValue) {
+                    patternPtr++;
+
+                    if (patternPtr == patternLength) {
+                        foundSequences.Add(scanPtr);
+                        scanPtr++;
+                        patternPtr = 0;
+                    }
+                }
+                else {
+                    scanPtr += Math.Max(1, patternPtr);
+                    patternPtr = 0;
+                }
             }
 
             return foundSequences.ToArray();
         }
 
 
-        private static (char[] mask, byte[] pattern) DeriveMask(string signature) {
+        private (char[] mask, byte[] pattern, int offset) DeriveMask(string signature) {
             var hexValues = signature.Split(' ');
 
             if (hexValues.Length < 2) {
                 throw new Exception($"Invalid pattern, your {nameof(signature)} is not long enough.");
             }
 
-            var mask = new string('x', hexValues.Length).ToCharArray();
-            var buffer = new byte[hexValues.Length];
+            var mask = new List<char>();
+            var buffer = new List<byte>();
+            var offset = 0;
 
-            for (var x = 0; x < buffer.Length; x++) {
+            for (var x = 0; x < hexValues.Length; x++) {
                 if (_hexRegex.IsMatch(hexValues[x])) {
-                    buffer[x] = byte.Parse(hexValues[x], NumberStyles.HexNumber);
+                    buffer.Add(byte.Parse(hexValues[x], NumberStyles.HexNumber));
+                    mask.Add('x');
                 }
-                else {
-                    buffer[x] = 0x00;
-                    mask[x] = '?';
+                else if (hexValues[x] == "?") {
+                    buffer.Add(0x00);
+                    mask.Add('?');
+                }
+                else if (hexValues[x] == "|") {
+                    if (offset != -1) {
+                        throw new Exception("Multiple offset indicators '|' found in the pattern.");
+                    }
+
+                    offset = x;
                 }
             }
 
-            return (mask, buffer);
+            if (buffer.Count != mask.Count) {
+                throw new Exception("Invalid Signature");
+            }
+
+            offset = offset == -1 ? 0 : offset;
+            return (mask.ToArray(), buffer.ToArray(), offset);
         }
     }
 }
