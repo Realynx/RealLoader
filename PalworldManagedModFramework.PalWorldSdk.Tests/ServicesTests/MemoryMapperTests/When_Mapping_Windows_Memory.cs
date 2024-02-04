@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Models;
 
 using Xunit;
 
@@ -9,18 +9,11 @@ namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.MemoryMapp
     public class When_Mapping_Windows_Memory : Using_Windows_Memory_Mapper {
         private MemoryRegion[] _memoryRegions = [];
         protected override void Setup() {
-            baseModule = Process.GetCurrentProcess().MainModule;
+
         }
 
         protected override void Act() {
-            _memoryRegions = TestableImplementation.FindMemoryRegions(baseModule!);
-        }
-
-        [SkippableFact]
-        public void Did_Fill_Valid_Data() {
-            Skip.IfNot(Environment.OSVersion.Platform == PlatformID.Win32NT);
-
-            Assert.Equal(baseModule!.BaseAddress, (nint)_memoryRegions.First().StartAddress);
+            _memoryRegions = TestableImplementation.FindMemoryRegions();
         }
 
         [SkippableFact]
@@ -51,18 +44,29 @@ namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.MemoryMapp
             Assert.Contains(_memoryRegions, i => i.ExecuteFlag);
         }
 
-        //[SkippableFact]
-        //public unsafe void Found_Manually_Created_Memory() {
-        //    Skip.IfNot(Environment.OSVersion.Platform == PlatformID.Win32NT);
+        [SkippableFact]
+        public unsafe void Found_Manually_Created_Memory() {
+            Skip.IfNot(Environment.OSVersion.Platform == PlatformID.Win32NT);
 
-        //    var allocatedBytes = (int*)Marshal.AllocHGlobal(20);
-        //    var address = (nint)allocatedBytes;
+            var allocatedBytes = (int*)Marshal.AllocHGlobal(20);
+            var address = (nint)allocatedBytes;
 
-        //    Assert.Contains(_memoryRegions, i => address >= (nint)i.StartAddress && address < (nint)i.EndAddress);
+            Assert.Contains(_memoryRegions, i => address >= (nint)i.StartAddress && address < (nint)i.EndAddress);
+            Marshal.FreeHGlobal((nint)allocatedBytes);
+        }
 
+        [SkippableFact]
+        public unsafe void Found_Manually_Created_Memory_At_Non_Zero_Address() {
+            Skip.IfNot(Environment.OSVersion.Platform == PlatformID.Win32NT);
 
-        //    Marshal.FreeHGlobal((nint)allocatedBytes);
-        //}
+            var allocatedBytes = (int*)Marshal.AllocHGlobal(20);
+            var address = (nint)allocatedBytes;
+
+            var memoryRegion = _memoryRegions.SingleOrDefault(i => address >= (nint)i.StartAddress && address < (nint)i.EndAddress);
+
+            Assert.True(memoryRegion.StartAddress != 0);
+            Marshal.FreeHGlobal((nint)allocatedBytes);
+        }
 
     }
 }

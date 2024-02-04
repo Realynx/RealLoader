@@ -2,6 +2,9 @@
 
 using PalworldManagedModFramework.PalWorldSdk.Services;
 using PalworldManagedModFramework.PalWorldSdk.Services.Interfaces;
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux;
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows;
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
 
 using Shared.SystemUnderTest;
 
@@ -13,6 +16,19 @@ namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceSc
 
         public Using_Sequence_Scanner() {
             Init();
+        }
+
+        protected unsafe void SetupMemoryMapperService() {
+            IMemoryMapper memoryMapper = null;
+
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+                memoryMapper = new WindowsMemoryMapper();
+            }
+            else if (Environment.OSVersion.Platform == PlatformID.Unix) {
+                memoryMapper = new LinuxMemoryMapper();
+            }
+
+            Mocker.Use(memoryMapper!);
         }
     }
 }

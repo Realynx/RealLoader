@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using PalworldManagedModFramework.DI;
 using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
+using PalworldManagedModFramework.Services.MemoryScanning;
 
 namespace PalworldManagedModFramework {
     internal static class Program {
@@ -30,6 +31,11 @@ namespace PalworldManagedModFramework {
                     Services.GetRequiredService<ILogger>();
 
                 loggerInstance.Info("DI Container Setup!");
+
+
+                // TODO: Move this into it's own function for setting up all the runtime scanning.
+                var reflectionScanner = host.Services.GetRequiredService<UReflectionPointerScanner>();
+                reflectionScanner.ScanMemoryForUnrealReflectionPointers();
 
                 var modLoader = host.Services.GetRequiredService<IModLoader>();
                 modLoader.LoadMods();

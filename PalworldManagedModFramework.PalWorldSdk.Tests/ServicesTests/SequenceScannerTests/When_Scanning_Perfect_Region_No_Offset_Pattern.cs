@@ -8,19 +8,12 @@ using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows;
 using Xunit;
 
 namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceScannerTests {
-    public class When_Scanning_Many_No_Offset_Pattern : Using_Sequence_Scanner {
+    public class When_Scanning_Perfect_Region_No_Offset_Pattern : Using_Sequence_Scanner {
         private IntPtr[] _results = Array.Empty<IntPtr>();
         private nint allocatedBytesAddress = 0;
 
         protected unsafe override void Setup() {
-            IMemoryMapper memoryMapper = null;
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
-                memoryMapper = new WindowsMemoryMapper();
-            }
-            else if (Environment.OSVersion.Platform == PlatformID.Unix) {
-                memoryMapper = new LinuxMemoryMapper();
-            }
-            Mocker.Use(memoryMapper!);
+            SetupMemoryMapperService();
 
             memoryBytes = new byte[] { 0x1A, 0xBC, 0x2F, 0x7D, 0x4E, 0x88, 0x3C, 0x5A };
             var allocatedBytes = (byte*)Marshal.AllocHGlobal(memoryBytes.Length);
@@ -30,23 +23,27 @@ namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceSc
                 var memByte = memoryBytes[x];
                 allocatedBytes[x] = memByte;
             }
-                       
+
             pattern = "1A BC 2F 7D 4E 88 3C 5A";
-            scanningModule = Process.GetCurrentProcess().MainModule;
         }
 
         protected override void Act() {
-            _results = TestableImplementation.SequenceScan(pattern, scanningModule!);
+            _results = TestableImplementation.SequenceScan(pattern, allocatedBytesAddress, allocatedBytesAddress + memoryBytes.Length);
         }
 
-        //[Fact]
-        //public unsafe void Does_Scanner_Find_Anything() {
-        //    Assert.NotEmpty(_results);
-        //}
+        [Fact]
+        public unsafe void Does_Scanner_Find_Anything() {
+            Assert.NotEmpty(_results);
+        }
 
-        //[Fact]
-        //public unsafe void Does_Scanner_Find_Block() {
-        //    Assert.Contains(_results, i => i == allocatedBytesAddress);
-        //}
+        [Fact]
+        public unsafe void Does_Scanner_Find_Single() {
+            Assert.Single(_results);
+        }
+
+        [Fact]
+        public unsafe void Does_Scanner_Find_Block() {
+            Assert.Contains(_results, i => i == allocatedBytesAddress);
+        }
     }
 }

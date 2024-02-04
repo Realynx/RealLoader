@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
 
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Models;
+
 namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux {
     public class LinuxMemoryMapper : IMemoryMapper {
         private readonly Regex _linuxMapRegex = new Regex(@"([0-9a-fA-F]+)-([0-9a-fA-F]+) ([r-])([w-])([x-])([p-]) ([0-9a-fA-F]+) ");
 
-        public MemoryRegion[] FindMemoryRegions(ProcessModule processModule) {
+        public MemoryRegion[] FindMemoryRegions() {
             return EnumerateMemoryRegions().ToArray();
         }
 

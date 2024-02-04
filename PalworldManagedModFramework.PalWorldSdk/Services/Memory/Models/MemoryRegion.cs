@@ -1,4 +1,4 @@
-﻿namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory {
+﻿namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Models {
     public struct MemoryRegion {
         public ulong StartAddress;
         public ulong EndAddress;

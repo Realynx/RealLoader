@@ -1,7 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
 using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.PalWorldSdk.Services;
 using PalworldManagedModFramework.PalWorldSdk.Services.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning.EnginePatterns;
 
@@ -15,26 +14,20 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
     internal unsafe class UReflectionPointerScanner {
         private readonly ILogger _logger;
         private readonly ISequenceScanner _sequenceScanner;
+        private readonly IEnginePattern _enginePattern;
 
-        public UReflectionPointerScanner(ILogger logger, ISequenceScanner sequenceScanner) {
+        public UReflectionPointerScanner(ILogger logger, ISequenceScanner sequenceScanner, IEnginePattern enginePattern) {
             _logger = logger;
             _sequenceScanner = sequenceScanner;
+            _enginePattern = enginePattern;
         }
 
         public void ScanMemoryForUnrealReflectionPointers() {
+            var guObjectsArrayOffset = _sequenceScanner.SingleSequenceScan(_enginePattern.GUObjectArray);
+            _logger.Info($"Found {nameof(_enginePattern.GUObjectArray)} pattern. Offset: 0x{guObjectsArrayOffset:X}");
 
-            IEnginePattern enginePatterns = Environment.OSVersion.Platform == PlatformID.Unix
-                ? new LinuxServerPattern()
-                : new WindowsClientPattern();
-
-
-            DebugUtilities.WaitForDebuggerAttach();
-
-            var guObjectsArrayOffset = _sequenceScanner.SequenceScan(enginePatterns.GUObjectArray);
-            _logger.Info($"Found {nameof(enginePatterns.GUObjectArray)} pattern.");
-
-            var namePoolDataOffset = _sequenceScanner.SequenceScan(enginePatterns.NamePoolData);
-            _logger.Info($"Found {nameof(enginePatterns.NamePoolData)} pattern.");
+            var namePoolDataOffset = _sequenceScanner.SingleSequenceScan(_enginePattern.NamePoolData);
+            _logger.Info($"Found {nameof(_enginePattern.NamePoolData)} pattern. Offset: 0x{namePoolDataOffset:X}");
         }
     }
 }

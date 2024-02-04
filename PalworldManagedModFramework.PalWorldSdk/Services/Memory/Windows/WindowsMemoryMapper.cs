@@ -1,14 +1,15 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Models;
+
 namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {
     public class WindowsMemoryMapper : IMemoryMapper {
-        public MemoryRegion[] FindMemoryRegions(ProcessModule processModule) {
+        public MemoryRegion[] FindMemoryRegions() {
             var currentProcess = Process.GetCurrentProcess();
             var currentProcessHandle = currentProcess.Handle;
-            var baseAddress = currentProcess.MainModule!.BaseAddress;
 
-            return EnumerateMemoryRegions(currentProcessHandle, baseAddress).ToArray();
+            return EnumerateMemoryRegions(currentProcessHandle, 0).ToArray();
         }
 
         private unsafe ICollection<MemoryRegion> EnumerateMemoryRegions(nint hProcess, nint baseAddress) {
@@ -49,13 +50,7 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {
                         ExecuteFlag = executeFlag
                     });
 
-                    // Use checked to detect any overflow.
-                    try {
-                        baseAddress = checked(baseAddress + (nint)(*memoryInfoStructs).RegionSize);
-                    }
-                    catch (OverflowException) {
-                        break;
-                    }
+                    baseAddress = baseAddress + (nint)(*memoryInfoStructs).RegionSize;
                 }
 
                 return mappedMemoryRegions;

@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 using PalworldManagedModFramework.PalWorldSdk.Services.Interfaces;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.PalWorldSdk.Services {
     // TODO: Make this Singleton pattern using instance, Ex: Mkaes this unit-testable and interchangble.
@@ -11,9 +13,11 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services {
         private static readonly Regex _hexRegex = new(@"[0-9a-fA-F]{2}");
 
         private readonly IMemoryMapper _memoryMapper;
+        private readonly IProcessSuspender _processSuspender;
 
-        public SequenceScanner(IMemoryMapper memoryMapper) {
+        public SequenceScanner(IMemoryMapper memoryMapper, IProcessSuspender processSuspender) {
             _memoryMapper = memoryMapper;
+            _processSuspender = processSuspender;
         }
 
         /// <summary>
@@ -44,45 +48,56 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services {
         /// <param name="findCount">The number of matches to find before stopping the scan. Default is 1.</param>
         /// <returns>An array of memory addresses where the signature was found.</returns>
         public nint[] SequenceScan(string signature, ProcessModule processModule) {
-            var memoryRegions = _memoryMapper.FindMemoryRegions(processModule).Where(i => i.ReadFlag);
-            var foundSequences = new List<nint>();
+            var startAddress = processModule.BaseAddress;
+            var endAddress = processModule.BaseAddress + processModule.ModuleMemorySize;
+            return SequenceScan(signature, startAddress, endAddress);
+        }
 
-            var loopResult = Parallel.ForEach(memoryRegions, (scanRegion) => {
-                var foundAddresses = ScanMemoryRegion(signature, scanRegion);
-                if (foundAddresses.Length < 1) {
-                    return;
-                }
+        public nint[] SequenceScan(string signature, nint startAddress, nint endAddress) {
+            _processSuspender.PauseSelf();
 
-                lock (foundSequences) {
-                    foundSequences.AddRange(foundAddresses);
-                }
-            });
+            var memoryRegions = _memoryMapper.FindMemoryRegions()
+                .Where(i => i.ReadFlag)
+                .Where(i => (startAddress <= (nint)i.EndAddress && endAddress >= (nint)i.StartAddress));
 
+            var foundSequences = ScanMemoryRegions(signature, memoryRegions);
 
-            while (!loopResult.IsCompleted) {
-                Thread.Sleep(100);
-            }
-
+            _processSuspender.ResumeSelf();
             return foundSequences.ToArray();
         }
 
-        private unsafe nint[] ScanMemoryRegion(string signature, MemoryRegion memoryRegion) {
-            var patternMask = DeriveMask(signature);
-            var patternLength = patternMask.pattern.Length;
+        private List<nint> ScanMemoryRegions(string signature, IEnumerable<MemoryRegion> memoryRegions) {
+            var foundSequences = new List<nint>();
 
+            foreach (var scanRegion in memoryRegions) {
+                var foundAddresses = ScanMemoryRegion(signature, scanRegion);
+                if (foundAddresses.Length > 0) {
+                    foundSequences.AddRange(foundAddresses);
+                }
+            }
+
+            return foundSequences;
+        }
+
+        private unsafe nint[] ScanMemoryRegion(string signature, MemoryRegion memoryRegion) {
             var foundSequences = new List<nint>();
 
             var scanPtr = (nint)memoryRegion.StartAddress;
             var endPtr = (nint)memoryRegion.EndAddress;
             var patternPtr = 0;
 
+            var patternMask = DeriveMask(signature);
+            var patternLength = patternMask.pattern.Length;
+
             while (scanPtr < endPtr) {
-                var matchedValue = patternMask.mask[patternPtr] == '?' || patternMask.pattern[patternPtr] == ((byte*)scanPtr)[patternPtr];
+                var scanByte = ((byte*)scanPtr)[patternPtr];
+
+                var matchedValue = patternMask.mask[patternPtr] == '?' || patternMask.pattern[patternPtr] == scanByte;
                 if (matchedValue) {
                     patternPtr++;
 
                     if (patternPtr == patternLength) {
-                        foundSequences.Add(scanPtr);
+                        foundSequences.Add(scanPtr + patternMask.offset);
                         scanPtr++;
                         patternPtr = 0;
                     }
@@ -106,7 +121,7 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services {
 
             var mask = new List<char>();
             var buffer = new List<byte>();
-            var offset = 0;
+            var offset = -1;
 
             for (var x = 0; x < hexValues.Length; x++) {
                 if (_hexRegex.IsMatch(hexValues[x])) {
