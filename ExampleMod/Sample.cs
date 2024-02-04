@@ -17,15 +17,15 @@ namespace ExampleMod {
             _logger = logger;
 
             // Windows Bytecode Pattern
-            var gWorld = SequenceScanner.SingleSequenceScan("49 ?? ?? ?? 48 ?? ?? ?? ?? ?? ?? 49 ?? ?? ?? f6");
-            var gobalWorldAddress = gWorld + 5;
-            _logger.Info($"Found Global World Instance: 0x{gobalWorldAddress:X}");
+            //var gWorld = SequenceScanner.SingleSequenceScan("49 ?? ?? ?? 48 ?? ?? ?? ?? ?? ?? 49 ?? ?? ?? f6");
+            //var gobalWorldAddress = gWorld + 5;
+            //_logger.Info($"Found Global World Instance: 0x{gobalWorldAddress:X}");
 
-            var gObjects = SequenceScanner.SingleSequenceScan("48 8B 05 ?? ?? ?? ?? 48 8B 0C C8 4C 8D 04 D1 EB 03");
-            _logger.Info($"Found Global Objects Instance: 0x{gObjects:X}");
+            //var gObjects = SequenceScanner.SingleSequenceScan("48 8B 05 ?? ?? ?? ?? 48 8B 0C C8 4C 8D 04 D1 EB 03");
+            //_logger.Info($"Found Global Objects Instance: 0x{gObjects:X}");
 
-            var fNames = SequenceScanner.SingleSequenceScan("48 8D 05 ?? ?? ?? ?? EB 13 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? C6 05 ?? ?? ?? ?? ?? 0F 10");
-            _logger.Info($"Found F Names Instance: 0x{fNames:X}");
+            //var fNames = SequenceScanner.SingleSequenceScan("48 8D 05 ?? ?? ?? ?? EB 13 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? C6 05 ?? ?? ?? ?? ?? 0F 10");
+            //_logger.Info($"Found F Names Instance: 0x{fNames:X}");
 
             // Abusing the fact that these pointers are
 
