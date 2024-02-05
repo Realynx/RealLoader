@@ -30,6 +30,9 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {
 
         [DllImport("kernel32", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern bool CloseHandle(IntPtr handle);
+
+        [DllImport("kernel32.dll")]
+        public static extern uint GetCurrentThreadId();
     }
 
     public class WindowsStructs {

@@ -1,45 +1,23 @@
-﻿using System.Diagnostics;
+﻿using PalworldManagedModFramework.PalWorldSdk.Logging;
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
 
 namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux {
     public class LinuxProcessSuspender : IProcessSuspender {
-        public void PauseSelf() {
-            var currentThreadId = GetCurrentThreadId();
-            var processPath = $"/proc/self/task";
-            var threadDirs = Directory.GetDirectories(processPath);
+        private readonly ILogger _logger;
 
-            foreach (var threadDir in threadDirs) {
-                var threadId = Path.GetFileName(threadDir);
-                if (threadId != currentThreadId) {
-                    var startInfo = new ProcessStartInfo {
-                        FileName = "kill",
-                        Arguments = $"-STOP {threadId}",
-                        UseShellExecute = false
-                    };
-                    Process.Start(startInfo);
-                }
-            }
+        public LinuxProcessSuspender(ILogger logger) {
+            _logger = logger;
+        }
+
+        /// <summary>
+        /// Yea... good luck
+        /// </summary>
+        public void PauseSelf() {
+            _logger.Debug($"{nameof(PauseSelf)} Was called on linux, cannot pause threads as a child thread!");
         }
 
         public void ResumeSelf() {
-            var currentThreadId = GetCurrentThreadId();
-            var processPath = $"/proc/self/task";
-            var threadDirs = Directory.GetDirectories(processPath);
 
-            foreach (var threadDir in threadDirs) {
-                var threadId = Path.GetFileName(threadDir);
-                if (threadId != currentThreadId) {
-                    var startInfo = new ProcessStartInfo {
-                        FileName = "kill",
-                        Arguments = $"-CONT {threadId}",
-                        UseShellExecute = false
-                    };
-                    Process.Start(startInfo);
-                }
-            }
-        }
-
-        private string GetCurrentThreadId() {
-            return File.ReadAllText("/proc/self/task/self/tid").Trim();
         }
     }
 }

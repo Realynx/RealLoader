@@ -32,11 +32,6 @@ namespace PalworldManagedModFramework {
 
                 loggerInstance.Info("DI Container Setup!");
 
-
-                // TODO: Move this into it's own function for setting up all the runtime scanning.
-                var reflectionScanner = host.Services.GetRequiredService<UReflectionPointerScanner>();
-                reflectionScanner.ScanMemoryForUnrealReflectionPointers();
-
                 var modLoader = host.Services.GetRequiredService<IModLoader>();
                 modLoader.LoadMods();
 

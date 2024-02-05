@@ -1,12 +1,10 @@
 ﻿using System.Diagnostics;
-
-using PalworldManagedModFramework.PalWorldSdk.Services;
-using PalworldManagedModFramework.PalWorldSdk.Services.Interfaces;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
 
 using Shared.SystemUnderTest;
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
 
 namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceScannerTests {
     public class Using_Sequence_Scanner : SpecAutoMocker<ISequenceScanner, SequenceScanner> {

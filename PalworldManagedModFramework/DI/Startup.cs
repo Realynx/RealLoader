@@ -4,15 +4,16 @@ using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.Models.Config;
 using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.PalWorldSdk.Services;
-using PalworldManagedModFramework.PalWorldSdk.Services.Interfaces;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows;
 using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning;
-using PalworldManagedModFramework.Services.MemoryScanning.EnginePatterns;
+using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
+using PalworldManagedModFramework.Services.MemoryScanning.Linux;
+using PalworldManagedModFramework.Services.MemoryScanning.Windows;
 
 namespace PalworldManagedModFramework.DI {
     internal static class Startup {
@@ -33,13 +34,15 @@ namespace PalworldManagedModFramework.DI {
                 services
                     .AddSingleton<IEnginePattern, LinuxServerPattern>()
                     .AddSingleton<IProcessSuspender, LinuxProcessSuspender>()
-                    .AddSingleton<IMemoryMapper, LinuxMemoryMapper>();
+                    .AddSingleton<IMemoryMapper, LinuxMemoryMapper>()
+                    .AddSingleton<IMemoryScanner, LinuxMemoryScanner>();
             }
             else if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
                 services
                     .AddSingleton<IEnginePattern, WindowsClientPattern>()
                     .AddSingleton<IProcessSuspender, WindowsProcessSuspender>()
-                    .AddSingleton<IMemoryMapper, WindowsMemoryMapper>();
+                    .AddSingleton<IMemoryMapper, WindowsMemoryMapper>()
+                    .AddSingleton<IMemoryScanner, WindowsMemoryScanner>();
             }
 
             services

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {

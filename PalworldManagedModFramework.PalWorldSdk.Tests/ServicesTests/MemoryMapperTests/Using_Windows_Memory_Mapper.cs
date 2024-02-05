@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
+using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows;
 
 using Shared.SystemUnderTest;
