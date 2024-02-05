@@ -1,5 +1,5 @@
-﻿namespace PalworldManagedModFramework.Attributes {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+﻿namespace PalworldManagedModFramework.PalWorldSdk.Attributes {
+    [AttributeUsage(AttributeTargets.Property)]
     public class MachineCodePatternAttribute : Attribute {
         public MachineCodePatternAttribute(string pattern, OperandType patternType) {
             Pattern = pattern;

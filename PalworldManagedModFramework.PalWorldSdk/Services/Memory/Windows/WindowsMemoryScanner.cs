@@ -1,8 +1,8 @@
-﻿using PalworldManagedModFramework.PalWorldSdk.Logging;
+﻿using System.Diagnostics;
+
+using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux;
-
-using System.Diagnostics;
 
 namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {
     public class WindowsMemoryScanner : IMemoryScanner {

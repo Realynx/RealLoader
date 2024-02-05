@@ -7,7 +7,8 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux {
         private readonly ISequenceScanner _sequenceScanner;
         private readonly IMemoryMapper _memoryMapper;
 
-        public LinuxMemoryScanner(ILogger logger, ISequenceScanner sequenceScanner, IMemoryMapper memoryMapper) {
+        public LinuxMemoryScanner(ILogger logger, ISequenceScanner sequenceScanner,
+            IMemoryMapper memoryMapper) {
             _logger = logger;
             _sequenceScanner = sequenceScanner;
             _memoryMapper = memoryMapper;

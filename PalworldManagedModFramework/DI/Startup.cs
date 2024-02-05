@@ -3,17 +3,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.Models.Config;
+
 using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows;
+
 using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning.Linux;
-using PalworldManagedModFramework.Services.MemoryScanning.Windows;
 
 namespace PalworldManagedModFramework.DI {
     internal static class Startup {
@@ -46,6 +47,8 @@ namespace PalworldManagedModFramework.DI {
             }
 
             services
+                .AddSingleton<IAddressResolver, AddressResolver>()
+                .AddSingleton<IPatternResolver, PatternResolver>()
                 .AddSingleton<UReflectionPointerScanner>()
                 .AddSingleton<ISequenceScanner, SequenceScanner>()
                 .AddSingleton<ILogger, Logger>()
