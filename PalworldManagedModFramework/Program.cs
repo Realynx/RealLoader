@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Text;
+
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.DI;
 using PalworldManagedModFramework.PalWorldSdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
-using PalworldManagedModFramework.Services.MemoryScanning;
 
 namespace PalworldManagedModFramework {
     internal static class Program {
@@ -12,6 +13,8 @@ namespace PalworldManagedModFramework {
         internal delegate void VoidDelegateSignature();
         public static void EntryPoint() {
             try {
+                Console.OutputEncoding = Encoding.UTF8;
+
                 AppDomainMonitor.MonitorDomain();
 
                 Console.WriteLine($"Loading .NET DI Service Container...");

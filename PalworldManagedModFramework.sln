@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared.SystemUnderTest", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework.Tests", "PalworldManagedModFramework.Tests\PalworldManagedModFramework.Tests.csproj", "{29284618-550B-4A9D-8C28-FCDD278D6DA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalworldManagedModFramework.PalWorldSdk.Tests", "PalworldManagedModFramework.PalWorldSdk.Tests\PalworldManagedModFramework.PalWorldSdk.Tests.csproj", "{A839A387-9A69-4739-BD0D-99671EF4B48F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework.PalWorldSdk.Tests", "PalworldManagedModFramework.PalWorldSdk.Tests\PalworldManagedModFramework.PalWorldSdk.Tests.csproj", "{A839A387-9A69-4739-BD0D-99671EF4B48F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetSdkBuilderMod", "DotNetSdkBuilderMod\DotNetSdkBuilderMod.csproj", "{9D0B6F70-6367-4E72-BC5F-04746456EF93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -216,6 +218,24 @@ Global
 		{A839A387-9A69-4739-BD0D-99671EF4B48F}.Release|x64.Build.0 = Release|Any CPU
 		{A839A387-9A69-4739-BD0D-99671EF4B48F}.Release|x86.ActiveCfg = Release|Any CPU
 		{A839A387-9A69-4739-BD0D-99671EF4B48F}.Release|x86.Build.0 = Release|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Debug|x64.Build.0 = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Debug|x86.Build.0 = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Dist|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Dist|Any CPU.Build.0 = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Dist|x64.ActiveCfg = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Dist|x64.Build.0 = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Dist|x86.ActiveCfg = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Dist|x86.Build.0 = Debug|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Release|x64.ActiveCfg = Release|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Release|x64.Build.0 = Release|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Release|x86.ActiveCfg = Release|Any CPU
+		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

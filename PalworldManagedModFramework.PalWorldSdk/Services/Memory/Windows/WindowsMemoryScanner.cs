@@ -11,12 +11,19 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {
         private readonly IProcessSuspender _processSuspender;
         private readonly IMemoryMapper _memoryMapper;
 
+        private readonly nint _baseAddress;
+
         public WindowsMemoryScanner(ILogger logger, ISequenceScanner sequenceScanner,
             IProcessSuspender processSuspender, IMemoryMapper memoryMapper) {
             _logger = logger;
             _sequenceScanner = sequenceScanner;
             _processSuspender = processSuspender;
             _memoryMapper = memoryMapper;
+
+            var processModule = Process.GetCurrentProcess().MainModule!;
+            _baseAddress = processModule.BaseAddress;
+
+            _logger.Debug($"Windows Main Module Base Address: 0x{_baseAddress:X}");
         }
 
         public nint? SingleSequenceScan(string signature) {
@@ -26,11 +33,8 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {
         public nint[] SequenceScan(string signature) {
             var processModule = Process.GetCurrentProcess().MainModule!;
 
-            var startAddress = processModule.BaseAddress;
             var endAddress = processModule.BaseAddress + processModule.ModuleMemorySize;
-
-            _logger.Debug($"Windows Main Module Address Space: 0x{startAddress:X} - 0x{endAddress:X}");
-            return SequenceScan(signature, startAddress, endAddress);
+            return SequenceScan(signature, _baseAddress, endAddress);
         }
 
         public nint[] SequenceScan(string signature, nint startAddress, nint endAddress) {
@@ -39,12 +43,10 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {
             var memoryRegions = _memoryMapper.FindMemoryRegions()
                 .Where(i => i.ReadFlag)
                 .Where(i => startAddress <= (nint)i.EndAddress && endAddress >= (nint)i.StartAddress);
-
-            _logger.Debug($"Scanning {memoryRegions.Count()} memory regions");
             var foundSequences = _sequenceScanner.ScanMemoryRegions(signature, memoryRegions);
-            _logger.Debug($"Finished scan, found {foundSequences.Count()} matches.");
 
             _processSuspender.ResumeSelf();
+
             return foundSequences.ToArray();
         }
     }

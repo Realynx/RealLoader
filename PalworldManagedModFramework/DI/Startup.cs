@@ -15,6 +15,8 @@ using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning.Linux;
+using PalworldManagedModFramework.UnrealSdk.Services;
+using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
 namespace PalworldManagedModFramework.DI {
     internal static class Startup {
@@ -47,13 +49,14 @@ namespace PalworldManagedModFramework.DI {
             }
 
             services
-                .AddSingleton<IAddressResolver, AddressResolver>()
+                .AddSingleton<IOperandResolver, OperandResolver>()
                 .AddSingleton<IPatternResolver, PatternResolver>()
                 .AddSingleton<UReflectionPointerScanner>()
                 .AddSingleton<ISequenceScanner, SequenceScanner>()
                 .AddSingleton<ILogger, Logger>()
                 .AddSingleton<IAssemblyDiscovery, AssemblyDiscovery>()
-                .AddSingleton<IModLoader, ModLoader>();
+                .AddSingleton<IModLoader, ModLoader>()
+                .AddSingleton<IGlobalObjects, GlobalObjects>();
         }
     }
 }

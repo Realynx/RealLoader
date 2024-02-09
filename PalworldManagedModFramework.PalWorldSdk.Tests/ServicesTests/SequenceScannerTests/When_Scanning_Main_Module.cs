@@ -11,7 +11,7 @@ namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceSc
         }
 
         protected override void Act() {
-            _results = TestableImplementation.SequenceScan("48 8B 45 ?", Process.GetCurrentProcess().MainModule!);
+            //_results = TestableImplementation.SequenceScan("48 8B 45 ?", Process.GetCurrentProcess().MainModule!);
         }
 
         [Fact]

@@ -1,6 +1,10 @@
-﻿namespace PalworldManagedModFramework.PalWorldSdk.Attributes {
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
+
+namespace PalworldManagedModFramework.PalWorldSdk.Attributes {
     [AttributeUsage(AttributeTargets.Property)]
     public class MachineCodePatternAttribute : Attribute {
+
         public MachineCodePatternAttribute(string pattern, OperandType patternType) {
             Pattern = pattern;
             PatternType = patternType;
@@ -11,7 +15,9 @@
     }
 
     public enum OperandType {
+        Function,
         DirectAddress_32,
-        RelativeOffset_32
+        IP_RelativeOffset_32,
+        Base_RelativeOffset_32
     }
 }

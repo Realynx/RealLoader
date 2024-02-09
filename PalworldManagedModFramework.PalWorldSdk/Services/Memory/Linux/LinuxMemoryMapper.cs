@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 using PalworldManagedModFramework.PalWorldSdk.Logging;
@@ -18,6 +19,12 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux {
 
         public MemoryRegion[] FindMemoryRegions() {
             return EnumerateMemoryRegions().ToArray();
+        }
+
+        public nint GetBaseAddress() {
+            var startAddress = Process.GetCurrentProcess().MainModule!.BaseAddress;
+            _logger.Debug($"Linux base address: 0x{startAddress:X}");
+            return startAddress;
         }
 
         private IEnumerable<MemoryRegion> EnumerateMemoryRegions() {

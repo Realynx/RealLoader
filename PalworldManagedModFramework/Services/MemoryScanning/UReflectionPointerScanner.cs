@@ -15,7 +15,8 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
         }
 
         public void ScanMemoryForUnrealReflectionPointers() {
-            // DebugUtilities.WaitForDebuggerAttach();
+            // TODO: Make the scanner do one scan for each pattern instead of multiple scans. 
+            // probably use some sort of IDisposable instance for scan instance
             _logger.Debug("Starting Pattern Scan");
 
             var objectArrayPropInfo = _enginePattern.GetType().GetProperty(nameof(_enginePattern.PGUObjectArray));

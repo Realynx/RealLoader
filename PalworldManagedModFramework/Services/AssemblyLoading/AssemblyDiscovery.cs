@@ -30,14 +30,10 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
                 var dllFiles = Directory.GetFiles(modFolder, "*.dll");
                 runtimeAssemblies.AddRange(dllFiles);
 
-                //var resolver = new PathAssemblyResolver(runtimeAssemblies);
-
-                //using var metadataLoadContext = new MetadataLoadContext(resolver);
                 foreach (var dllAssembly in dllFiles) {
                     var fileName = Path.GetFileName(dllAssembly);
                     _logger.Debug($"[{fileName}] Loading Assembly Context.");
 
-                    //var assembly = metadataLoadContext.LoadFromAssemblyPath(dllAssembly);
                     Assembly assembly;
                     try {
                         assembly = Assembly.LoadFrom(dllAssembly);

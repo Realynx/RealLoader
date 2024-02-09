@@ -5,6 +5,7 @@ using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
 
 using Shared.SystemUnderTest;
 using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
+using PalworldManagedModFramework.PalWorldSdk.Logging;
 
 namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceScannerTests {
     public class Using_Sequence_Scanner : SpecAutoMocker<ISequenceScanner, SequenceScanner> {
@@ -23,7 +24,8 @@ namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceSc
                 memoryMapper = new WindowsMemoryMapper();
             }
             else if (Environment.OSVersion.Platform == PlatformID.Unix) {
-                memoryMapper = new LinuxMemoryMapper();
+                var mockedLogger = Mocker.CreateInstance<ILogger>();
+                memoryMapper = new LinuxMemoryMapper(mockedLogger);
             }
 
             Mocker.Use(memoryMapper!);

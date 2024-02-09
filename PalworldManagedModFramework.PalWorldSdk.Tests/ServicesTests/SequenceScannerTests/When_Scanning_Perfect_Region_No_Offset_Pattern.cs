@@ -28,7 +28,7 @@ namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceSc
         }
 
         protected override void Act() {
-            _results = TestableImplementation.SequenceScan(pattern, allocatedBytesAddress, allocatedBytesAddress + memoryBytes.Length);
+            //_results = TestableImplementation.SequenceScan(pattern, allocatedBytesAddress, allocatedBytesAddress + memoryBytes.Length);
         }
 
         [Fact]

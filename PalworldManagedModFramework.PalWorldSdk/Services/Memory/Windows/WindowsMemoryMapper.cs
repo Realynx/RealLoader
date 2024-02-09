@@ -13,6 +13,10 @@ namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {
             return EnumerateMemoryRegions(currentProcessHandle, 0).ToArray();
         }
 
+        public nint GetBaseAddress() {
+            return Process.GetCurrentProcess().MainModule!.BaseAddress;
+        }
+
         private unsafe ICollection<MemoryRegion> EnumerateMemoryRegions(nint hProcess, nint baseAddress) {
             var sizeOfStruct = sizeof(WindowsStructs.MEMORY_BASIC_INFORMATION64);
             var memoryInfoStructs = (WindowsStructs.MEMORY_BASIC_INFORMATION64*)Marshal.AllocHGlobal(sizeOfStruct);
