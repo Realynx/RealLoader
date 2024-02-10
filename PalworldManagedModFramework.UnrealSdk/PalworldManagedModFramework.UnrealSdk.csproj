@@ -6,10 +6,15 @@
     <Nullable>enable</Nullable>
     <BaseOutputPath>../GithubSymbols/Net/PWMMF_UnrealSDK</BaseOutputPath>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.PalWorldSdk.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\Data\Interfaces\" />
   </ItemGroup>
 
 </Project>

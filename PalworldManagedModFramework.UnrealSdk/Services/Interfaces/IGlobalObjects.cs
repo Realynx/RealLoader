@@ -1,11 +1,14 @@
-﻿using PalworldManagedModFramework.UnrealSdk.Services.Structs;
+﻿using PalworldManagedModFramework.UnrealSdk.Services.Data.UniversalStructs.GNameStructs;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.UniversalStructs.UClassStructs;
 
 namespace PalworldManagedModFramework.UnrealSdk.Services.Interfaces {
     public interface IGlobalObjects {
-        IDictionary<string, ICollection<GObjectsStructs.UObjectBase>> EnumerateNamedObjects();
-        ICollection<GObjectsStructs.UObjectBase> EnumerateObjects();
-        GObjectsStructs.UObjectBase? FindObjects(string name, StringComparison stringComparison = StringComparison.Ordinal);
-        unsafe GNamesStructs.FNameEntry* GetName(GNamesStructs.FNameEntryId fnameEntryId);
-        string GetNameString(GNamesStructs.FNameEntryId fnameEntryId);
+        IDictionary<string, ICollection<UObjectBase>> EnumerateNamedObjects();
+        ICollection<UObjectBase> EnumerateRootObjects();
+        ICollection<UObjectBase> EnumerateParents();
+        UObjectBase? FindObjects(string name, StringComparison stringComparison = StringComparison.Ordinal);
+        unsafe FNameEntry* GetName(FNameEntryId fnameEntryId);
+        string GetNameString(FNameEntryId fnameEntryId);
+        ICollection<UObjectBase> EnumerateEverything();
     }
 }
