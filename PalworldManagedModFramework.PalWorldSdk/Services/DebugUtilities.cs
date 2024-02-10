@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Services {
+namespace PalworldManagedModFramework.Sdk.Services {
     public static class DebugUtilities {
         public static void WaitForDebuggerAttach(CancellationToken cancellationToken = default) {
             Console.WriteLine("*** Waiting for Debugger Attach ***");

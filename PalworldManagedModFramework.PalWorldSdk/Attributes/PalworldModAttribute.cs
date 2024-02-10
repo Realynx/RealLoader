@@ -1,4 +1,4 @@
-﻿namespace PalworldManagedModFramework.PalWorldSdk.Attributes {
+﻿namespace PalworldManagedModFramework.Sdk.Attributes {
     public class PalworldModAttribute : Attribute {
         public PalworldModAttribute(string modName, string author, string discordAlias, string semanticVersion, PalworldModType modType) {
             ModName = modName;

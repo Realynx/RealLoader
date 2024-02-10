@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-using PalworldManagedModFramework.UnrealSdk.Services.Data.UniversalStructs.UClassStructs;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 
 namespace PalworldManagedModFramework.UnrealSdk.Services.Data.Windows {
     [StructLayout(LayoutKind.Sequential, Size = 0x230)]

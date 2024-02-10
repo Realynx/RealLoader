@@ -1,8 +1,8 @@
-﻿using PalworldManagedModFramework.PalWorldSdk.Attributes;
-using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
+﻿using PalworldManagedModFramework.Sdk.Attributes;
+using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory {
+namespace PalworldManagedModFramework.Sdk.Services.Memory {
     public class OperandResolver : IOperandResolver {
         private readonly ILogger _logger;
         private readonly IMemoryMapper _memoryMapper;

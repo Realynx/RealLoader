@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux {
+namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
     public static class LinuxNativeMethods {
         [DllImport("libc.so.6", EntryPoint = "gettid")]
         public static extern long GetCurrentThreadId();

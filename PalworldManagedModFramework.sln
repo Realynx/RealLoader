@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework.UnrealSdk", "PalworldManagedModFramework.UnrealSdk\PalworldManagedModFramework.UnrealSdk.csproj", "{FDD9463B-E51E-4E8C-A33B-CA0CD737E744}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework.PalWorldSdk", "PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.PalWorldSdk.csproj", "{CC477B3D-A558-4144-A945-96C868B4DAC9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework.Sdk", "PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.Sdk.csproj", "{CC477B3D-A558-4144-A945-96C868B4DAC9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldModInstaller", "PalworldModInstaller\PalworldModInstaller.csproj", "{20343058-887C-4BD8-A7BB-10D5EF81FB99}"
 EndProject
@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared.SystemUnderTest", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework.Tests", "PalworldManagedModFramework.Tests\PalworldManagedModFramework.Tests.csproj", "{29284618-550B-4A9D-8C28-FCDD278D6DA7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework.PalWorldSdk.Tests", "PalworldManagedModFramework.PalWorldSdk.Tests\PalworldManagedModFramework.PalWorldSdk.Tests.csproj", "{A839A387-9A69-4739-BD0D-99671EF4B48F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework.Sdk.Tests", "PalworldManagedModFramework.PalWorldSdk.Tests\PalworldManagedModFramework.Sdk.Tests.csproj", "{A839A387-9A69-4739-BD0D-99671EF4B48F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetSdkBuilderMod", "DotNetSdkBuilderMod\DotNetSdkBuilderMod.csproj", "{9D0B6F70-6367-4E72-BC5F-04746456EF93}"
 EndProject

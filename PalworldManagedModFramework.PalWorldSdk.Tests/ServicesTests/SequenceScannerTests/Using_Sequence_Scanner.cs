@@ -1,13 +1,13 @@
 ﻿using System.Diagnostics;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
+using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
+using PalworldManagedModFramework.Sdk.Services.Memory.Windows;
+using PalworldManagedModFramework.Sdk.Services.Memory;
 
 using Shared.SystemUnderTest;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
-using PalworldManagedModFramework.PalWorldSdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
+using PalworldManagedModFramework.Sdk.Logging;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceScannerTests {
+namespace PalworldManagedModFramework.Sdk.Tests.ServicesTests.SequenceScannerTests {
     public class Using_Sequence_Scanner : SpecAutoMocker<ISequenceScanner, SequenceScanner> {
         protected byte[] memoryBytes = Array.Empty<byte>();
         protected string pattern = string.Empty;

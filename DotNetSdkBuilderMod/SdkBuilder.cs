@@ -1,7 +1,13 @@
-﻿using PalworldManagedModFramework.PalWorldSdk.Attributes;
-using PalworldManagedModFramework.PalWorldSdk.Interfaces;
-using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.UniversalStructs.UClassStructs;
+﻿using System.Text;
+
+using DotNetSdkBuilderMod.AssemblyBuilding;
+
+using PalworldManagedModFramework.Sdk.Attributes;
+using PalworldManagedModFramework.Sdk.Interfaces;
+using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.UnrealSdk.Services;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
 namespace DotNetSdkBuilderMod {
@@ -10,50 +16,57 @@ namespace DotNetSdkBuilderMod {
         private readonly CancellationToken _cancellationToken;
         private readonly ILogger _logger;
         private readonly IGlobalObjects _globalObjects;
+        private readonly UnrealReflection _unrealReflection;
+        private readonly SourceCodeGenerator _sourceCodeGenerator;
 
-        public SdkBuilder(CancellationToken cancellationToken, ILogger logger, IGlobalObjects globalObjects) {
+        public SdkBuilder(CancellationToken cancellationToken, ILogger logger,
+            IGlobalObjects globalObjects, UnrealReflection unrealReflection, SourceCodeGenerator sourceCodeGenerator) {
             _cancellationToken = cancellationToken;
             _logger = logger;
             _globalObjects = globalObjects;
+            _unrealReflection = unrealReflection;
+            _sourceCodeGenerator = sourceCodeGenerator;
         }
 
         public unsafe void Load() {
             _logger.Debug("Loading SDK Builder!");
-            DumpAllMembers();
+            ReflectAllMembers();
         }
 
-        private unsafe void DumpAllMembers() {
-            var parents = _globalObjects.EnumerateEverything();
+        private unsafe void ReflectAllMembers() {
+            var parentObjects = _globalObjects.EnumerateEverything();
 
-            foreach (var parentObject in parents) {
+            foreach (var parentObject in parentObjects) {
                 var objectName = _globalObjects.GetNameString(parentObject.namePrivate.comparisonIndex);
-                _logger.Debug($"[{objectName}] Dumping All Members");
+                var objectClass = *parentObject.classPrivate;
 
-                DumpClassFields(*parentObject.classPrivate);
-                DumpClassProperties(*parentObject.classPrivate);
+                var properties = _unrealReflection.GetTypeProperties(objectClass);
+                var fields = _unrealReflection.GetTypeFields(objectClass);
+
+                if (properties.Count == 0) {
+                    continue;
+                }
+
+                _logger.Debug($"Object: {objectName}");
+                PrintMembers(fields, properties);
             }
         }
 
-        private unsafe void DumpClassFields(UClass uClass) {
-            _logger.Debug("Dump Fields");
-
-            for (UField* nextField = &uClass.baseUStruct.baseUfield; nextField is not null; nextField = nextField->next) {
-                var fieldNameID = nextField->baseUObject.namePrivate;
-                var fieldName = _globalObjects.GetNameString(fieldNameID.comparisonIndex);
-
-                _logger.Debug($"Field Name: {fieldName}");
+        private unsafe void PrintMembers(ICollection<UField> fields, ICollection<FField> properties) {
+            var stringBuilder = new StringBuilder();
+            foreach (var field in fields) {
+                var fieldName = _globalObjects.GetNameString(field.baseUObject.namePrivate.comparisonIndex);
+                var fieldFlags = Enum.GetName(field.baseUObject.objectFlags);
+                stringBuilder.AppendLine($"Field: [{fieldFlags}] {fieldName}");
             }
-        }
 
-        private unsafe void DumpClassProperties(UClass uClass) {
-            _logger.Debug("Dump Properties");
-
-            for (FField* nextField = uClass.baseUStruct.childProperties; nextField is not null; nextField = nextField->next) {
-                var fieldNameID = nextField->namePrivate;
-                var propertyName = _globalObjects.GetNameString(fieldNameID.comparisonIndex);
-
-                _logger.Debug($"Property Name: {propertyName}");
+            foreach (var property in properties) {
+                var propertyName = _globalObjects.GetNameString(property.namePrivate.comparisonIndex);
+                var properyFlags = Enum.GetName(property.flagsPrivate);
+                stringBuilder.AppendLine($"Property: [{properyFlags}]{propertyName}");
             }
+
+            _logger.Debug(stringBuilder.ToString());
         }
 
         public void Unload() {

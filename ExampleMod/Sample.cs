@@ -1,6 +1,6 @@
-﻿using PalworldManagedModFramework.PalWorldSdk.Attributes;
-using PalworldManagedModFramework.PalWorldSdk.Interfaces;
-using PalworldManagedModFramework.PalWorldSdk.Logging;
+﻿using PalworldManagedModFramework.Sdk.Attributes;
+using PalworldManagedModFramework.Sdk.Interfaces;
+using PalworldManagedModFramework.Sdk.Logging;
 
 namespace ExampleMod {
     [PalworldMod("Sample", "poofyfox", ".poofyfox", "1.0.0", PalworldModType.Client)]

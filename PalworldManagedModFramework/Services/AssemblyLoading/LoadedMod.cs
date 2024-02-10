@@ -1,6 +1,9 @@
-﻿using PalworldManagedModFramework.Models;
-using PalworldManagedModFramework.PalWorldSdk.Interfaces;
-using PalworldManagedModFramework.PalWorldSdk.Logging;
+﻿using System.Reflection;
+
+using PalworldManagedModFramework.Models;
+using PalworldManagedModFramework.Sdk.Interfaces;
+using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Services.SandboxDI;
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading {
     internal class LoadedMod {
@@ -12,14 +15,36 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
 
         private readonly ClrMod _clrMod;
         private readonly ILogger _logger;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly ISandboxDIService _sandboxDIService;
         private readonly Task _runningTask;
 
-        public LoadedMod(Type entryPoint, ClrMod clrMod, ILogger logger, IServiceProvider serviceProvider) {
+        private bool IsSandboxedDI {
+            get {
+                return ModStartup != null;
+            }
+        }
+
+        private ISbStartup _sbStartup = null;
+        private ISbStartup ModStartup {
+            get {
+                if (_sbStartup is null) {
+                    var startupType = _clrMod.Assembly.GetTypes()
+                        .FirstOrDefault(type => typeof(ISbStartup).IsAssignableFrom(type) && !type.IsAbstract);
+
+                    if (startupType != null) {
+                        _sbStartup = Activator.CreateInstance(startupType) as ISbStartup;
+                    }
+                }
+
+                return _sbStartup;
+            }
+        }
+
+        public LoadedMod(Type entryPoint, ClrMod clrMod, ILogger logger, ISandboxDIService sandboxDIService) {
             _entryPoint = entryPoint;
             _clrMod = clrMod;
             _logger = logger;
-            _serviceProvider = serviceProvider;
+            _sandboxDIService = sandboxDIService;
             CancelTokenSource = new CancellationTokenSource();
 
             _runningTask = Task.Factory.StartNew(Load, CancelTokenSource.Token)
@@ -36,6 +61,28 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
             }
 
             modTask.Dispose();
+        }
+
+        public void Unload() {
+            _logger.Warning($"[{_clrMod.PalworldModAttribute.ModName}] Requested Unload.");
+
+            if (IsSandboxedDI) {
+                _sandboxDIService.DestroyProvider(ModStartup);
+            }
+
+            Task.Factory.StartNew(() => {
+                (_entryPointInstance as IPalworldMod).Unload();
+                CancelTokenSource.Cancel();
+
+                Task.Delay(TimeSpan.FromSeconds(5));
+
+                if (!_runningTask.IsCompleted) {
+                    _logger.Error($"[{_clrMod.PalworldModAttribute.ModName}] Causing delinquent thread to hang!");
+                }
+
+                _runningTask.Dispose();
+                CancelTokenSource.Dispose();
+            });
         }
 
         private void Load() {
@@ -71,6 +118,20 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
                 return false;
             }
 
+            if (IsSandboxedDI) {
+                _sandboxDIService.InitServiceProvider(ModStartup);
+            }
+
+            var dependencies = ResolveDependencies(ctor);
+            if (dependencies.Any(i => i is null)) {
+                return false;
+            }
+
+            _entryPointInstance = ctor.Invoke(dependencies);
+            return true;
+        }
+
+        private object[] ResolveDependencies(ConstructorInfo ctor) {
             var parameters = ctor.GetParameters();
             var args = new object[parameters.Length];
 
@@ -81,34 +142,15 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
                     continue;
                 }
 
-                var service = _serviceProvider.GetService(parameterType);
+                var service = _sandboxDIService.ResolveService(parameterType, ModStartup);
                 if (service is null) {
                     _logger.Warning($"The required service of type {parameterType.FullName} cannot be resolved for {_entryPoint.FullName}. Skipping mod.");
-                    return false;
                 }
 
                 args[x] = service;
             }
 
-            _entryPointInstance = ctor.Invoke(args);
-            return true;
-        }
-
-        public void Unload() {
-            _logger.Warning($"[{_clrMod.PalworldModAttribute.ModName}] Requested Unload.");
-            Task.Factory.StartNew(() => {
-                (_entryPointInstance as IPalworldMod).Unload();
-                CancelTokenSource.Cancel();
-
-                Task.Delay(TimeSpan.FromSeconds(5));
-
-                if (!_runningTask.IsCompleted) {
-                    _logger.Error($"[{_clrMod.PalworldModAttribute.ModName}] Causing delinquent thread to hang!");
-                }
-
-                _runningTask.Dispose();
-                CancelTokenSource.Dispose();
-            });
+            return args;
         }
     }
 }

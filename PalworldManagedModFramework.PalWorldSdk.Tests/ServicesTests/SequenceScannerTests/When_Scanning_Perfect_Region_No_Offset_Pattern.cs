@@ -1,13 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows;
+using PalworldManagedModFramework.Sdk.Services.Memory;
+using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
+using PalworldManagedModFramework.Sdk.Services.Memory.Windows;
 
 using Xunit;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceScannerTests {
+namespace PalworldManagedModFramework.Sdk.Tests.ServicesTests.SequenceScannerTests {
     public class When_Scanning_Perfect_Region_No_Offset_Pattern : Using_Sequence_Scanner {
         private IntPtr[] _results = Array.Empty<IntPtr>();
         private nint allocatedBytesAddress = 0;

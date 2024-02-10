@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Models;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {
+namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
     public class WindowsMemoryMapper : IMemoryMapper {
         public MemoryRegion[] FindMemoryRegions() {
             var currentProcess = Process.GetCurrentProcess();

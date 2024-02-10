@@ -1,8 +1,8 @@
-﻿using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Models;
+﻿using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory {
+namespace PalworldManagedModFramework.Sdk.Services.Memory {
     public class SequenceScanner : ISequenceScanner {
         private readonly ILogger _logger;
 

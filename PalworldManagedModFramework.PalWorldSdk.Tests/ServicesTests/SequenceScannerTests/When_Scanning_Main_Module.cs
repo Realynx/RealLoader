@@ -2,7 +2,7 @@
 
 using Xunit;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceScannerTests {
+namespace PalworldManagedModFramework.Sdk.Tests.ServicesTests.SequenceScannerTests {
     public class When_Scanning_Main_Module : Using_Sequence_Scanner {
         private IntPtr[] _results = Array.Empty<IntPtr>();
 

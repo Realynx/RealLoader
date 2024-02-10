@@ -1,4 +1,4 @@
-﻿namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux {
+﻿namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
     public interface IMemoryScanner {
         nint[] SequenceScan(string signature);
         nint[] SequenceScan(string signature, nint startAddress, nint endAddress);

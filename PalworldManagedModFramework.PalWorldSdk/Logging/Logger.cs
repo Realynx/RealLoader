@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Logging {
+namespace PalworldManagedModFramework.Sdk.Logging {
     [Flags]
     public enum LogLevel {
         Debugging = 1,

@@ -1,6 +1,6 @@
-﻿using PalworldManagedModFramework.PalWorldSdk.Logging;
+﻿using PalworldManagedModFramework.Sdk.Logging;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Interfaces {
+namespace PalworldManagedModFramework.Sdk.Interfaces {
     public interface IPalworldMod {
         /// <summary>
         /// This function is called when your assembly/mod has been loaded into the system.

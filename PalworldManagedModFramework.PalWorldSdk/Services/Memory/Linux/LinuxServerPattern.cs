@@ -1,4 +1,4 @@
-﻿using PalworldManagedModFramework.PalWorldSdk.Attributes;
+﻿using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 
 namespace PalworldManagedModFramework.Services.MemoryScanning.Linux {

@@ -1,5 +1,5 @@
-﻿using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
+﻿using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 
 namespace PalworldManagedModFramework.Services.MemoryScanning {

@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Models;
+using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 using Xunit;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.MemoryMapperTests {
+namespace PalworldManagedModFramework.Sdk.Tests.ServicesTests.MemoryMapperTests {
     public class When_Mapping_Windows_Memory : Using_Windows_Memory_Mapper {
         private MemoryRegion[] _memoryRegions = [];
         protected override void Setup() {

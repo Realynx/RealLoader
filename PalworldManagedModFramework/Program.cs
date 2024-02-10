@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.DI;
-using PalworldManagedModFramework.PalWorldSdk.Logging;
+using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 
 namespace PalworldManagedModFramework {

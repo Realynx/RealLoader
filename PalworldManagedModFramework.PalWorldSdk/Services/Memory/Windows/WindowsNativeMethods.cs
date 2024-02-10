@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 
-using static PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows.WindowsStructs;
+using static PalworldManagedModFramework.Sdk.Services.Memory.Windows.WindowsStructs;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {
+namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
     /// <summary>
     /// Native methods for working in Windows process memory.
     /// </summary>

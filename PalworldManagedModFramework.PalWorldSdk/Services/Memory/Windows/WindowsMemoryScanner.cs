@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
 
-using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux;
+using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows {
+namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
     public class WindowsMemoryScanner : IMemoryScanner {
         private readonly ILogger _logger;
         private readonly ISequenceScanner _sequenceScanner;

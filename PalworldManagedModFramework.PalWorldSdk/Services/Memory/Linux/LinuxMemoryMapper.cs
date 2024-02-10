@@ -2,11 +2,11 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Models;
+using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux {
+namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
     public class LinuxMemoryMapper : IMemoryMapper {
         private const string LINUX_MAPS_PATH = "/proc/self/maps";
         private readonly Regex _linuxMapRegex = new Regex(@"([0-9a-fA-F]+)-([0-9a-fA-F]+) ([r-])([w-])([x-])([p-]) ([0-9a-fA-F]+) .+");

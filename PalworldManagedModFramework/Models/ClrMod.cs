@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-using PalworldManagedModFramework.PalWorldSdk.Attributes;
+using PalworldManagedModFramework.Sdk.Attributes;
 
 namespace PalworldManagedModFramework.Models {
     public class ClrMod {

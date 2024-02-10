@@ -3,8 +3,8 @@ using System.Runtime.InteropServices;
 
 using PalworldManagedModFramework.Models;
 using PalworldManagedModFramework.Models.Config;
-using PalworldManagedModFramework.PalWorldSdk.Attributes;
-using PalworldManagedModFramework.PalWorldSdk.Logging;
+using PalworldManagedModFramework.Sdk.Attributes;
+using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading {

@@ -2,7 +2,7 @@
 
 using Xunit;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Tests.ServicesTests.SequenceScannerTests {
+namespace PalworldManagedModFramework.Sdk.Tests.ServicesTests.SequenceScannerTests {
     public class When_Scanning_Region_With_Offset : Using_Sequence_Scanner {
         private const int TESTED_POSITION = 5000;
         private IntPtr[] _results = Array.Empty<IntPtr>();

@@ -1,13 +1,13 @@
-﻿using PalworldManagedModFramework.PalWorldSdk.Attributes;
+﻿using PalworldManagedModFramework.Sdk.Attributes;
 using System.Reflection;
 
-using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux;
+using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Services.Memory {
+namespace PalworldManagedModFramework.Sdk.Services.Memory {
     public class PatternResolver : IPatternResolver {
         private static readonly Regex _hexRegex = new(@"[0-9a-fA-F]{2}");
 

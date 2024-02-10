@@ -1,4 +1,4 @@
-﻿namespace PalworldManagedModFramework.PalWorldSdk.Services {
+﻿namespace PalworldManagedModFramework.Sdk.Services {
     public static class UnrealHook {
         public static void HookFunction<T>(string functionName, Func<T, T> Callback, bool trampoline = false) {
 

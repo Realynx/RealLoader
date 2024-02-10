@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace PalworldManagedModFramework.PalWorldSdk.Attributes {
+namespace PalworldManagedModFramework.Sdk.Attributes {
     [AttributeUsage(AttributeTargets.Property)]
     public class MachineCodePatternAttribute : Attribute {
 

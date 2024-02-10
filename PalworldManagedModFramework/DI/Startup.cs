@@ -4,17 +4,18 @@ using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.Models.Config;
 
-using PalworldManagedModFramework.PalWorldSdk.Logging;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Interfaces;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Linux;
-using PalworldManagedModFramework.PalWorldSdk.Services.Memory.Windows;
+using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.Memory;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
+using PalworldManagedModFramework.Sdk.Services.Memory.Windows;
 
 using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning.Linux;
+using PalworldManagedModFramework.Services.SandboxDI;
 using PalworldManagedModFramework.UnrealSdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
@@ -56,6 +57,8 @@ namespace PalworldManagedModFramework.DI {
                 .AddSingleton<ILogger, Logger>()
                 .AddSingleton<IAssemblyDiscovery, AssemblyDiscovery>()
                 .AddSingleton<IModLoader, ModLoader>()
+                .AddSingleton<ISandboxDIService, SandboxDIService>()
+                .AddSingleton<UnrealReflection>()
                 .AddSingleton<IGlobalObjects, GlobalObjects>();
         }
     }
