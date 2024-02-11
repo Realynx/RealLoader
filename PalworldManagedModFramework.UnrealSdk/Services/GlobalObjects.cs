@@ -1,10 +1,9 @@
-﻿using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameStructs;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GobjectsStructs;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GObjectsStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
@@ -12,18 +11,22 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
     public class GlobalObjects : IGlobalObjects {
         private readonly ILogger _logger;
         private readonly IEnginePattern _enginePattern;
+        private readonly unsafe FUObjectArray* _objectPoolAddress;
 
-        public GlobalObjects(ILogger logger, IEnginePattern enginePattern) {
+        public unsafe GlobalObjects(ILogger logger, IEnginePattern enginePattern) {
             _logger = logger;
             _enginePattern = enginePattern;
+
+            _objectPoolAddress = (FUObjectArray*)_enginePattern.PGUObjectArray;
         }
 
         public unsafe ICollection<UObjectBase> EnumerateObjects() {
             var objectList = new List<UObjectBase>();
 
-            var objectPoolAddress = (FUObjectArray*)_enginePattern.PGUObjectArray;
-            var objects = *objectPoolAddress->objects;
-            for (var x = 0; x < objectPoolAddress->numElements; x++) {
+            var fixedChunkedArray = _objectPoolAddress->ObjObjects;
+            var objects = *fixedChunkedArray.objects;
+
+            for (var x = 0; x < fixedChunkedArray.numElements; x++) {
                 var currentItem = objects + x;
 
                 if (currentItem is not null) {
@@ -38,9 +41,10 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
         }
 
         public unsafe UObjectBase? FindObjects(string name, StringComparison stringComparison = StringComparison.Ordinal) {
-            var objectPoolAddress = (FUObjectArray*)_enginePattern.PGUObjectArray;
-            var objects = *objectPoolAddress->objects;
-            for (var x = 0; x < objectPoolAddress->numElements; x++) {
+            var fixedChunkedArray = _objectPoolAddress->ObjObjects;
+            var objects = *fixedChunkedArray.objects;
+
+            for (var x = 0; x < fixedChunkedArray.numElements; x++) {
                 var currentItem = objects + x;
 
                 if (currentItem is not null) {
@@ -61,10 +65,10 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
 
         public unsafe IDictionary<string, ICollection<UObjectBase>> EnumerateNamedObjects() {
             var objectDictionary = new Dictionary<string, ICollection<UObjectBase>>();
+            var fixedChunkedArray = _objectPoolAddress->ObjObjects;
+            var objects = *fixedChunkedArray.objects;
 
-            var objectPoolAddress = (FUObjectArray*)_enginePattern.PGUObjectArray;
-            var objects = *objectPoolAddress->objects;
-            for (var x = 0; x < objectPoolAddress->numElements; x++) {
+            for (var x = 0; x < fixedChunkedArray.numElements; x++) {
                 var currentItem = objects + x;
 
                 if (currentItem is not null) {
