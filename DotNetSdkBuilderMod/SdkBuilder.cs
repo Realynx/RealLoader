@@ -6,7 +6,6 @@ using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.UnrealSdk.Services;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
@@ -34,39 +33,52 @@ namespace DotNetSdkBuilderMod {
         }
 
         private unsafe void ReflectAllMembers() {
-            var parentObjects = _globalObjects.EnumerateEverything();
+            var parentObjects = _globalObjects.EnumerateObjects();
 
             foreach (var parentObject in parentObjects) {
+
                 var objectName = _globalObjects.GetNameString(parentObject.namePrivate.comparisonIndex);
                 var objectClass = *parentObject.classPrivate;
 
-                var properties = _unrealReflection.GetTypeProperties(objectClass);
                 var fields = _unrealReflection.GetTypeFields(objectClass);
-
-                if (properties.Count == 0) {
+                if (fields.Count < 1) {
                     continue;
                 }
 
                 _logger.Debug($"Object: {objectName}");
-                PrintMembers(fields, properties);
+                PrintMembers(fields);
             }
         }
 
-        private unsafe void PrintMembers(ICollection<UField> fields, ICollection<FField> properties) {
+        private unsafe void PrintMembers(ICollection<FField> fields) {
             var stringBuilder = new StringBuilder();
             foreach (var field in fields) {
-                var fieldName = _globalObjects.GetNameString(field.baseUObject.namePrivate.comparisonIndex);
-                var fieldFlags = Enum.GetName(field.baseUObject.objectFlags);
-                stringBuilder.AppendLine($"Field: [{fieldFlags}] {fieldName}");
-            }
 
-            foreach (var property in properties) {
-                var propertyName = _globalObjects.GetNameString(property.namePrivate.comparisonIndex);
-                var properyFlags = Enum.GetName(property.flagsPrivate);
-                stringBuilder.AppendLine($"Property: [{properyFlags}]{propertyName}");
+                var className = _globalObjects.GetNameString(field.classPrivate->name.comparisonIndex);
+
+                var flagValue = field.flagsPrivate;
+                var fieldFlags = string.Join(", ", GetFlagNames(flagValue));
+
+                var fieldName = _globalObjects.GetNameString(field.namePrivate.comparisonIndex);
+
+                stringBuilder.AppendLine($"Field: [{className}] {fieldName}");
             }
 
             _logger.Debug(stringBuilder.ToString());
+        }
+
+        static string[] GetFlagNames(Enum flags) {
+            var flagNames = new List<string>();
+
+            foreach (Enum value in Enum.GetValues(flags.GetType())) {
+                if (flags.HasFlag(value)) {
+                    if (!value.Equals(default(Enum))) {
+                        flagNames.Add(Enum.GetName(flags.GetType(), value));
+                    }
+                }
+            }
+
+            return flagNames.ToArray();
         }
 
         public void Unload() {
