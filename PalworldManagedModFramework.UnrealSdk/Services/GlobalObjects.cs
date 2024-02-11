@@ -160,7 +160,7 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
 
         public unsafe string GetNameString(FNameEntryId fnameEntryId) {
             var nameEntry = GetName(fnameEntryId);
-            var stringValue = Encoding.UTF8.GetString(&nameEntry->StringPointer, nameEntry->header.Len);
+            var stringValue = Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len);
 
             return stringValue;
         }
