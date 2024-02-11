@@ -17,4 +17,8 @@
     <Folder Include="AssemblyBuilding\Interfaces\" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /Y /R &quot;$(TargetDir)*.*&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Palworld\ClrMods\SdkBuilder\&quot;" />
+  </Target>
+
 </Project>
