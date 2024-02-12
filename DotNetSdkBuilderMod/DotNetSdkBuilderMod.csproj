@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y /R &quot;$(TargetDir)*.*&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Palworld\ClrMods\SdkBuilder\&quot;" />
+    <Exec Command="xcopy /Y /R /I &quot;$(TargetDir)*.*&quot; &quot;$(SdkBuilderDir)&quot;" />
   </Target>
 
 </Project>
