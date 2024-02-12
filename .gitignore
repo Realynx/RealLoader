@@ -412,6 +412,9 @@ bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/CL.command.1.t
 *.out
 *.app
 
+# JetBrains Rider
+.idea/
+
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
