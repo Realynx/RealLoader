@@ -19,6 +19,7 @@
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SdkBuilderDir)' != ''">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SdkBuilderDir)" OverwriteReadOnlyFiles="true" />
+    <Exec Command="echo Copied SdkBuilder successfully" />
   </Target>
 
 </Project>
