@@ -48,7 +48,7 @@ namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClass
         public EClassFlags ClassFlags;
 
         /// <summary>
-        /// Cast flags used to accelerate dynamic_cast<T*> on objects of this type for common T.
+        /// Cast flags used to accelerate dynamic_cast&lt;T*> on objects of this type for common T.
         /// </summary>
         public EClassCastFlags ClassCastFlags;
 
@@ -92,7 +92,7 @@ namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClass
         /// <summary>
         ///  Map of all functions by name contained in this class.
         /// </summary>
-        //public TMap<FName, UFunction*, FDefaultSetAllocator, TDefaultMapHashableKeyFuncs<FName, UFunction*,false>> FuncMap;
+        // public TMap<FName, UFunction*, FDefaultSetAllocator, TDefaultMapHashableKeyFuncs<FName, UFunction*,false>> FuncMap;
 
         /// <summary>
         ///  A cache of all functions by name that exist in a parent (superclass or interface) context.
