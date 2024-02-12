@@ -6,6 +6,7 @@ using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory {
     public class PatternResolver : IPatternResolver {
@@ -36,7 +37,14 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             var resolvedAddress = _operandResolver.ResolveInstructionAddress(patternOffsetAddress, patternMask.operandOffset, machineCodeAttribute);
 
             if (instance is not null) {
-                member.SetValue(instance, resolvedAddress);
+                if (machineCodeAttribute.PatternType == OperandType.Function) {
+                    var delegateValue = Marshal
+                        .GetDelegateForFunctionPointer(resolvedAddress, member.PropertyType);
+                    member.SetValue(instance, delegateValue);
+                }
+                else {
+                    member.SetValue(instance, resolvedAddress);
+                }
             }
 
             return resolvedAddress;

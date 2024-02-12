@@ -8,14 +8,20 @@ namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameS
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct FNameEntryId {
-        /// <summary>
-        /// <see cref="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/Core/Public/UObject/NameTypes.h#L107"/>
-        /// </summary>
-        public ushort lowerOrderValue;
+        ///// <summary>
+        ///// <see cref="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/Core/Public/UObject/NameTypes.h#L107"/>
+        ///// </summary>
+        public uint value;
 
-        /// <summary>
-        /// <see cref="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/Core/Public/UObject/NameTypes.h#L107"/>
-        /// </summary>
-        public ushort higherOrderValue;
+        public ushort LowerOrderValue {
+            get {
+                return (ushort)(value & 0xffff);
+            }
+        }
+        public ushort HigherOrderValue {
+            get {
+                return (ushort)(value >> 16);
+            }
+        }
     }
 }

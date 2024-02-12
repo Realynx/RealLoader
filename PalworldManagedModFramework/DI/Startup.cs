@@ -17,6 +17,7 @@ using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning.Linux;
 using PalworldManagedModFramework.Services.SandboxDI;
 using PalworldManagedModFramework.UnrealSdk.Services;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FunctionServices;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
 namespace PalworldManagedModFramework.DI {
@@ -37,6 +38,7 @@ namespace PalworldManagedModFramework.DI {
             if (Environment.OSVersion.Platform == PlatformID.Unix) {
                 services
                     .AddSingleton<IEnginePattern, LinuxServerPattern>()
+                    //.AddSingleton<IUObjectFuncs, LinuxUObjectFuncs>()
                     .AddSingleton<IProcessSuspender, LinuxProcessSuspender>()
                     .AddSingleton<IMemoryMapper, LinuxMemoryMapper>()
                     .AddSingleton<IMemoryScanner, LinuxMemoryScanner>();
@@ -44,6 +46,7 @@ namespace PalworldManagedModFramework.DI {
             else if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
                 services
                     .AddSingleton<IEnginePattern, WindowsClientPattern>()
+                    .AddSingleton<IUObjectFuncs, WindowsUObjectFuncs>()
                     .AddSingleton<IProcessSuspender, WindowsProcessSuspender>()
                     .AddSingleton<IMemoryMapper, WindowsMemoryMapper>()
                     .AddSingleton<IMemoryScanner, WindowsMemoryScanner>();

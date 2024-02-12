@@ -1,6 +1,7 @@
 ﻿using System.Text;
 
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GObjectsStructs;
@@ -18,6 +19,31 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
             _enginePattern = enginePattern;
 
             _objectPoolAddress = (FUObjectArray*)_enginePattern.PGUObjectArray;
+        }
+
+        public unsafe ICollection<UFunction> EnumerateUFunctions() {
+            var objectList = new List<UFunction>();
+
+            var fixedChunkedArray = _objectPoolAddress->ObjObjects;
+            var objects = *fixedChunkedArray.objects;
+
+            for (var x = 0; x < fixedChunkedArray.numElements; x++) {
+                var currentItem = objects + x;
+
+                if (currentItem is not null) {
+                    if (currentItem->uObject is not null) {
+                        var pObjectBase = (UFunction*)currentItem->uObject;
+
+                        if (!pObjectBase->functionFlags.HasFlag(Data.CoreUObject.FLags.EFunctionFlags.FUNC_Public)) {
+                            continue;
+                        }
+
+                        objectList.Add(*pObjectBase);
+                    }
+                }
+            }
+
+            return objectList;
         }
 
         public unsafe ICollection<UObjectBase> EnumerateObjects() {
@@ -144,7 +170,6 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
 
         public unsafe FNameEntry* GetName(FNameEntryId fnameEntryId) {
             var namePool = _enginePattern.PNamePoolData;
-            var nameBlockOffset = fnameEntryId.lowerOrderValue * 2;
 
             // Windows lock object is 0x8 bytes
             // Linux lock object is 0x38 bytes
@@ -154,7 +179,9 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
                 offsetSize = 0x40;
             }
 
-            var namePointerBlock = (nint*)(namePool + offsetSize + (fnameEntryId.higherOrderValue * 8));
+            var nameBlockOffset = fnameEntryId.LowerOrderValue * 2;
+            var namePointerBlock = (nint*)(namePool + offsetSize + (fnameEntryId.HigherOrderValue * 8));
+
             return (FNameEntry*)(*namePointerBlock + nameBlockOffset);
         }
 

@@ -11,5 +11,6 @@ namespace PalworldManagedModFramework.UnrealSdk.Services.Interfaces {
         string GetNameString(FNameEntryId fnameEntryId);
         ICollection<UObjectBase> EnumerateEverything();
         ICollection<UObjectBase> EnumeratePackages();
+        ICollection<UFunction> EnumerateUFunctions();
     }
 }
