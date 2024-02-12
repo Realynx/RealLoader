@@ -17,8 +17,8 @@
     <Folder Include="AssemblyBuilding\Interfaces\" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /Y /R /I &quot;$(TargetDir)*.*&quot; &quot;$(SdkBuilderDir)&quot;" />
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SdkBuilderDir)' != ''">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SdkBuilderDir)" OverwriteReadOnlyFiles="true" />
   </Target>
 
 </Project>
