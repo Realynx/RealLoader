@@ -5,7 +5,7 @@ using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning;
-using PalworldManagedModFramework.Services.SandboxDI;
+using PalworldManagedModFramework.Services.SandboxDI.Interfaces;
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading {
     internal class ModLoader : IModLoader {

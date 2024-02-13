@@ -1,6 +1,6 @@
 ﻿using PalworldManagedModFramework.Sdk.Interfaces;
 
-namespace PalworldManagedModFramework.Services.SandboxDI {
+namespace PalworldManagedModFramework.Services.SandboxDI.Interfaces {
     public interface ISandboxDIService {
         void DestroyProvider(ISbStartup serviceContainerMod);
         void InitServiceProvider(ISbStartup serviceContainerMod);

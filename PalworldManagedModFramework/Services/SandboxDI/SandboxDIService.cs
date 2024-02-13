@@ -1,7 +1,10 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Services.SandboxDI.Interfaces;
+using PalworldManagedModFramework.Services.SandboxDI.ServiceResolution;
 
 namespace PalworldManagedModFramework.Services.SandboxDI {
     public class SandboxDIService : ISandboxDIService {
@@ -14,7 +17,6 @@ namespace PalworldManagedModFramework.Services.SandboxDI {
             _rootServiceProvider = serviceProvider;
         }
 
-        // TODO: If this becomes too much overhead, I'll implement it myself to make a more memory light DI for mod instances.
         public void InitServiceProvider(ISbStartup serviceContainerMod) {
             if (_modContainers.ContainsKey(serviceContainerMod)) {
                 _logger.Error($"Mods can only consume a single {nameof(IHost)} instance.");
@@ -22,6 +24,8 @@ namespace PalworldManagedModFramework.Services.SandboxDI {
             }
 
             var hostBuilder = new HostBuilder();
+
+            hostBuilder.UseServiceProviderFactory(new SandboxServiceProviderFactory(_rootServiceProvider));
 
             hostBuilder.ConfigureAppConfiguration(serviceContainerMod.Configure);
             hostBuilder.ConfigureAppConfiguration((_, config) => serviceContainerMod.Configuration = config.Build());
@@ -46,6 +50,7 @@ namespace PalworldManagedModFramework.Services.SandboxDI {
             _logger.Debug("Cleaned up mod host instance.");
         }
 
+        // TODO: Fix this, un-needed
         public object ResolveService(Type serviceType, ISbStartup sbStartupMod = null) {
             object resolvedService = null;
 

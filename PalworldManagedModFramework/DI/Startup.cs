@@ -16,6 +16,7 @@ using PalworldManagedModFramework.Services.MemoryScanning;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning.Linux;
 using PalworldManagedModFramework.Services.SandboxDI;
+using PalworldManagedModFramework.Services.SandboxDI.Interfaces;
 using PalworldManagedModFramework.UnrealSdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FunctionServices;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;

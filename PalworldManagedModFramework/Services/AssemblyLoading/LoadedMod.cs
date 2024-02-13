@@ -3,7 +3,7 @@
 using PalworldManagedModFramework.Models;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Services.SandboxDI;
+using PalworldManagedModFramework.Services.SandboxDI.Interfaces;
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading {
     internal class LoadedMod {

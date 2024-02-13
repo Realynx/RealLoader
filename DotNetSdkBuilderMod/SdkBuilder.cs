@@ -1,8 +1,7 @@
-﻿using System.Data.Common;
-using System.Reflection.Metadata;
-using System.Text;
+﻿using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding;
+using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
@@ -22,16 +21,18 @@ namespace DotNetSdkBuilderMod {
         private readonly IUObjectFuncs _uObjectFuncs;
         private readonly UnrealReflection _unrealReflection;
         private readonly SourceCodeGenerator _sourceCodeGenerator;
+        private readonly IReflectedGraphBuilder _reflectedGraphBuilder;
 
         public SdkBuilder(CancellationToken cancellationToken, ILogger logger,
             IGlobalObjects globalObjects, IUObjectFuncs uObjectFuncs, UnrealReflection unrealReflection,
-            SourceCodeGenerator sourceCodeGenerator) {
+            SourceCodeGenerator sourceCodeGenerator, IReflectedGraphBuilder reflectedGraphBuilder) {
             _cancellationToken = cancellationToken;
             _logger = logger;
             _globalObjects = globalObjects;
             _uObjectFuncs = uObjectFuncs;
             _unrealReflection = unrealReflection;
             _sourceCodeGenerator = sourceCodeGenerator;
+            _reflectedGraphBuilder = reflectedGraphBuilder;
         }
 
         public unsafe void Load() {
@@ -42,55 +43,75 @@ namespace DotNetSdkBuilderMod {
         private unsafe void ReflectAllMembers() {
             Thread.Sleep(TimeSpan.FromSeconds(10));
 
-            var parentObjects = _globalObjects.EnumerateEverything();
-            var uniqueObjects = new HashSet<string>();
 
-            var classNames = new HashSet<string>(0);
+            var typeGraph = _reflectedGraphBuilder.BuildRootNode();
+            DebugUtilities.WaitForDebuggerAttach();
+            Console.WriteLine($"UwU");
 
-            foreach (var parentObject in parentObjects) {
+            //var parentObjects = _globalObjects.EnumerateEverything();
+            //var uniqueObjects = new HashSet<string>();
+            //var unLinkedNodes = new Dictionary<string, List<ClassNode>>();
 
-                // var externalPackage = _uObjectFuncs.GetExternalPackage(&parentObject);
-                //if (externalPackage is not null) {
-                //    var packageId = externalPackage->packageId.id;
-                //    _logger.Debug($"[{packageId}] 0x{(nint)externalPackage:X}");
-                //}
+            //var classNames = new HashSet<string>(0);
 
-                // _logger.Debug($"Method Call Package: {packageName}");
+            //foreach (var parentObject in parentObjects) {
 
+            // var externalPackage = _uObjectFuncs.GetExternalPackage(&parentObject);
+            //if (externalPackage is not null) {
+            //    var packageId = externalPackage->packageId.id;
+            //    _logger.Debug($"[{packageId}] 0x{(nint)externalPackage:X}");
+            //}
 
-                var fullpath = GetFullPath(parentObject);
-                var baseClassObject = parentObject.classPrivate->ClassDefaultObject->baseObjectBaseUtility.baseUObjectBase;
-                var classObjectName = _globalObjects.GetNameString(baseClassObject.namePrivate.comparisonIndex);
-                var objectName = _globalObjects.GetNameString(parentObject.namePrivate.comparisonIndex);
-
-
-                var objectClass = *parentObject.classPrivate;
-                var fields = _unrealReflection.GetTypeFields(objectClass);
-                var functions = _unrealReflection.GetTypeFunctions(objectClass);
-
-                var flags = GetFlagNames(parentObject.objectFlags);
+            // _logger.Debug($"Method Call Package: {packageName}");
 
 
-                //if (objectName == "Default__AnimLayerInterface") {
-                //    DebugUtilities.WaitForDebuggerAttach();
-                //}
+            //var fullpath = GetFullPath(parentObject);
+            //var baseClassObject = parentObject.classPrivate->ClassDefaultObject->baseObjectBaseUtility.baseUObjectBase;
+            //var classObjectName = _globalObjects.GetNameString(baseClassObject.namePrivate.comparisonIndex);
+            //var objectName = _globalObjects.GetNameString(parentObject.namePrivate.comparisonIndex);
 
-                var feldStrings = PrintMembers(fields, functions);
-                var classEntry = $"[Flags]\n{string.Join(", ", flags)}\n{classObjectName}\n[Fields]\n{string.Join("\n", feldStrings)}";
-                classNames.Add(classEntry);
+            //var baseClass = parentObject.classPrivate->baseUStruct.superStruct;
+            //var baseClassName = string.Empty;
+            //if (baseClass is not null) {
+            //    baseClassName = _globalObjects.GetNameString(baseClass->baseUfield.baseUObject.namePrivate.comparisonIndex);
+            //}
+
+            //var objectClass = *parentObject.classPrivate;
+            //var fields = _unrealReflection.GetTypeFields(objectClass);
+            //var functions = _unrealReflection.GetTypeFunctions(objectClass);
+
+            //var flags = GetFlagNames(parentObject.objectFlags);
 
 
-                var logEntry = $"[{fullpath}] privateClass: [0x{(nint)parentObject.classPrivate:X}]{classObjectName}, Object: {objectName}";
-                uniqueObjects.Add(logEntry);
-                //_logger.Debug(logEntry);
-            }
+            //if (objectName == "Default__AnimLayerInterface") {
+            //    DebugUtilities.WaitForDebuggerAttach();
+            //}
 
-            var filePath = Path.GetFullPath("ObjectMap.txt");
-            File.WriteAllText(filePath, string.Join("\n", uniqueObjects.OrderBy(i => i)));
+            //var feldStrings = PrintMembers(fields, functions);
+            //var classEntry = $"[Flags]\n{string.Join(", ", flags)}\n{classObjectName} : {baseClassName}\n[Fields]\n{string.Join("\n", feldStrings)}";
+            //classNames.Add(classEntry);
 
-            filePath = Path.GetFullPath("ClassMap.txt");
-            File.WriteAllText(filePath, string.Join("\n", classNames.OrderBy(i => i)));
-            _logger.Debug(filePath);
+
+            //var logEntry = $"[{fullpath}] privateClass: [0x{(nint)parentObject.classPrivate:X}]{classObjectName}, Object: {objectName}";
+            //uniqueObjects.Add(logEntry);
+            ////_logger.Debug(logEntry);
+
+            //// Add our node
+            //var currentNode = new ClassNode() {
+            //    functions = functions.ToArray(),
+            //    properties = fields.ToArray(),
+            //    nodeClass = *parentObject.classPrivate
+            //};
+            //unLinkedNodes.Add(classObjectName, new List<ClassNode>() { currentNode });
+            //}
+
+            //var filePath = Path.GetFullPath("ObjectMap.txt");
+            //File.WriteAllText(filePath, string.Join("\n", uniqueObjects.OrderBy(i => i)));
+
+            //filePath = Path.GetFullPath("ClassMap.txt");
+            //File.WriteAllText(filePath, string.Join("\n", classNames.OrderBy(i => i)));
+            //_logger.Debug(filePath);
+
         }
 
         private unsafe string GetFullPath(UObjectBase uObjectBase) {

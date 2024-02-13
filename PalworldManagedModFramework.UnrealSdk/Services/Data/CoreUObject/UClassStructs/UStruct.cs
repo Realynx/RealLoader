@@ -1,5 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameStructs;
+
 namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs {
 
     /// <summary>
@@ -9,6 +11,11 @@ namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClass
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Size = 0xb0)]
     public unsafe struct UStruct {
+        public FNameEntryId ObjectName {
+            get {
+                return baseUfield.baseUObject.namePrivate.comparisonIndex;
+            }
+        }
         // Inherits
         public UField baseUfield;
 
