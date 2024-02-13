@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Services.SandboxDI.Hosting;
 using PalworldManagedModFramework.Services.SandboxDI.Interfaces;
 using PalworldManagedModFramework.Services.SandboxDI.ServiceResolution;
 
@@ -23,8 +24,7 @@ namespace PalworldManagedModFramework.Services.SandboxDI {
                 return;
             }
 
-            var hostBuilder = new HostBuilder();
-
+            var hostBuilder = new SandboxHostBuilder();
             hostBuilder.UseServiceProviderFactory(new SandboxServiceProviderFactory(_rootServiceProvider));
 
             hostBuilder.ConfigureAppConfiguration(serviceContainerMod.Configure);
@@ -50,16 +50,11 @@ namespace PalworldManagedModFramework.Services.SandboxDI {
             _logger.Debug("Cleaned up mod host instance.");
         }
 
-        // TODO: Fix this, un-needed
         public object ResolveService(Type serviceType, ISbStartup sbStartupMod = null) {
             object resolvedService = null;
 
             if (sbStartupMod is not null && _modContainers.ContainsKey(sbStartupMod)) {
                 resolvedService = _modContainers[sbStartupMod].Services.GetService(serviceType);
-            }
-
-            if (resolvedService is null) {
-                resolvedService = _rootServiceProvider.GetService(serviceType);
             }
 
             return resolvedService;

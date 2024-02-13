@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using PalworldManagedModFramework.DI;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
+using PalworldManagedModFramework.Services.SandboxDI.Hosting;
 
 namespace PalworldManagedModFramework {
     internal static class Program {
