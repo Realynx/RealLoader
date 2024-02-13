@@ -28,12 +28,12 @@ namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClass
         /// <summary>
         /// Total size of parameters in memory.
         /// </summary>
-        public short paramSize;
+        public ushort paramSize;
 
         /// <summary>
         /// Memory offset of return value property.
         /// </summary>
-        public short returnValueOffset;
+        public ushort returnValueOffset;
 
         /// <summary>
         /// Id of this RPC function call (must be FUNC_Net & (FUNC_NetService|FUNC_NetResponse)).

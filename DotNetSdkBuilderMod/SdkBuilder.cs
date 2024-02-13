@@ -1,10 +1,13 @@
-﻿using System.Text;
+﻿using System.Data.Common;
+using System.Reflection.Metadata;
+using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding;
 
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FunctionServices;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
@@ -37,8 +40,12 @@ namespace DotNetSdkBuilderMod {
         }
 
         private unsafe void ReflectAllMembers() {
-            var parentObjects = _globalObjects.EnumerateParents();
+            Thread.Sleep(TimeSpan.FromSeconds(10));
+
+            var parentObjects = _globalObjects.EnumerateEverything();
             var uniqueObjects = new HashSet<string>();
+
+            var classNames = new HashSet<string>(0);
 
             foreach (var parentObject in parentObjects) {
 
@@ -59,22 +66,30 @@ namespace DotNetSdkBuilderMod {
 
                 var objectClass = *parentObject.classPrivate;
                 var fields = _unrealReflection.GetTypeFields(objectClass);
+                var functions = _unrealReflection.GetTypeFunctions(objectClass);
 
                 var flags = GetFlagNames(parentObject.objectFlags);
 
-                //if (fields.Count > 0) {
-                //    var fieldNames = PrintMembers(fields);
-                //    uniqueObjects.Add($"{fullpath} - \n{fieldNames}");
+
+                //if (objectName == "Default__AnimLayerInterface") {
+                //    DebugUtilities.WaitForDebuggerAttach();
                 //}
 
-                //uniqueObjects.Add($"0x{(nint)parentObject.classPrivate:X} {classObjectName}:{objectName}");
+                var feldStrings = PrintMembers(fields, functions);
+                var classEntry = $"[Flags]\n{string.Join(", ", flags)}\n{classObjectName}\n[Fields]\n{string.Join("\n", feldStrings)}";
+                classNames.Add(classEntry);
 
-                uniqueObjects.Add($"{fullpath} [{string.Join(" | ", flags)}]");
-                _logger.Debug($"[{fullpath}] privateClass: {classObjectName}, Object: {objectName}");
+
+                var logEntry = $"[{fullpath}] privateClass: [0x{(nint)parentObject.classPrivate:X}]{classObjectName}, Object: {objectName}";
+                uniqueObjects.Add(logEntry);
+                //_logger.Debug(logEntry);
             }
 
             var filePath = Path.GetFullPath("ObjectMap.txt");
-            File.WriteAllLines(filePath, uniqueObjects.OrderBy(i => i));
+            File.WriteAllText(filePath, string.Join("\n", uniqueObjects.OrderBy(i => i)));
+
+            filePath = Path.GetFullPath("ClassMap.txt");
+            File.WriteAllText(filePath, string.Join("\n", classNames.OrderBy(i => i)));
             _logger.Debug(filePath);
         }
 
@@ -89,18 +104,70 @@ namespace DotNetSdkBuilderMod {
             return string.Join(".", nameBuilder);
         }
 
-        private unsafe string PrintMembers(ICollection<FField> fields) {
+        private unsafe string PrintMembers(ICollection<FProperty> fields, ICollection<UFunction> funcs) {
             var stringBuilder = new StringBuilder();
             foreach (var field in fields) {
 
-                var className = _globalObjects.GetNameString(field.classPrivate->name.comparisonIndex);
+                var className = _globalObjects.GetNameString(field.baseFField.namePrivate.comparisonIndex);
 
-                var flagValue = field.flagsPrivate;
+                var flagValue = field.baseFField.flagsPrivate;
                 var fieldFlags = string.Join(", ", GetFlagNames(flagValue));
 
-                var fieldName = _globalObjects.GetNameString(field.namePrivate.comparisonIndex);
+                var fieldName = _globalObjects.GetNameString(field.baseFField.namePrivate.comparisonIndex);
 
-                stringBuilder.AppendLine($"Field: [{className}] {fieldName}");
+                stringBuilder.AppendLine($"[0x{field.offset_Internal:X}] Field: [{className}] {fieldName}");
+            }
+
+            foreach (var function in funcs) {
+                var fieldName = _globalObjects.GetNameString(function.baseUstruct.baseUfield.baseUObject.namePrivate.comparisonIndex);
+                var flagValue = function.functionFlags;
+                var funcFlags = string.Join(", ", GetFlagNames(flagValue));
+                var paramnum = function.numParams;
+
+                var propertyString = new StringBuilder();
+                for (FProperty* currentProp = function.firstPropertyToInit; currentProp is not null; currentProp = currentProp->propertyLinkNext) {
+                    var propName = _globalObjects.GetNameString(currentProp->baseFField.namePrivate.comparisonIndex);
+                    var className = _globalObjects.GetNameString(currentProp->baseFField.classPrivate->name.comparisonIndex);
+
+                    propertyString.AppendLine($"Local Struct Property: [{className}] {propName}");
+                }
+
+                var childrenString = new StringBuilder();
+                var prefixString = new StringBuilder();
+                var signature = _unrealReflection.GetFunctionSignature(function);
+
+                if (signature.returnValue.HasValue) {
+                    var returnValue = signature.returnValue.Value;
+
+                    var propName = _globalObjects.GetNameString(returnValue.namePrivate.comparisonIndex);
+                    var className = _globalObjects.GetNameString(returnValue.classPrivate->name.comparisonIndex);
+                    prefixString.Append($" {className} ");
+                }
+                else {
+                    prefixString.Append($"void");
+                }
+
+                foreach (var parameter in signature.parameters) {
+                    var propName = _globalObjects.GetNameString(parameter.namePrivate.comparisonIndex);
+                    var className = _globalObjects.GetNameString(parameter.classPrivate->name.comparisonIndex);
+
+                    childrenString.Append($"{className} {propName}, ");
+                }
+
+
+
+                if (!string.IsNullOrWhiteSpace(childrenString.ToString())) {
+                    childrenString = childrenString.Remove(childrenString.Length - 2, 2);
+                }
+
+
+
+                //if (paramnum > 2) {
+                //    DebugUtilities.WaitForDebuggerAttach();
+                //}
+
+                var methodPropertyStructs = string.IsNullOrWhiteSpace(propertyString.ToString()) ? string.Empty : propertyString.ToString();
+                stringBuilder.AppendLine($"[{funcFlags}] Function ({paramnum}):\n   - {prefixString} {fieldName}({childrenString.ToString()}){methodPropertyStructs}");
             }
 
             return stringBuilder.ToString();

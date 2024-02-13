@@ -1,7 +1,6 @@
 ﻿using System.Text;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GObjectsStructs;
@@ -187,9 +186,13 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
 
         public unsafe string GetNameString(FNameEntryId fnameEntryId) {
             var nameEntry = GetName(fnameEntryId);
-            var stringValue = Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len);
 
-            return stringValue;
+            if (nameEntry->header.BIsWide) {
+                return Encoding.Unicode.GetString(&nameEntry->stringContents, nameEntry->header.Len);
+            }
+            else {
+                return Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len);
+            }
         }
     }
 }
