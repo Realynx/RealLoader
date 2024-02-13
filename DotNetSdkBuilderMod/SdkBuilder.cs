@@ -108,12 +108,12 @@ namespace DotNetSdkBuilderMod {
             var stringBuilder = new StringBuilder();
             foreach (var field in fields) {
 
-                var className = _globalObjects.GetNameString(field.baseFField.namePrivate.comparisonIndex);
+                var className = _globalObjects.GetNameString(field.baseFField.classPrivate->name.comparisonIndex);
+                var fieldName = _globalObjects.GetNameString(field.baseFField.namePrivate.comparisonIndex);
 
                 var flagValue = field.baseFField.flagsPrivate;
                 var fieldFlags = string.Join(", ", GetFlagNames(flagValue));
 
-                var fieldName = _globalObjects.GetNameString(field.baseFField.namePrivate.comparisonIndex);
 
                 stringBuilder.AppendLine($"[0x{field.offset_Internal:X}] Field: [{className}] {fieldName}");
             }
@@ -129,7 +129,7 @@ namespace DotNetSdkBuilderMod {
                     var propName = _globalObjects.GetNameString(currentProp->baseFField.namePrivate.comparisonIndex);
                     var className = _globalObjects.GetNameString(currentProp->baseFField.classPrivate->name.comparisonIndex);
 
-                    propertyString.AppendLine($"Local Struct Property: [{className}] {propName}");
+                    propertyString.AppendLine($"    Local Struct Property: [{className}] {propName}");
                 }
 
                 var childrenString = new StringBuilder();
@@ -141,7 +141,7 @@ namespace DotNetSdkBuilderMod {
 
                     var propName = _globalObjects.GetNameString(returnValue.namePrivate.comparisonIndex);
                     var className = _globalObjects.GetNameString(returnValue.classPrivate->name.comparisonIndex);
-                    prefixString.Append($" {className} ");
+                    prefixString.Append($"{className}");
                 }
                 else {
                     prefixString.Append($"void");
@@ -154,19 +154,15 @@ namespace DotNetSdkBuilderMod {
                     childrenString.Append($"{className} {propName}, ");
                 }
 
-
-
                 if (!string.IsNullOrWhiteSpace(childrenString.ToString())) {
                     childrenString = childrenString.Remove(childrenString.Length - 2, 2);
                 }
-
-
 
                 //if (paramnum > 2) {
                 //    DebugUtilities.WaitForDebuggerAttach();
                 //}
 
-                var methodPropertyStructs = string.IsNullOrWhiteSpace(propertyString.ToString()) ? string.Empty : propertyString.ToString();
+                var methodPropertyStructs = string.IsNullOrWhiteSpace(propertyString.ToString()) ? string.Empty : $"\n{propertyString}";
                 stringBuilder.AppendLine($"[{funcFlags}] Function ({paramnum}):\n   - {prefixString} {fieldName}({childrenString.ToString()}){methodPropertyStructs}");
             }
 
