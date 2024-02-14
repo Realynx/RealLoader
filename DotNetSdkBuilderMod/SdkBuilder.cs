@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding;
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
@@ -52,14 +53,19 @@ namespace DotNetSdkBuilderMod {
         }
 
         private unsafe void ReflectAllMembers() {
-            Thread.Sleep(TimeSpan.FromSeconds(10));
+            //Thread.Sleep(TimeSpan.FromSeconds(10));
 
 
             var typeGraph = _reflectedGraphBuilder.BuildRootNode();
             //DebugUtilities.WaitForDebuggerAttach();
 
+            var timer = new Stopwatch();
+            timer.Start();
             var tree = GenerateTree(typeGraph);
+            timer.Stop();
             _logger.Debug(tree);
+
+            _logger.Debug($"Graph took: {timer.ElapsedMilliseconds} MS to build.");
 
             var filePath = Path.GetFullPath("Inheritance.txt");
             File.WriteAllText(filePath, tree);
