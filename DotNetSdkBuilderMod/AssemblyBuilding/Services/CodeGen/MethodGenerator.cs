@@ -23,9 +23,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe void GenerateMethod(StringBuilder codeBuilder, UFunction method) {
-            var modifers = GetMethodModifers(method);
+            var modifiers = GetMethodModifiers(method);
 
-            codeBuilder.AppendIndented(modifers, 2);
+            codeBuilder.AppendIndented(modifiers, 2);
             codeBuilder.Append(WHITE_SPACE);
 
             var signature = _unrealReflection.GetFunctionSignature(method);
@@ -60,7 +60,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             codeBuilder.AppendLine(CLOSED_CURLY_BRACKET);
         }
 
-        private string GetMethodModifers(UFunction method) {
+        private string GetMethodModifiers(UFunction method) {
             // TODO: At some point we may want to get more details here.
             return PUBLIC;
         }
