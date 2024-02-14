@@ -7,6 +7,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FunctionServices;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
@@ -17,14 +18,16 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
         private readonly IReflectedGraphBuilder _reflectedGraphBuilder;
         private readonly IGlobalObjects _globalObjects;
         private readonly IUObjectFuncs _uObjectFuncs;
+        private readonly NameSpaceGenerator _nameSpaceGenerator;
 
         public SourceCodeGenerator(ILogger logger, IFileGenerator fileGenerator, IReflectedGraphBuilder reflectedGraphBuilder,
-            IGlobalObjects globalObjects, IUObjectFuncs uObjectFuncs) {
+            IGlobalObjects globalObjects, IUObjectFuncs uObjectFuncs, NameSpaceGenerator nameSpaceGenerator) {
             _logger = logger;
             _fileGenerator = fileGenerator;
             _reflectedGraphBuilder = reflectedGraphBuilder;
             _globalObjects = globalObjects;
             _uObjectFuncs = uObjectFuncs;
+            _nameSpaceGenerator = nameSpaceGenerator;
         }
 
         public unsafe void BuildSourceCode() {
@@ -33,8 +36,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             TraverseNodes(rootNode);
         }
 
-        private void TraverseNodes(ClassNode currentnode) {
-            var packageName = GetPackageName(currentnode);
+        private void TraverseNodes(ClassNode currentNode) {
+            var packageName = GetPackageName(currentNode);
 
             var nameSpace = new StringBuilder(packageName)
                 .Replace('/', '.')
@@ -42,22 +45,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
                 .ToString();
 
             var classFile = new StringBuilder();
+            var nameSpace = namespaces[currentNode.ClassName];
             DebugUtilities.WaitForDebuggerAttach();
-            _fileGenerator.GenerateFile(classFile, currentnode, nameSpace);
+            _fileGenerator.GenerateFile(classFile, currentNode, nameSpace);
 
             _logger.Debug(classFile.ToString());
 
-            foreach (var node in currentnode.children) {
+            foreach (var node in currentNode.children) {
                 TraverseNodes(node);
             }
-        }
-
-        private unsafe string GetPackageName(ClassNode rootNode) {
-            var baseObject = rootNode.nodeClass.baseUStruct.baseUfield.baseUObject;
-            var pBaseObject = &baseObject;
-            var package = _uObjectFuncs.GetParentPackage((UObjectBaseUtility*)pBaseObject);
-
-            return _globalObjects.GetNameString(package->Name);
         }
 
         private ClassNode TimeGraphBuilder() {

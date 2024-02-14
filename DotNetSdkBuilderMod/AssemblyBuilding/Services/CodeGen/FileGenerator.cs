@@ -4,6 +4,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 
@@ -20,10 +21,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         public unsafe void GenerateFile(StringBuilder codeBuilder, ClassNode classNode, string nameSpace) {
             // Usings
             // TODO: Figure out usings
-            for (var i = 0; i < 1; i++) {
+            var imports = GetImports(classNode, nameSpace);
+            foreach (var import in imports) {
                 codeBuilder.Append(USING);
                 codeBuilder.Append(WHITE_SPACE);
-                codeBuilder.Append("TODO: types");
+                codeBuilder.Append(import);
                 codeBuilder.AppendLine(SEMICOLON);
             }
 
@@ -42,6 +44,36 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             _classGenerator.GenerateClass(codeBuilder, classNode);
 
             codeBuilder.Append(CLOSED_CURLY_BRACKET);
+        }
+
+        private string[] GetImports(ClassNode classNode, string currentNamespace) {
+            var imports = new HashSet<string>();
+
+            foreach (var propertyImport in GetPropertyImports(classNode.properties)) {
+                if (propertyImport.StartsWith(currentNamespace)) {
+                    continue;
+                }
+
+                imports.Add(propertyImport);
+            }
+
+            foreach (var propertyImport in GetFunctionImports(classNode.functions)) {
+                if (propertyImport.StartsWith(currentNamespace)) {
+                    continue;
+                }
+
+                imports.Add(propertyImport);
+            }
+
+            return imports.ToArray();
+        }
+
+        private IEnumerable<string> GetPropertyImports(FProperty[] properties) {
+            return Enumerable.Empty<string>();
+        }
+
+        private IEnumerable<string> GetFunctionImports(UFunction[] functions) {
+            return Enumerable.Empty<string>();
         }
     }
 }
