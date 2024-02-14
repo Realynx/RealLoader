@@ -25,6 +25,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
                 .AddSingleton<IReflectedGraphBuilder, ReflectedGraphBuilder>();
 
             services
+                .AddSingleton<INameSpaceGenerator, NameSpaceGenerator>()
                 .AddSingleton<ISourceCodeGenerator, SourceCodeGenerator>()
                 .AddSingleton<IFileGenerator, FileGenerator>()
                 .AddSingleton<IClassGenerator, ClassGenerator>()

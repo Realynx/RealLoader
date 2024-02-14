@@ -12,10 +12,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class FileGenerator : IFileGenerator {
         private readonly ILogger _logger;
         private readonly IClassGenerator _classGenerator;
+        private readonly INameSpaceGenerator _nameSpaceGenerator;
 
-        public FileGenerator(ILogger logger, IClassGenerator classGenerator) {
+        public FileGenerator(ILogger logger, IClassGenerator classGenerator, INameSpaceGenerator nameSpaceGenerator) {
             _logger = logger;
             _classGenerator = classGenerator;
+            _nameSpaceGenerator = nameSpaceGenerator;
         }
 
         public unsafe void GenerateFile(StringBuilder codeBuilder, ClassNode classNode, string nameSpace) {
@@ -68,12 +70,26 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             return imports.ToArray();
         }
 
-        private IEnumerable<string> GetPropertyImports(FProperty[] properties) {
-            return Enumerable.Empty<string>();
+        private unsafe string[] GetPropertyImports(FProperty[] properties) {
+            var namespaces = new List<string>();
+
+            foreach (var property in properties) {
+                var nameSpace = _nameSpaceGenerator.GetNameSpace(*(UObjectBase*)property.baseFField.classPrivate);
+                namespaces.Add(nameSpace);
+            }
+
+            return namespaces.ToArray();
         }
 
-        private IEnumerable<string> GetFunctionImports(UFunction[] functions) {
-            return Enumerable.Empty<string>();
+        private string[] GetFunctionImports(UFunction[] functions) {
+            var namespaces = new List<string>();
+
+            foreach (var function in functions) {
+                var nameSpace = _nameSpaceGenerator.GetNameSpace(function.baseUstruct.baseUfield.baseUObject);
+                namespaces.Add(nameSpace);
+            }
+
+            return namespaces.ToArray();
         }
     }
 }

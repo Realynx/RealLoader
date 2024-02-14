@@ -6,9 +6,6 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FunctionServices;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameStructs;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
@@ -17,16 +14,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
         private readonly IFileGenerator _fileGenerator;
         private readonly IReflectedGraphBuilder _reflectedGraphBuilder;
         private readonly IGlobalObjects _globalObjects;
-        private readonly IUObjectFuncs _uObjectFuncs;
-        private readonly NameSpaceGenerator _nameSpaceGenerator;
+        private readonly INameSpaceGenerator _nameSpaceGenerator;
 
         public SourceCodeGenerator(ILogger logger, IFileGenerator fileGenerator, IReflectedGraphBuilder reflectedGraphBuilder,
-            IGlobalObjects globalObjects, IUObjectFuncs uObjectFuncs, NameSpaceGenerator nameSpaceGenerator) {
+            IGlobalObjects globalObjects, INameSpaceGenerator nameSpaceGenerator) {
             _logger = logger;
             _fileGenerator = fileGenerator;
             _reflectedGraphBuilder = reflectedGraphBuilder;
             _globalObjects = globalObjects;
-            _uObjectFuncs = uObjectFuncs;
             _nameSpaceGenerator = nameSpaceGenerator;
         }
 
@@ -37,15 +32,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
         }
 
         private void TraverseNodes(ClassNode currentNode) {
-            var packageName = GetPackageName(currentNode);
-
-            var nameSpace = new StringBuilder(packageName)
-                .Replace('/', '.')
-                .Insert(0, "BaseNameSpace")
-                .ToString();
-
+            DebugUtilities.WaitForDebuggerAttach();
             var classFile = new StringBuilder();
-            var nameSpace = namespaces[currentNode.ClassName];
+            var nodeBaseObject = currentNode.nodeClass.baseUStruct.baseUfield.baseUObject;
+            var nameSpace = _nameSpaceGenerator.GetNameSpace(nodeBaseObject);
             DebugUtilities.WaitForDebuggerAttach();
             _fileGenerator.GenerateFile(classFile, currentNode, nameSpace);
 
