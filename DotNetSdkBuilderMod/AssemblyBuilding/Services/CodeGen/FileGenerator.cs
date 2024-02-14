@@ -55,7 +55,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             var imports = new HashSet<string>();
 
             foreach (var propertyImport in GetPropertyImports(classNode.properties)) {
-                if (propertyImport.StartsWith(currentNamespace)) {
+                if (propertyImport.StartsWith(currentNamespace)
+                    || currentNamespace.StartsWith(propertyImport)) {
                     continue;
                 }
 
@@ -63,7 +64,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
 
             foreach (var functionImport in GetFunctionImports(classNode.functions)) {
-                if (functionImport.StartsWith(currentNamespace)) {
+                if (functionImport.StartsWith(currentNamespace)
+                    || currentNamespace.StartsWith(functionImport)) {
                     continue;
                 }
 
