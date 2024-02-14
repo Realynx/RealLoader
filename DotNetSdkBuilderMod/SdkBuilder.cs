@@ -1,6 +1,7 @@
 ﻿using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding;
+using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Attributes;
@@ -40,13 +41,28 @@ namespace DotNetSdkBuilderMod {
             ReflectAllMembers();
         }
 
+        private string GenerateTree(ClassNode currentNode, int tabIndex = 0) {
+            var currentName = _globalObjects.GetNameString(currentNode.ClassName);
+            var tree = $"{new string(' ', tabIndex * 4)}- {currentName}\n";
+
+            foreach (var child in currentNode.children) {
+                tree += GenerateTree(child, tabIndex + 1);
+            }
+            return tree;
+        }
+
         private unsafe void ReflectAllMembers() {
             Thread.Sleep(TimeSpan.FromSeconds(10));
 
 
             var typeGraph = _reflectedGraphBuilder.BuildRootNode();
-            DebugUtilities.WaitForDebuggerAttach();
-            Console.WriteLine($"UwU");
+            //DebugUtilities.WaitForDebuggerAttach();
+
+            var tree = GenerateTree(typeGraph);
+            _logger.Debug(tree);
+
+            var filePath = Path.GetFullPath("Inheritance.txt");
+            File.WriteAllText(filePath, tree);
 
             //var parentObjects = _globalObjects.EnumerateEverything();
             //var uniqueObjects = new HashSet<string>();

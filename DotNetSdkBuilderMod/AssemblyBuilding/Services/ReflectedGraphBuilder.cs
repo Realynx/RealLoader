@@ -4,6 +4,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
@@ -15,7 +16,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
         private readonly UnrealReflection _unrealReflection;
 
         private List<UObjectBase> _everyLoadedObjects;
-        private Dictionary<string, List<UClass>> _classMemo;
+        private Dictionary<string, HashSet<UClass>> _classMemo;
 
         public ReflectedGraphBuilder(ILogger logger, IGlobalObjects globalObjects, UnrealReflection unrealReflection) {
             _logger = logger;
@@ -25,6 +26,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
 
         public ClassNode? BuildRootNode() {
             _logger.Debug("Building root node graph");
+
+            DebugUtilities.WaitForDebuggerAttach();
             _everyLoadedObjects = _globalObjects.EnumerateEverything().ToList();
             _classMemo = new();
 
@@ -61,7 +64,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
                         .GetValueRefOrAddDefault(_classMemo, superName, out var previouslyExisted);
 
                     if (!previouslyExisted) {
-                        collectionValue = new List<UClass>();
+                        collectionValue = new HashSet<UClass>();
                     }
 
                     collectionValue!.Add(objectClass);
@@ -75,10 +78,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             var children = new List<ClassNode>();
             var currentNodeName = _globalObjects.GetNameString(currentnode.ClassName);
 
+            if (!_classMemo.TryGetValue(currentNodeName, out var memoChildren)) {
+                return Array.Empty<ClassNode>();
+            }
 
-            var memoChildren = _classMemo[currentNodeName].ToArray();
-            if (memoChildren is null) {
-                return children.ToArray();
+            _classMemo.Remove(currentNodeName);
+
+            if (memoChildren.Count < 1) {
+                return Array.Empty<ClassNode>();
             }
 
             foreach (var memoChild in memoChildren) {
@@ -91,7 +98,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             }
 
             foreach (var child in children) {
-                child.children = FindChildren(currentnode);
+                child.children = FindChildren(child);
             }
 
             return children.ToArray();
