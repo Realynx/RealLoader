@@ -45,8 +45,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
 
             foreach (var obj in _everyLoadedObjects) {
                 var objectClass = *obj.classPrivate;
-                var className = _globalObjects.GetNameString(objectClass.ObjectName);
-
                 if (objectClass.baseUStruct.superStruct is null) {
                     var functions = _unrealReflection.GetTypeFunctions(objectClass);
                     var properties = _unrealReflection.GetTypeFields(objectClass);
