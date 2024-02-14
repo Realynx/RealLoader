@@ -4,6 +4,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.UnrealSdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
@@ -13,11 +14,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private readonly ILogger _logger;
         private readonly IClassGenerator _classGenerator;
         private readonly INameSpaceGenerator _nameSpaceGenerator;
+        private readonly UnrealReflection _unrealReflection;
 
-        public FileGenerator(ILogger logger, IClassGenerator classGenerator, INameSpaceGenerator nameSpaceGenerator) {
+        public FileGenerator(ILogger logger, IClassGenerator classGenerator, INameSpaceGenerator nameSpaceGenerator, UnrealReflection unrealReflection) {
             _logger = logger;
             _classGenerator = classGenerator;
             _nameSpaceGenerator = nameSpaceGenerator;
+            _unrealReflection = unrealReflection;
         }
 
         public unsafe void GenerateFile(StringBuilder codeBuilder, ClassNode classNode, string nameSpace) {
@@ -59,12 +62,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 imports.Add(propertyImport);
             }
 
-            foreach (var propertyImport in GetFunctionImports(classNode.functions)) {
-                if (propertyImport.StartsWith(currentNamespace)) {
+            foreach (var functionImport in GetFunctionImports(classNode.functions)) {
+                if (functionImport.StartsWith(currentNamespace)) {
                     continue;
                 }
 
-                imports.Add(propertyImport);
+                imports.Add(functionImport);
             }
 
             return imports.ToArray();
@@ -81,12 +84,20 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             return namespaces.ToArray();
         }
 
-        private string[] GetFunctionImports(UFunction[] functions) {
+        private unsafe string[] GetFunctionImports(UFunction[] functions) {
             var namespaces = new List<string>();
 
             foreach (var function in functions) {
-                var nameSpace = _nameSpaceGenerator.GetNameSpace(function.baseUstruct.baseUfield.baseUObject);
-                namespaces.Add(nameSpace);
+                var signature = _unrealReflection.GetFunctionSignature(function);
+                if (signature.returnValue.HasValue) {
+                    var nameSpace = _nameSpaceGenerator.GetNameSpace(*(UObjectBase*)signature.returnValue.Value.classPrivate);
+                    namespaces.Add(nameSpace);
+                }
+
+                foreach (var parameter in signature.parameters) {
+                    var nameSpace = _nameSpaceGenerator.GetNameSpace(*(UObjectBase*)parameter.classPrivate);
+                    namespaces.Add(nameSpace);
+                }
             }
 
             return namespaces.ToArray();

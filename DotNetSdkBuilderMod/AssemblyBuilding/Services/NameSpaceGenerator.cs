@@ -28,13 +28,18 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
 
             var packageName = GetPackageName(baseObject);
 
+            if (packageName == "None") {
+                value = "BaseNameSpace";
+                return value;
+            }
+
             var nameSpace = new StringBuilder(packageName)
                 .Replace('/', '.')
                 .Insert(0, "BaseNameSpace")
                 .ToString();
 
             value = nameSpace;
-            return nameSpace;
+            return value;
         }
 
         private unsafe string GetPackageName(UObjectBase baseObject) {
