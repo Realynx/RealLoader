@@ -150,7 +150,7 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
             };
 
             var threadDataBlocks = new List<UObjectBase>[rootObjects.Length];
-            Parallel.For(0, rootObjects.Length, x => {
+            Parallel.For(0, rootObjects.Length, threadingOptions, x => {
                 var parentMostObjectBase = rootObjects[x];
                 threadDataBlocks[x] = new List<UObjectBase>();
 
