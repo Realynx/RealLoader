@@ -6,6 +6,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
@@ -31,12 +32,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             TraverseNodes(rootNode);
         }
 
-        private void TraverseNodes(ClassNode currentNode) {
+        private unsafe void TraverseNodes(ClassNode currentNode) {
             DebugUtilities.WaitForDebuggerAttach();
             var classFile = new StringBuilder();
             var nodeBaseObject = currentNode.nodeClass.baseUStruct.baseUfield.baseUObject;
-            var nameSpace = _nameSpaceGenerator.GetNameSpace(nodeBaseObject);
+            var nameSpace = _nameSpaceGenerator.GetNameSpace((UObjectBaseUtility*)&nodeBaseObject);
+
             DebugUtilities.WaitForDebuggerAttach();
+
             _fileGenerator.GenerateFile(classFile, currentNode, nameSpace);
 
             _logger.Debug(classFile.ToString());

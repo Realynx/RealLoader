@@ -79,7 +79,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             var namespaces = new List<string>();
 
             foreach (var property in properties) {
-                var nameSpace = _nameSpaceGenerator.GetNameSpace(*(UObjectBase*)property.baseFField.classPrivate);
+                var nameSpace = _nameSpaceGenerator.GetNameSpace((UObjectBaseUtility*)property.baseFField.classPrivate);
                 namespaces.Add(nameSpace);
             }
 
@@ -92,13 +92,18 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             foreach (var function in functions) {
                 var signature = _unrealReflection.GetFunctionSignature(function);
                 if (signature.returnValue.HasValue) {
-                    var nameSpace = _nameSpaceGenerator.GetNameSpace(*(UObjectBase*)signature.returnValue.Value.classPrivate);
+                    var nameSpace = _nameSpaceGenerator.GetNameSpace((UObjectBaseUtility*)signature.returnValue.Value.classPrivate);
                     namespaces.Add(nameSpace);
                 }
 
                 foreach (var parameter in signature.parameters) {
-                    var nameSpace = _nameSpaceGenerator.GetNameSpace(*(UObjectBase*)parameter.classPrivate);
-                    namespaces.Add(nameSpace);
+                    if (parameter.owner.bIsUObject) {
+                        var nameSpace = _nameSpaceGenerator.GetNameSpace((UObjectBaseUtility*)&parameter.owner.Container);
+                        namespaces.Add(nameSpace);
+                    }
+                    else {
+                        _logger.Error("Not Uobject");
+                    }
                 }
             }
 

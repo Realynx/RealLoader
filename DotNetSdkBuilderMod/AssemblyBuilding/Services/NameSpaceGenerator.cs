@@ -19,8 +19,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             _uObjectFuncs = uObjectFuncs;
         }
 
-        public string GetNameSpace(UObjectBase baseObject) {
-            ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(_namespaces, baseObject.namePrivate.comparisonIndex, out var previouslyExisted);
+        public unsafe string GetNameSpace(UObjectBaseUtility* baseObject) {
+            ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(_namespaces, baseObject->baseUObjectBase.namePrivate.comparisonIndex, out var previouslyExisted);
 
             if (previouslyExisted) {
                 return value!;
@@ -42,10 +42,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             return value;
         }
 
-        private unsafe string GetPackageName(UObjectBase baseObject) {
-            var pBaseObject = &baseObject;
-            var package = _uObjectFuncs.GetParentPackage((UObjectBaseUtility*)pBaseObject);
-
+        private unsafe string GetPackageName(UObjectBaseUtility* baseObject) {
+            var package = _uObjectFuncs.GetParentPackage(baseObject);
             return _globalObjects.GetNameString(package->Name);
         }
     }
