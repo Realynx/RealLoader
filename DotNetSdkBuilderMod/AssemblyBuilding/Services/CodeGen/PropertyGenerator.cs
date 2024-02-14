@@ -31,6 +31,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             var propertyName = _globalObjects.GetNameString(property.ObjectName);
             codeBuilder.Append(propertyName);
+            codeBuilder.Append(WHITE_SPACE);
 
             codeBuilder.Append(OPEN_CURLY_BRACKET);
 
