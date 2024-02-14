@@ -7,6 +7,10 @@ namespace PalworldManagedModFramework.Sdk.Services {
             [CallerFilePath] string classFile = "",
             [CallerLineNumber] int lineNumber = 0,
             [CallerMemberName] string callerName = "") {
+            if (Debugger.IsAttached) {
+                return;
+            }
+
             // If the binary was compiled on windows the constant class filenames will have windows path seperators, and vice versa for linux.
             // So we must check for this manually.
             var directorySeparatorChar = classFile.Contains('/') ? '/' : '\\';

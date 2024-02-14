@@ -15,6 +15,6 @@ namespace PalworldManagedModFramework.Sdk.Interfaces {
         /// <param name="services"></param>
         void ConfigureServices(IServiceCollection services);
 
-        void Configure(IConfigurationBuilder configurationBuilder);
+        void Configure(string assemblyFolder, IConfigurationBuilder configurationBuilder);
     }
 }

@@ -1,24 +1,35 @@
-﻿using DotNetSdkBuilderMod.AssemblyBuilding.Services;
+﻿using DotNetSdkBuilderMod.AssemblyBuilding.Models;
+using DotNetSdkBuilderMod.AssemblyBuilding.Services;
+using DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using PalworldManagedModFramework.Sdk.Interfaces;
-using PalworldManagedModFramework.Sdk.Logging;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
     public class Startup : ISbStartup {
         public IConfiguration Configuration { get; set; }
 
-        public void Configure(IConfigurationBuilder configurationBuilder) {
+        public void Configure(string assemblyFolder, IConfigurationBuilder configurationBuilder) {
+            configurationBuilder
+                .AddJsonFile(Path.Combine(assemblyFolder, "SdkBuilderConfig.json"));
 
+            Configuration = configurationBuilder.Build();
         }
 
         public void ConfigureServices(IServiceCollection services) {
             services
-                .AddSingleton<IReflectedGraphBuilder, ReflectedGraphBuilder>()
-                .AddSingleton<SourceCodeGenerator>();
+                .AddSingleton<SdkBuilderConfig>()
+                .AddSingleton<IReflectedGraphBuilder, ReflectedGraphBuilder>();
+
+            services
+                .AddSingleton<ISourceCodeGenerator, SourceCodeGenerator>()
+                .AddSingleton<IFileGenerator, FileGenerator>()
+                .AddSingleton<IClassGenerator, ClassGenerator>()
+                .AddSingleton<IMethodGenerator, MethodGenerator>()
+                .AddSingleton<IPropertiesGenerator, PropertiesGenerator>();
         }
     }
 }

@@ -37,7 +37,19 @@ namespace PalworldManagedModFramework.Sdk.Logging {
             [CallerLineNumber] int lineNumber = 0,
             [CallerMemberName] string callerName = "") {
             if (Level.HasFlag(LogLevel.Info)) {
-                LogOutput(ConsoleColor.Green, string.Join("\n", info), classFile, lineNumber, callerName);
+                LogOutput(ConsoleColor.Green, info, classFile, lineNumber, callerName);
+            }
+        }
+
+        public void Info(DefaultInterpolatedStringHandler info,
+            [CallerFilePath] string classFile = "",
+            [CallerLineNumber] int lineNumber = 0,
+            [CallerMemberName] string callerName = "")
+        {
+            if (Level.HasFlag(LogLevel.Info))
+            {
+                var infoString = info.ToStringAndClear();
+                LogOutput(ConsoleColor.Green, infoString, classFile, lineNumber, callerName);
             }
         }
 
@@ -46,7 +58,19 @@ namespace PalworldManagedModFramework.Sdk.Logging {
             [CallerLineNumber] int lineNumber = 0,
             [CallerMemberName] string callerName = "") {
             if (Level.HasFlag(LogLevel.Errors)) {
-                LogOutput(ConsoleColor.Red, string.Join("\n", error), classFile, lineNumber, callerName);
+                LogOutput(ConsoleColor.Red, error, classFile, lineNumber, callerName);
+            }
+        }
+
+        public void Error(DefaultInterpolatedStringHandler error,
+            [CallerFilePath] string classFile = "",
+            [CallerLineNumber] int lineNumber = 0,
+            [CallerMemberName] string callerName = "")
+        {
+            if (Level.HasFlag(LogLevel.Errors))
+            {
+                var errorString = error.ToStringAndClear();
+                LogOutput(ConsoleColor.Red, errorString, classFile, lineNumber, callerName);
             }
         }
 
@@ -55,7 +79,19 @@ namespace PalworldManagedModFramework.Sdk.Logging {
             [CallerLineNumber] int lineNumber = 0,
             [CallerMemberName] string callerName = "") {
             if (Level.HasFlag(LogLevel.Warnings)) {
-                LogOutput(ConsoleColor.Yellow, string.Join("\n", warning), classFile, lineNumber, callerName);
+                LogOutput(ConsoleColor.Yellow, warning, classFile, lineNumber, callerName);
+            }
+        }
+
+        public void Warning(DefaultInterpolatedStringHandler warning,
+            [CallerFilePath] string classFile = "",
+            [CallerLineNumber] int lineNumber = 0,
+            [CallerMemberName] string callerName = "")
+        {
+            if (Level.HasFlag(LogLevel.Warnings))
+            {
+                var warningString = warning.ToStringAndClear();
+                LogOutput(ConsoleColor.Yellow, warningString, classFile, lineNumber, callerName);
             }
         }
 
@@ -64,7 +100,19 @@ namespace PalworldManagedModFramework.Sdk.Logging {
             [CallerLineNumber] int lineNumber = 0,
             [CallerMemberName] string callerName = "") {
             if (Level.HasFlag(LogLevel.Debugging)) {
-                LogOutput(ConsoleColor.Magenta, string.Join("\n", debug), classFile, lineNumber, callerName);
+                LogOutput(ConsoleColor.Magenta, debug, classFile, lineNumber, callerName);
+            }
+        }
+
+        public void Debug(DefaultInterpolatedStringHandler debug,
+            [CallerFilePath] string classFile = "",
+            [CallerLineNumber] int lineNumber = 0,
+            [CallerMemberName] string callerName = "")
+        {
+            if (Level.HasFlag(LogLevel.Debugging))
+            {
+                var debugString = debug.ToStringAndClear();
+                LogOutput(ConsoleColor.Magenta, debugString, classFile, lineNumber, callerName);
             }
         }
 

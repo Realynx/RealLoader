@@ -11,6 +11,11 @@ namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClass
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public unsafe struct FFieldClass {
+        public FNameEntryId ObjectName {
+            get {
+                return name.comparisonIndex;
+            }
+        }
         /// <summary>
         /// Name of this field class.
         /// </summary>

@@ -10,6 +10,11 @@ namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClass
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct UPackage {
+        public FNameEntryId Name {
+            get {
+                return baseUObject.baseObjectBaseUtility.baseUObjectBase.namePrivate.comparisonIndex;
+            }
+        }
         //Inherit
         public UObject baseUObject;
 

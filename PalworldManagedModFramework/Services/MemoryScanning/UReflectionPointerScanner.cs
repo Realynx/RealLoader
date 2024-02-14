@@ -27,6 +27,7 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
 
             // Functions
             ResolveMachineCodeProperty(_uObjectFuncs, nameof(_uObjectFuncs.GetExternalPackage));
+            ResolveMachineCodeProperty(_uObjectFuncs, nameof(_uObjectFuncs.GetParentPackage));
             //ResolveMachineCodeProperty(_uObjectFuncs, nameof(_uObjectFuncs.GetFullName));
 
         }

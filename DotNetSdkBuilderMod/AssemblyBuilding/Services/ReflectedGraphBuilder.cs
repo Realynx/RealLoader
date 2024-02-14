@@ -4,7 +4,6 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
@@ -27,7 +26,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
         public ClassNode? BuildRootNode() {
             _logger.Debug("Building root node graph");
 
-            DebugUtilities.WaitForDebuggerAttach();
             _everyLoadedObjects = _globalObjects.EnumerateEverything().ToList();
             _classMemo = new();
 

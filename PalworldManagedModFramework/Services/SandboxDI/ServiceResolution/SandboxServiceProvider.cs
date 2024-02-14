@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Reflection;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PalworldManagedModFramework.Services.SandboxDI.ServiceResolution {
     public class SandboxServiceProvider : IServiceProvider, IDisposable {
@@ -13,8 +15,9 @@ namespace PalworldManagedModFramework.Services.SandboxDI.ServiceResolution {
         }
 
         public object GetService(Type serviceType) {
-            var service = _rootServiceProvider.GetService(serviceType);
-            service ??= GetOrActivateService(serviceType);
+            var service = GetOrActivateService(serviceType);
+            service ??= _rootServiceProvider.GetService(serviceType);
+
 
             return service;
         }
@@ -31,21 +34,29 @@ namespace PalworldManagedModFramework.Services.SandboxDI.ServiceResolution {
                 var DICtor = constructors.OrderByDescending(i => i.GetParameters().Length).FirstOrDefault();
 
                 if (DICtor is null) {
-                    _serviceSingletons[serviceType] = Activator.CreateInstance(implementationType);
+                    var service = Activator.CreateInstance(implementationType);
+                    _serviceSingletons[serviceType] = service;
+                    return service;
                 }
 
-                var parameters = DICtor.GetParameters();
-                var arguments = new object[parameters.Length];
-                for (var x = 0; x < parameters.Length; x++) {
-                    var parameter = parameters[x];
-
-                    arguments[x] = GetService(parameter.ParameterType);
-                }
+                var arguments = GetConstructorArguments(DICtor);
 
                 _serviceSingletons[serviceType] = DICtor.Invoke(arguments);
             }
 
             return _serviceSingletons[serviceType];
+        }
+
+        private object[] GetConstructorArguments(ConstructorInfo DICtor) {
+            var parameters = DICtor.GetParameters();
+            var arguments = new object[parameters.Length];
+            for (var x = 0; x < parameters.Length; x++) {
+                var parameter = parameters[x];
+
+                arguments[x] = GetService(parameter.ParameterType);
+            }
+
+            return arguments;
         }
 
         public void Dispose() {
