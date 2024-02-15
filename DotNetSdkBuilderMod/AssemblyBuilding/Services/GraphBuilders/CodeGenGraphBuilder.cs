@@ -56,7 +56,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
             var assemblyNodes = new CodeGenAssemblyNode[namespaceTree.Length];
             for (var i = 0; i < namespaceTree.Length; i++) {
-                assemblyNodes[i] = new CodeGenAssemblyNode { namespaces = namespaceTree[i].namespaces, name = namespaceTree[i].nameSpace };
+                assemblyNodes[i] = new CodeGenAssemblyNode {
+                    namespaces = namespaceTree[i].namespaces,
+                    name = namespaceTree[i].name
+                };
             }
 
             return assemblyNodes;
@@ -85,14 +88,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var timer = new Stopwatch();
             timer.Start();
             var namespaceTree = new CodeGenNamespaceNode();
-            _ = BuildAllNamespaces(namespaces, namespaceTree);
+            _ = BuildAllNamespaces(namespaces, "", namespaceTree);
             timer.Stop();
 
             _logger.Debug($"Built namespace tree; {timer.ElapsedMilliseconds} ms to build.");
             return namespaceTree.namespaces;
         }
 
-        private CodeGenNamespaceNode BuildAllNamespaces(string[] namespaceNames, CodeGenNamespaceNode currentNode) {
+        private CodeGenNamespaceNode BuildAllNamespaces(string[] namespaceNames, string previousNamespace, CodeGenNamespaceNode currentNode) {
             var rootLevel = namespaceNames
                 .Where(i => i.Contains('/'))
                 .Select(i => i.Split('/')[1])
@@ -101,21 +104,25 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
             currentNode.namespaces = new CodeGenNamespaceNode[rootLevel.Length];
             for (var x = 0; x < rootLevel.Length; x++) {
+                var fullBranchNamespace = $"{previousNamespace}/{rootLevel[x]}";
                 var branchNamespace = rootLevel[x];
 
-                currentNode.namespaces[x] = new CodeGenNamespaceNode() { nameSpace = branchNamespace };
+                currentNode.namespaces[x] = new CodeGenNamespaceNode {
+                    fullNameSpace = fullBranchNamespace,
+                    name = branchNamespace
+                };
 
-                var nameSpacePrefix = $"/{currentNode.namespaces[x].nameSpace}/";
+                var nameSpacePrefix = $"/{branchNamespace}/";
                 var childNamespaceNames = namespaceNames
                     .Where(i => i.StartsWith(nameSpacePrefix))
                     .Select(i => i.Substring(nameSpacePrefix.Length - 1))
                     .ToArray();
 
-                if (childNamespaceNames.Length == 0 || childNamespaceNames is [""]) {
+                if (childNamespaceNames.Length == 0) {
                     continue;
                 }
 
-                currentNode.namespaces[x] = BuildAllNamespaces(childNamespaceNames, currentNode.namespaces[x]);
+                currentNode.namespaces[x] = BuildAllNamespaces(childNamespaceNames, fullBranchNamespace, currentNode.namespaces[x]);
             }
 
             return currentNode;
@@ -126,7 +133,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             timer.Start();
             var namespacesMemo = new Dictionary<string, CodeGenNamespaceNode>();
             foreach (var namespaceNode in namespaceTree) {
-                MemoizeNamespaceNodes(namespaceNode, "", namespacesMemo);
+                MemoizeNamespaceNodes(namespaceNode, namespacesMemo);
             }
 
             timer.Stop();
@@ -135,17 +142,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             return namespacesMemo;
         }
 
-        private void MemoizeNamespaceNodes(CodeGenNamespaceNode currentNode, string previousNameSpace, Dictionary<string, CodeGenNamespaceNode> namespacesMemo) {
-            var currentNamespace = $"{previousNameSpace}/{currentNode.nameSpace}";
-
-            namespacesMemo[currentNamespace] = currentNode;
+        private void MemoizeNamespaceNodes(CodeGenNamespaceNode currentNode, Dictionary<string, CodeGenNamespaceNode> namespacesMemo) {
+            namespacesMemo[currentNode.fullNameSpace] = currentNode;
 
             if (currentNode.namespaces is null) {
                 return;
             }
 
             foreach (var namespaceNode in currentNode.namespaces) {
-                MemoizeNamespaceNodes(namespaceNode, currentNamespace, namespacesMemo);
+                MemoizeNamespaceNodes(namespaceNode, namespacesMemo);
             }
         }
 
@@ -319,7 +324,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var timer = new Stopwatch();
             timer.Start();
             foreach (var namespaceNode in namespaceTree) {
-                ApplyImportsToNamespace(namespaceNode, "", classNamespaces);
+                ApplyImportsToNamespace(namespaceNode, classNamespaces);
             }
 
             timer.Stop();
@@ -327,14 +332,17 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             _logger.Debug($"Applied imports to namespace tree; {timer.ElapsedMilliseconds} ms to build.");
         }
 
-        private void ApplyImportsToNamespace(CodeGenNamespaceNode current, string previousNameSpace, Dictionary<string, string> classNamespaces) {
-            var currentNamespace = $"{previousNameSpace}/{current.nameSpace}";
+        private void ApplyImportsToNamespace(CodeGenNamespaceNode current, Dictionary<string, string> classNamespaces) {
 
             var imports = new HashSet<string>();
 
             // Lord have mercy on my soul for the amount of indentation
             if (current.classes is not null) {
                 foreach (var classNode in current.classes) {
+                    if (classNode.baseType != null) {
+                        TryAddClassAsImport(classNode.baseType);
+                    }
+
                     if (classNode.propertyNodes is not null) {
                         foreach (var propertyNode in classNode.propertyNodes) {
                             TryAddClassAsImport(propertyNode.returnType);
@@ -371,14 +379,16 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
             if (current.namespaces is not null) {
                 foreach (var child in current.namespaces) {
-                    ApplyImportsToNamespace(child, currentNamespace, classNamespaces);
+                    ApplyImportsToNamespace(child, classNamespaces);
                 }
             }
 
             void TryAddClassAsImport(string className) {
+                var currentNameSpace = current.fullNameSpace;
+
                 if (classNamespaces.TryGetValue(className, out var argNamespace)
-                    && !currentNamespace.StartsWith(argNamespace)
-                    && !argNamespace.StartsWith(current.nameSpace)) {
+                    && !currentNameSpace.StartsWith(argNamespace)
+                    && !argNamespace.StartsWith(currentNameSpace)) {
                     imports.Add(argNamespace);
                 }
             }

@@ -7,12 +7,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public string name;
     }
 
-    [DebuggerDisplay("{nameSpace}: {namespaces?.Length ?? 0} sub-namespaces, {classes?.Length ?? 0} classes")]
+    [DebuggerDisplay("{fullNameSpace}: {namespaces?.Length ?? 0} sub-namespaces, {classes?.Length ?? 0} classes")]
     public class CodeGenNamespaceNode {
         public CodeGenNamespaceNode[] namespaces;
         public CodeGenClassNode[] classes;
 
-        public string nameSpace;
+        public string fullNameSpace;
+        public string name;
         public string imports;
     }
 

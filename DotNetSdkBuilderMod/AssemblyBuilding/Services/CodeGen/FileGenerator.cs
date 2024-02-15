@@ -32,7 +32,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             codeBuilder.Append(NAMESPACE);
             codeBuilder.Append(WHITE_SPACE);
 
-            codeBuilder.Append(namespaceNode.nameSpace);
+            var fullyQualifiedNamespace = namespaceNode.fullNameSpace.TrimStart('/').Replace('/', '.');
+            codeBuilder.Append(fullyQualifiedNamespace);
 
             codeBuilder.Append(WHITE_SPACE);
             codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
