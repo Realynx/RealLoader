@@ -42,7 +42,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             _logger.Debug("Building namespace-namespace dictionary...");
             var memoizedNamespaceNodes = TimedNamespaceNamespaceNodeMemoize(namespaceTree);
 
-            _logger.Debug("BuildassemblyNodes = {CodeGenAssemblyNode[]} CodeGenAssemblyNode[2] ing class-namespace dictionary...");
+            _logger.Debug("Building class-namespace dictionary...");
             var classNamespaces = TimedClassNamespaceMemoize(rootNode);
 
             _logger.Debug("Building namespace-classes dictionary...");
