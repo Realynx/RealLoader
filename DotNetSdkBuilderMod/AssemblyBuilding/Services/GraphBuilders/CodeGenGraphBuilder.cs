@@ -30,56 +30,22 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var namespaceTree = TimedNamespaceTree(rootNode, distinctNamespaces);
 
             foreach (var rootNamespace in namespaceTree) {
-                _logger.Debug($"Root Name: {rootNamespace}");
+                _logger.Debug($"Root Name: {rootNamespace.nameSpace}");
 
                 PrintTree(rootNamespace);
             }
 
             void PrintTree(CodeGenNamespaceNode current, int tabIndex = 0) {
                 _logger.Debug($"{new string(' ', tabIndex * 4)}- {current.nameSpace}");
-                foreach (var child in current.namespaces) {
-                    PrintTree(child, tabIndex++);
+                if (current.namespaces != null) {
+                    foreach (var child in current.namespaces) {
+                        PrintTree(child, tabIndex + 1);
+                    }
                 }
             }
 
-
             return [];
         }
-
-        //private class CodeGenNamespaceNode2 {
-        //    public List<CodeGenNamespaceNode> namespaces;
-        //    public List<CodeGenClassNode> classes;
-
-        //    public string nameSpace;
-        //    public string imports;
-        //}
-
-        //private void GetNameSpaceNodes(ClassNode currentNode, List<CodeGenNamespaceNode2> rootNamespaceNodes) {
-        //    var currentNameSpace = currentNode.packageName;
-
-        //    var selectedRootNode = rootNamespaceNodes.FirstOrDefault(x => currentNameSpace.AsSpan(1).StartsWith(x.nameSpace));
-        //    if (selectedRootNode == null) {
-        //        selectedRootNode = new CodeGenNamespaceNode2() {
-        //            nameSpace = currentNameSpace.Split('/')[0]
-        //        };
-        //    }
-
-        //    rootNamespaceNodes.Add(selectedRootNode);
-        //    AddNameSpace(currentNode, selectedRootNode);
-
-        //    var childNameSpaces = new List<CodeGenNamespaceNode>();
-        //    foreach (var child in currentNode.children) {
-        //        childNameSpaces.Add(GetNameSpaces(child, depth + 1));
-        //    }
-
-        //    return
-        //}
-
-        //private void AddNameSpace(ClassNode node, CodeGenNamespaceNode2 namespaceNode) {
-        //    if (node.packageName.AsSpan().Trim('/').SequenceEqual(namespaceNode.nameSpace)) {
-
-        //    }
-        //}
 
         private string[] TimedDistinctNamespaces(ClassNode rootNode) {
             var timer = new Stopwatch();
@@ -115,7 +81,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             return namespaceTree.namespaces;
         }
 
-        private CodeGenNamespaceNode BuildAllNamespaces(IEnumerable<string> namespaceNames, CodeGenNamespaceNode currentNode) {
+        private CodeGenNamespaceNode BuildAllNamespaces(string[] namespaceNames, CodeGenNamespaceNode currentNode) {
             var rootLevel = namespaceNames
                 .Where(i => i.Contains('/'))
                 .Select(i => i.Split('/')[1])
@@ -130,12 +96,17 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                     nameSpace = branchNamespace
                 };
 
-                var nameSpacePrefix = $"/{currentNode.namespaces[x].nameSpace}";
+                var nameSpacePrefix = $"/{currentNode.namespaces[x].nameSpace}/";
                 var childNamespaceNames = namespaceNames
                     .Where(i => i.StartsWith(nameSpacePrefix))
-                    .Select(i => i.Substring(nameSpacePrefix.Length));
+                    .Select(i => i.Substring(nameSpacePrefix.Length - 1))
+                    .ToArray();
 
-                currentNode.namespaces[x] = BuildAllNamespaces(childNamespaceNames, currentNode);
+                if (childNamespaceNames.Length == 0 || childNamespaceNames is [""]) {
+                    continue;
+                }
+
+                currentNode.namespaces[x] = BuildAllNamespaces(childNamespaceNames, currentNode.namespaces[x]);
             }
 
             return currentNode;

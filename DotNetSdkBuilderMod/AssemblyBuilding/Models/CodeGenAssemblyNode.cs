@@ -1,8 +1,11 @@
-﻿namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
+﻿using System.Diagnostics;
+
+namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     public class CodeGenAssemblyNode {
         public CodeGenNamespaceNode[] namespaces;
     }
 
+    [DebuggerDisplay("{nameSpace}: {namespaces?.Length ?? 0} sub-namespaces, {classes?.Length ?? 0} classes")]
     public class CodeGenNamespaceNode {
         public CodeGenNamespaceNode[] namespaces;
         public CodeGenClassNode[] classes;
