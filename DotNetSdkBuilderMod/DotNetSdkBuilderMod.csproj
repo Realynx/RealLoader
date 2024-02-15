@@ -10,7 +10,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AssemblyBuilding\Services\Interfaces\INamespaceGenerator.cs" />
+    <Compile Remove="AssemblyBuilding\Services\NameSpaceGenerator.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="AssemblyBuilding\Services\CodeGen\NewFile1.txt" />
+    <None Remove="AssemblyBuilding\Services\GraphBuilders\NameSpaceGenerator" />
+    <None Remove="AssemblyBuilding\Services\GraphBuilders\NewFile1.txt" />
+    <None Remove="AssemblyBuilding\Services\Interfaces\NewFile1.txt" />
   </ItemGroup>
 
   <ItemGroup>

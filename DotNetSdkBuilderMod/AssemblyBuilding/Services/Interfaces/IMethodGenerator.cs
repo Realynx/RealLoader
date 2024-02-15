@@ -1,9 +1,9 @@
 ﻿using System.Text;
 
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
+using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces {
     public interface IMethodGenerator {
-        void GenerateMethod(StringBuilder codeBuilder, UFunction method);
+        void GenerateMethod(StringBuilder codeBuilder, CodeGenMethodNode methodNode);
     }
 }

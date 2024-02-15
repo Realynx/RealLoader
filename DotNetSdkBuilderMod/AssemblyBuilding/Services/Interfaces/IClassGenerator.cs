@@ -4,6 +4,6 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces {
     public interface IClassGenerator {
-        void GenerateClass(StringBuilder codeBuilder, ClassNode classNode);
+        void GenerateClass(StringBuilder codeBuilder, CodeGenClassNode classNode);
     }
 }

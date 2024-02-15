@@ -13,14 +13,16 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
         private readonly ILogger _logger;
         private readonly IGlobalObjects _globalObjects;
         private readonly UnrealReflection _unrealReflection;
+        private readonly IPackageNameGenerator _packageNameGenerator;
 
         private List<UObjectBase> _everyLoadedObjects;
         private Dictionary<string, HashSet<UClass>> _classMemo;
 
-        public ReflectedGraphBuilder(ILogger logger, IGlobalObjects globalObjects, UnrealReflection unrealReflection) {
+        public ReflectedGraphBuilder(ILogger logger, IGlobalObjects globalObjects, UnrealReflection unrealReflection, IPackageNameGenerator packageNameGenerator) {
             _logger = logger;
             _globalObjects = globalObjects;
             _unrealReflection = unrealReflection;
+            _packageNameGenerator = packageNameGenerator;
         }
 
         public ClassNode? BuildRootNode() {
@@ -46,10 +48,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
                 if (objectClass.baseUStruct.superStruct is null) {
                     var functions = _unrealReflection.GetTypeFunctions(objectClass);
                     var properties = _unrealReflection.GetTypeFields(objectClass);
+                    var packageName = _packageNameGenerator.GetPackageName((UObjectBaseUtility*)&obj);
+
                     rootNode = new ClassNode() {
                         functions = functions.ToArray(),
                         properties = properties.ToArray(),
-                        nodeClass = objectClass
+                        nodeClass = objectClass,
+                        packageName = packageName,
                     };
                 }
                 else {
@@ -85,9 +90,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             }
 
             foreach (var memoChild in memoChildren) {
+                var classBase = currentnode.nodeClass.baseUStruct.baseUfield.baseUObject;
+                var packageName = _packageNameGenerator.GetPackageName((UObjectBaseUtility*)&classBase);
+
                 children.Add(new ClassNode() {
                     functions = _unrealReflection.GetTypeFunctions(memoChild).ToArray(),
                     properties = _unrealReflection.GetTypeFields(memoChild).ToArray(),
+                    packageName = packageName,
                     nodeClass = memoChild,
                     parent = currentnode
                 });

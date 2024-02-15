@@ -5,6 +5,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     public class ClassNode {
         public ClassNode parent;
         public ClassNode[] children;
+        public string packageName;
 
         public UClass nodeClass;
         public UFunction[] functions;

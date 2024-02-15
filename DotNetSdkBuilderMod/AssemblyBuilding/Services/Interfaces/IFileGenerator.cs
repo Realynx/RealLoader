@@ -4,6 +4,6 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces {
     public interface IFileGenerator {
-        void GenerateFile(StringBuilder codeBuilder, ClassNode classNode, string nameSpace);
+        void GenerateFile(StringBuilder codeBuilder, CodeGenNamespaceNode namespaceNode);
     }
 }

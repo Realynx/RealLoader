@@ -5,35 +5,32 @@
 
     public class CodeGenNamespaceNode {
         public CodeGenNamespaceNode[] namespaces;
-        public ClassNode[] classes;
+        public CodeGenClassNode[] classes;
+
+        public string nameSpace;
+        public string imports;
     }
 
-    public class CodeGenClassNode {
-        public string attributes;
-
-        public string modifer;
-        public string name;
-
+    public class CodeGenClassNode : CodeGenCodeObjectNode {
+        public string baseType;
         public CodeGenPropertyNode[] propertyNodes;
         public CodeGenMethodNode[] methodNodes;
     }
 
-    public class CodeGenPropertyNode {
-        public string attributes;
-
-        public string modifer;
+    public class CodeGenPropertyNode : CodeGenCodeObjectNode {
         public string returnType;
-        public string name;
         public string get;
         public string set;
     }
 
-    public class CodeGenMethodNode {
-        public string attributes;
-
-        public string modifer;
+    public class CodeGenMethodNode : CodeGenCodeObjectNode {
         public string returnType;
-        public string name;
         public string arguments;
+    }
+
+    public class CodeGenCodeObjectNode {
+        public string attributes;
+        public string modifer;
+        public string name;
     }
 }

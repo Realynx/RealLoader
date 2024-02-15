@@ -1,6 +1,7 @@
 ﻿using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen;
+using DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using Microsoft.Extensions.Configuration;
@@ -25,8 +26,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
                 .AddSingleton<IReflectedGraphBuilder, ReflectedGraphBuilder>();
 
             services
-                .AddSingleton<INameSpaceGenerator, NameSpaceGenerator>()
+                .AddSingleton<IPackageNameGenerator, PackageNameGenerator>()
+                .AddSingleton<INameDistanceService, NameDistanceService>()
+
+                .AddSingleton<ICodeGenGraphBuilder, CodeGenGraphBuilder>()
                 .AddSingleton<ISourceCodeGenerator, SourceCodeGenerator>()
+
                 .AddSingleton<IFileGenerator, FileGenerator>()
                 .AddSingleton<IClassGenerator, ClassGenerator>()
                 .AddSingleton<IMethodGenerator, MethodGenerator>()

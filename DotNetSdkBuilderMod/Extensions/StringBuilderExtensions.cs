@@ -10,11 +10,14 @@ namespace DotNetSdkBuilderMod.Extensions {
                 .AppendLine(str);
         }
 
-        public static StringBuilder AppendIndented(this StringBuilder sb, string str, int indentSize)
-        {
+        public static StringBuilder AppendIndented(this StringBuilder sb, string str, int indentSize) {
             return sb
                 .Append(' ', indentSize * INDENT_MULTIPLIER)
                 .Append(str);
+        }
+
+        public static StringBuilder RemoveLine(this StringBuilder sb) {
+            return sb.Remove(sb.Length - Environment.NewLine.Length, Environment.NewLine.Length);
         }
     }
 }

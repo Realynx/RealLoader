@@ -6,74 +6,71 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
-using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
     public class SourceCodeGenerator : ISourceCodeGenerator {
         private readonly ILogger _logger;
         private readonly IFileGenerator _fileGenerator;
         private readonly IReflectedGraphBuilder _reflectedGraphBuilder;
-        private readonly IGlobalObjects _globalObjects;
-        private readonly INameSpaceGenerator _nameSpaceGenerator;
+        private readonly ICodeGenGraphBuilder _codeGenGraphBuilder;
 
         public SourceCodeGenerator(ILogger logger, IFileGenerator fileGenerator, IReflectedGraphBuilder reflectedGraphBuilder,
-            IGlobalObjects globalObjects, INameSpaceGenerator nameSpaceGenerator) {
+            ICodeGenGraphBuilder codeGenGraphBuilder) {
             _logger = logger;
             _fileGenerator = fileGenerator;
             _reflectedGraphBuilder = reflectedGraphBuilder;
-            _globalObjects = globalObjects;
-            _nameSpaceGenerator = nameSpaceGenerator;
+            _codeGenGraphBuilder = codeGenGraphBuilder;
         }
 
         public unsafe void BuildSourceCode() {
             _logger.Debug("Building object tree...");
-            var rootNode = TimeGraphBuilder();
-            TraverseNodes(rootNode);
+            var rootNode = TimeObjectTreeBuilder();
+
+            _logger.Debug("Building assembly graphs...");
+            var assemblyGraphs = TimeAssemblyGraphBuilder(rootNode);
+
+            foreach (var assemblyGraph in assemblyGraphs) {
+                foreach (var nameSpace in assemblyGraph.namespaces) {
+                    TraverseNodes(nameSpace);
+                }
+            }
         }
 
-        private unsafe void TraverseNodes(ClassNode currentNode) {
-            DebugUtilities.WaitForDebuggerAttach();
+        private void TraverseNodes(CodeGenNamespaceNode namespaceNode) {
             var classFile = new StringBuilder();
-            var nodeBaseObject = currentNode.nodeClass.baseUStruct.baseUfield.baseUObject;
-            var nameSpace = _nameSpaceGenerator.GetNameSpace((UObjectBaseUtility*)&nodeBaseObject);
 
-            DebugUtilities.WaitForDebuggerAttach();
-
-            _fileGenerator.GenerateFile(classFile, currentNode, nameSpace);
-
+            _fileGenerator.GenerateFile(classFile, namespaceNode);
             _logger.Debug(classFile.ToString());
 
-            foreach (var node in currentNode.children) {
+            foreach (var node in namespaceNode.namespaces) {
                 TraverseNodes(node);
             }
         }
 
-        private ClassNode TimeGraphBuilder() {
+        private ClassNode TimeObjectTreeBuilder() {
             var timer = new Stopwatch();
 
             timer.Start();
             var treeGraph = _reflectedGraphBuilder.BuildRootNode();
             timer.Stop();
 
+            if (treeGraph is null) {
+                _logger.Error("Failed to build tree graph.");
+            }
+
             _logger.Debug($"Root Object Graph; {timer.ElapsedMilliseconds} ms to build.");
             return treeGraph;
         }
 
-        /// <summary>
-        /// Keep this for debugging, print out the graph.
-        /// </summary>
-        /// <param name="currentNode"></param>
-        /// <param name="tabIndex"></param>
-        /// <returns></returns>
-        private string GenerateTree(ClassNode currentNode, int tabIndex = 0) {
-            var currentName = _globalObjects.GetNameString(currentNode.ClassName);
-            var tree = $"{new string(' ', tabIndex * 4)}- {currentName}\n";
+        private CodeGenAssemblyNode[] TimeAssemblyGraphBuilder(ClassNode rootNode) {
+            var timer = new Stopwatch();
 
-            foreach (var child in currentNode.children) {
-                tree += GenerateTree(child, tabIndex + 1);
-            }
-            return tree;
+            timer.Start();
+            var assemblyGraph = _codeGenGraphBuilder.BuildAssemblyGraphs(rootNode);
+            timer.Stop();
+
+            _logger.Debug($"Assembly Graph; {timer.ElapsedMilliseconds} ms to build.");
+            return assemblyGraph;
         }
     }
 }
