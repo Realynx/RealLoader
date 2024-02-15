@@ -1,4 +1,3 @@
-using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FunctionServices;

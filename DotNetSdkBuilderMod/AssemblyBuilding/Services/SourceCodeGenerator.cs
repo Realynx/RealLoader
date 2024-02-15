@@ -5,7 +5,6 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
     public class SourceCodeGenerator : ISourceCodeGenerator {
@@ -29,21 +28,33 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             _logger.Debug("Building assembly graphs...");
             var assemblyGraphs = TimeAssemblyGraphBuilder(rootNode);
 
-            foreach (var assemblyGraph in assemblyGraphs) {
-                foreach (var nameSpace in assemblyGraph.namespaces) {
-                    TraverseNodes(nameSpace);
+            var path = Path.GetFullPath("GeneratedCode.cs");
+            using var sw = File.CreateText(path);
+
+            try {
+                foreach (var assemblyGraph in assemblyGraphs) {
+                    foreach (var nameSpace in assemblyGraph.namespaces) {
+                        TraverseNodes(nameSpace, sw);
+                    }
                 }
+            }
+            finally {
+                _logger.Debug($"Generated code written to {path}");
             }
         }
 
-        private void TraverseNodes(CodeGenNamespaceNode namespaceNode) {
+        private void TraverseNodes(CodeGenNamespaceNode namespaceNode, StreamWriter sw) {
             var classFile = new StringBuilder();
 
             _fileGenerator.GenerateFile(classFile, namespaceNode);
             _logger.Debug(classFile.ToString());
+            sw.WriteLine(classFile);
+            sw.WriteLine("------------------------------");
 
-            foreach (var node in namespaceNode.namespaces) {
-                TraverseNodes(node);
+            if (namespaceNode.namespaces != null) {
+                foreach (var node in namespaceNode.namespaces) {
+                    TraverseNodes(node, sw);
+                }
             }
         }
 

@@ -4,11 +4,12 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
-namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
+namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
     public class ReflectedGraphBuilder : IReflectedGraphBuilder {
         private readonly ILogger _logger;
         private readonly IGlobalObjects _globalObjects;
@@ -53,8 +54,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
                     rootNode = new ClassNode() {
                         functions = functions.ToArray(),
                         properties = properties.ToArray(),
-                        nodeClass = objectClass,
                         packageName = packageName,
+                        nodeClass = objectClass
                     };
                 }
                 else {
@@ -91,7 +92,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
 
             foreach (var memoChild in memoChildren) {
                 var classBase = currentnode.nodeClass.baseUStruct.baseUfield.baseUObject;
-                var packageName = _packageNameGenerator.GetPackageName((UObjectBaseUtility*)&classBase);
+                var packageName = string.Intern(_packageNameGenerator.GetPackageName((UObjectBaseUtility*)&classBase));
 
                 children.Add(new ClassNode() {
                     functions = _unrealReflection.GetTypeFunctions(memoChild).ToArray(),

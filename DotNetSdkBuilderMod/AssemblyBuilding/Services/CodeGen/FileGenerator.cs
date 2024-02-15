@@ -21,9 +21,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe void GenerateFile(StringBuilder codeBuilder, CodeGenNamespaceNode namespaceNode) {
-            codeBuilder.AppendLine(namespaceNode.imports);
+            if (namespaceNode.classes == null) {
+                return;
+            }
 
-            codeBuilder.AppendLine();
+            if (!string.IsNullOrWhiteSpace(namespaceNode.imports)) {
+                codeBuilder.AppendLine(namespaceNode.imports);
+            }
 
             codeBuilder.Append(NAMESPACE);
             codeBuilder.Append(WHITE_SPACE);
@@ -33,16 +37,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             codeBuilder.Append(WHITE_SPACE);
             codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
 
-            foreach (var classNode in namespaceNode.classes)
-            {
+            foreach (var classNode in namespaceNode.classes) {
                 _classGenerator.GenerateClass(codeBuilder, classNode);
                 codeBuilder.AppendLine();
             }
 
-            if (namespaceNode.classes.Length > 0) {
-                // Remove trailing newline between classes end and namespace closing bracket
-                codeBuilder.RemoveLine();
-            }
+            // Remove trailing newline between classes end and namespace closing bracket
+            codeBuilder.RemoveLine();
 
             codeBuilder.Append(CLOSED_CURLY_BRACKET);
         }
