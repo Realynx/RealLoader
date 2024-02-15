@@ -21,7 +21,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe void GenerateFile(StringBuilder codeBuilder, CodeGenNamespaceNode namespaceNode) {
-            if (namespaceNode.classes == null) {
+            if (namespaceNode.classes is null) {
                 return;
             }
 

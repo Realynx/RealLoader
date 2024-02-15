@@ -51,7 +51,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             sw.WriteLine(classFile);
             sw.WriteLine("------------------------------");
 
-            if (namespaceNode.namespaces != null) {
+            if (namespaceNode.namespaces is not null) {
                 foreach (var node in namespaceNode.namespaces) {
                     TraverseNodes(node, sw);
                 }

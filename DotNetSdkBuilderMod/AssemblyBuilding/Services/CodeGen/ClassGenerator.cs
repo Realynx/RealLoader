@@ -40,21 +40,27 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
 
-            if (classNode.propertyNodes != null) {
+            if (classNode.propertyNodes is null && classNode.methodNodes is null) {
+                codeBuilder.Append(WHITE_SPACE);
+                codeBuilder.Append(CLOSED_CURLY_BRACKET);
+                return;
+            }
+
+            if (classNode.propertyNodes is not null) {
                 foreach (var property in classNode.propertyNodes) {
                     _propertyGenerator.GenerateProperty(codeBuilder, property);
                     codeBuilder.AppendLine();
                 }
             }
 
-            if (classNode.methodNodes != null) {
+            if (classNode.methodNodes is not null) {
                 foreach (var method in classNode.methodNodes) {
                     _methodGenerator.GenerateMethod(codeBuilder, method);
                     codeBuilder.AppendLine();
                 }
             }
 
-            if (classNode.propertyNodes?.Length > 0 || classNode.methodNodes?.Length > 0) {
+            if (classNode.propertyNodes is not null || classNode.methodNodes is not null) {
                 // Remove trailing newline between members end and class closing bracket
                 codeBuilder.RemoveLine();
             }

@@ -27,7 +27,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             codeBuilder.Append(OPEN_ROUND_BRACKET);
 
-            if (methodNode.arguments != null) {
+            if (methodNode.arguments is not null) {
                 var joinedArgs = string.Join($"{COMMA}{WHITE_SPACE}", methodNode.arguments.Select(x => $"{x.type}{WHITE_SPACE}{x.name}"));
                 codeBuilder.Append(joinedArgs);
             }

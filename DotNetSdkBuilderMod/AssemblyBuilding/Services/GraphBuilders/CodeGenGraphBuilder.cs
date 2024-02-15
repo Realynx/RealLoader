@@ -247,7 +247,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
             var baseClass = classNode.nodeClass.baseUStruct.superStruct;
             string? baseClassName = null;
-            if (baseClass != null) {
+            if (baseClass is not null) {
                 baseClassName = _globalObjects.GetNameString(baseClass->ObjectName);
             }
 
@@ -333,22 +333,22 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var imports = new HashSet<string>();
 
             // Lord have mercy on my soul for the amount of indentation
-            if (current.classes != null) {
+            if (current.classes is not null) {
                 foreach (var classNode in current.classes) {
-                    if (classNode.propertyNodes != null) {
+                    if (classNode.propertyNodes is not null) {
                         foreach (var propertyNode in classNode.propertyNodes) {
                             TryAddClassAsImport(propertyNode.returnType);
                         }
                     }
 
-                    if (classNode.methodNodes != null) {
+                    if (classNode.methodNodes is not null) {
                         foreach (var methodNode in classNode.methodNodes) {
                             var returnType = methodNode.returnType;
                             if (returnType != CodeGenConstants.VOID) {
                                 TryAddClassAsImport(returnType);
                             }
 
-                            if (methodNode.arguments != null) {
+                            if (methodNode.arguments is not null) {
                                 foreach (var arg in methodNode.arguments) {
                                     TryAddClassAsImport(arg.type);
                                 }
@@ -369,7 +369,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 .Replace('/', '.')
                 .ToString();
 
-            if (current.namespaces != null) {
+            if (current.namespaces is not null) {
                 foreach (var child in current.namespaces) {
                     ApplyImportsToNamespace(child, currentNamespace, classNamespaces);
                 }
