@@ -38,13 +38,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 codeBuilder.Append(WHITE_SPACE);
             }
 
-            codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
-
             if (classNode.propertyNodes is null && classNode.methodNodes is null) {
+                codeBuilder.Append(OPEN_CURLY_BRACKET);
                 codeBuilder.Append(WHITE_SPACE);
-                codeBuilder.Append(CLOSED_CURLY_BRACKET);
+                codeBuilder.AppendLine(CLOSED_CURLY_BRACKET);
                 return;
             }
+
+            codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
 
             if (classNode.propertyNodes is not null) {
                 foreach (var property in classNode.propertyNodes) {
