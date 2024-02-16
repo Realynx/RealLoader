@@ -12,12 +12,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class FileGenerator : IFileGenerator {
         private readonly ILogger _logger;
         private readonly IClassGenerator _classGenerator;
-        private readonly IPackageNameGenerator _nameSpaceGenerator;
 
-        public FileGenerator(ILogger logger, IClassGenerator classGenerator, IPackageNameGenerator nameSpaceGenerator) {
+        public FileGenerator(ILogger logger, IClassGenerator classGenerator) {
             _logger = logger;
             _classGenerator = classGenerator;
-            _nameSpaceGenerator = nameSpaceGenerator;
         }
 
         public unsafe void GenerateFile(StringBuilder codeBuilder, CodeGenNamespaceNode namespaceNode) {

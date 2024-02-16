@@ -1,13 +1,14 @@
 ﻿using System.Runtime.InteropServices;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
-using DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.UnrealSdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
+
+using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
     public class CodeGenGraphBuilder : ICodeGenGraphBuilder {
@@ -172,7 +173,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             return new CodeGenClassNode {
                 propertyNodes = properties,
                 methodNodes = methods,
-                modifer = CodeGenConstants.PUBLIC,
+                modifer = PUBLIC,
                 name = className,
                 attributes = attributes,
                 baseType = baseClassName
@@ -186,13 +187,19 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
             var returnType = _globalObjects.GetNameString(property.baseFField.classPrivate->ObjectName);
 
+            var runtimeAddressFieldName = $"{propertyName}{RUNTIME_ADDRESS_FIELD_NAME_SUFFIX}";
+
+            var getter = $"{GET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{runtimeAddressFieldName}{SEMICOLON}";
+            var setter = $"{SET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{runtimeAddressFieldName}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{VALUE}{SEMICOLON}";
+
             return new CodeGenPropertyNode {
-                modifer = CodeGenConstants.PUBLIC,
+                modifer = PUBLIC,
                 name = propertyName,
                 attributes = attributes,
                 returnType = returnType,
-                get = CodeGenConstants.GETTER,
-                set = CodeGenConstants.SETTER,
+                get = getter,
+                set = setter,
+                runtimeAddressFieldName = runtimeAddressFieldName
             };
         }
 
@@ -209,7 +216,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 returnType = signatureString;
             }
             else {
-                returnType = CodeGenConstants.VOID;
+                returnType = VOID;
             }
 
             var functionParams = signature.parameters;
@@ -225,7 +232,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             }
 
             return new CodeGenMethodNode {
-                modifer = CodeGenConstants.PUBLIC,
+                modifer = PUBLIC,
                 name = methodName,
                 attributes = attributes,
                 returnType = returnType,

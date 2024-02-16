@@ -29,6 +29,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public string returnType;
         public string get;
         public string set;
+        public string runtimeAddressFieldName;
     }
 
     [DebuggerDisplay("{returnType} {name}: {arguments?.Length ?? 0} arguments")]

@@ -6,6 +6,8 @@
         internal const string CLOSED_ROUND_BRACKET = ")";
         internal const string OPEN_SQUARE_BRACKET = "[";
         internal const string CLOSED_SQUARE_BRACKET = "]";
+        internal const string OPEN_ANGLE_BRACKET = "<";
+        internal const string CLOSED_ANGLE_BRACKET = ">";
         internal const string WHITE_SPACE = " ";
         internal const string SEMICOLON = ";";
         internal const string COLON = ":";
@@ -13,6 +15,10 @@
         internal const string SINGLE_QUOTE = "'";
         internal const string COMMA = ",";
         internal const string DOT = ".";
+        internal const string STAR = "*";
+        internal const string LAMBDA = "=>";
+        internal const string EQUALS = "=";
+        internal const string VALUE = "value";
         //internal const string NEW_LINE = "\n"; // or Environment.NewLine for OS-specific new lines
         //internal const string TAB = "\t"; // or use "    " for spaces, depending on your coding standards
         internal const string USING = "using";
@@ -24,9 +30,12 @@
         internal const string INTERNAL = "internal";
         internal const string STATIC = "static";
         internal const string VOID = "void";
-        internal const string GETTER = "get";
-        internal const string SETTER = "set";
+        internal const string INT_PTR = "nint";
+        internal const string GET = "get";
+        internal const string SET = "set";
+        internal const string DELEGATE = "delegate";
         internal const string CODE_NAMESPACE = "DotNetSdkBuilderMod.Generated";
+        internal const string RUNTIME_ADDRESS_FIELD_NAME_SUFFIX = "_RuntimeAddress";
         internal const char INDENT = ' ';
         internal const int INDENT_SIZE = 4;
     }

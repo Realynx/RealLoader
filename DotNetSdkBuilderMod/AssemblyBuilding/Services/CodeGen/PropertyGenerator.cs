@@ -17,6 +17,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe void GenerateProperty(StringBuilder codeBuilder, CodeGenPropertyNode propertyNode) {
+            codeBuilder.AppendIndented(PRIVATE, 2);
+            codeBuilder.Append(WHITE_SPACE);
+            codeBuilder.Append(INT_PTR);
+            codeBuilder.Append(WHITE_SPACE);
+            codeBuilder.Append(propertyNode.runtimeAddressFieldName);
+            codeBuilder.AppendLine(SEMICOLON);
+
             codeBuilder.AppendIndented(propertyNode.modifer, 2);
             codeBuilder.Append(WHITE_SPACE);
 
@@ -33,22 +40,17 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
             else {
                 codeBuilder.Append(WHITE_SPACE);
-                codeBuilder.Append(OPEN_CURLY_BRACKET);
+                codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
 
                 if (hasGetter) {
-                    codeBuilder.Append(WHITE_SPACE);
-                    codeBuilder.Append(propertyNode.get);
-                    codeBuilder.Append(SEMICOLON);
+                    codeBuilder.AppendIndentedLine(propertyNode.get, 3);
                 }
 
                 if (hasSetter) {
-                    codeBuilder.Append(WHITE_SPACE);
-                    codeBuilder.Append(propertyNode.set);
-                    codeBuilder.Append(SEMICOLON);
+                    codeBuilder.AppendIndentedLine(propertyNode.set, 3);
                 }
 
-                codeBuilder.Append(WHITE_SPACE);
-                codeBuilder.AppendLine(CLOSED_CURLY_BRACKET);
+                codeBuilder.AppendIndentedLine(CLOSED_CURLY_BRACKET, 2);
             }
         }
     }
