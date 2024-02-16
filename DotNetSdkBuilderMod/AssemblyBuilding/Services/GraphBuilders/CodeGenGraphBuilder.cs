@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen;
@@ -15,20 +14,21 @@ using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
     public class CodeGenGraphBuilder : ICodeGenGraphBuilder {
         private readonly ILogger _logger;
-        private readonly INameDistanceService _nameDistanceService;
         private readonly IGlobalObjects _globalObjects;
         private readonly UnrealReflection _unrealReflection;
+        private readonly INameSpaceService _nameSpaceService;
+        private readonly IImportResolver _importResolver;
+        private readonly IFunctionTimingService _functionTimingService;
 
-        public CodeGenGraphBuilder(ILogger logger, INameDistanceService nameDistanceService, IGlobalObjects globalObjects, UnrealReflection unrealReflection) {
+        public CodeGenGraphBuilder(ILogger logger, IGlobalObjects globalObjects, UnrealReflection unrealReflection,
+            INameSpaceService nameSpaceService, IImportResolver importResolver, IFunctionTimingService functionTimingService) {
             _logger = logger;
-            _nameDistanceService = nameDistanceService;
             _globalObjects = globalObjects;
             _unrealReflection = unrealReflection;
+            _nameSpaceService = nameSpaceService;
+            _importResolver = importResolver;
+            _functionTimingService = functionTimingService;
         }
-
-        // TODO: Fine tune this.
-        // Do not make it user-configurable
-        const int GROUPING_DISTANCE = 5;
 
         public CodeGenAssemblyNode[] BuildAssemblyGraphs(ClassNode rootNode) {
             DebugUtilities.WaitForDebuggerAttach();
@@ -37,21 +37,21 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var distinctNamespaces = TimedDistinctNamespaces(rootNode);
 
             _logger.Debug("Building namespace tree...");
-            var namespaceTree = TimedNamespaceTree(distinctNamespaces);
+            var namespaceTree = TimedBuildNamespaceTree(distinctNamespaces);
 
             _logger.Debug("Building namespace-namespace dictionary...");
-            var memoizedNamespaceNodes = TimedNamespaceNamespaceNodeMemoize(namespaceTree);
-
-            _logger.Debug("Building class-namespace dictionary...");
-            var classNamespaces = TimedClassNamespaceMemoize(rootNode);
+            var memoizedNamespaceNodes = TimedMemoizeNamespaceTree(namespaceTree);
 
             _logger.Debug("Building namespace-classes dictionary...");
-            var namespaceClasses = TimedNamespaceClassMemoize(rootNode);
+            var namespaceClasses = TimedNamespaceClassesMemoize(rootNode);
 
             _logger.Debug("Applying classes to namespace tree...");
-            TimedApplyClassesToNamespaces(namespaceClasses, memoizedNamespaceNodes);
+            TimedAddClassesToNamespaces(namespaceClasses, memoizedNamespaceNodes);
 
-            _logger.Debug("Applying classes to namespace tree...");
+            _logger.Debug("Building class-namespace dictionary...");
+            var classNamespaces = TimedMemoizeTypeNamespaces(rootNode);
+
+            _logger.Debug("Generating imports...");
             TimedGenerateImports(namespaceTree, classNamespaces);
 
             var assemblyNodes = new CodeGenAssemblyNode[namespaceTree.Length];
@@ -66,130 +66,50 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private string[] TimedDistinctNamespaces(ClassNode rootNode) {
-            var timer = new Stopwatch();
-            timer.Start();
             var distinctNamespaces = new HashSet<string>();
-            GetAllNamespaces(rootNode, distinctNamespaces);
-            timer.Stop();
+            var time = _functionTimingService.Execute(() => _nameSpaceService.GetUniqueNamespaces(rootNode, distinctNamespaces));
 
-            _logger.Debug($"Distinct namespace; {timer.ElapsedMilliseconds} ms to build.");
+            _logger.Debug($"Distinct namespace; {time.TotalMilliseconds:F0} ms to build.");
             return distinctNamespaces.ToArray();
         }
 
-        private void GetAllNamespaces(ClassNode currentNode, HashSet<string> namespaces) {
-            namespaces.Add(currentNode.packageName);
-
-            foreach (var child in currentNode.children) {
-                GetAllNamespaces(child, namespaces);
-            }
-        }
-
-        private CodeGenNamespaceNode[] TimedNamespaceTree(string[] namespaces) {
-            var timer = new Stopwatch();
-            timer.Start();
+        private CodeGenNamespaceNode[] TimedBuildNamespaceTree(string[] namespaces) {
             var namespaceTree = new CodeGenNamespaceNode();
-            _ = BuildAllNamespaces(namespaces, "", namespaceTree);
-            timer.Stop();
+            var time = _functionTimingService.Execute(() => _nameSpaceService.BuildNamespaceTree(namespaces, string.Empty, namespaceTree));
 
-            _logger.Debug($"Built namespace tree; {timer.ElapsedMilliseconds} ms to build.");
+            _logger.Debug($"Built namespace tree; {time.TotalMilliseconds:F0} ms to build.");
             return namespaceTree.namespaces;
         }
 
-        private CodeGenNamespaceNode BuildAllNamespaces(string[] namespaceNames, string previousNamespace, CodeGenNamespaceNode currentNode) {
-            var rootLevel = namespaceNames
-                .Where(i => i.Contains('/'))
-                .Select(i => i.Split('/')[1])
-                .Distinct()
-                .ToArray();
-
-            currentNode.namespaces = new CodeGenNamespaceNode[rootLevel.Length];
-            for (var x = 0; x < rootLevel.Length; x++) {
-                var fullBranchNamespace = $"{previousNamespace}/{rootLevel[x]}";
-                var branchNamespace = rootLevel[x];
-
-                currentNode.namespaces[x] = new CodeGenNamespaceNode {
-                    fullNameSpace = fullBranchNamespace,
-                    name = branchNamespace
-                };
-
-                var nameSpacePrefix = $"/{branchNamespace}/";
-                var childNamespaceNames = namespaceNames
-                    .Where(i => i.StartsWith(nameSpacePrefix))
-                    .Select(i => i.Substring(nameSpacePrefix.Length - 1))
-                    .ToArray();
-
-                if (childNamespaceNames.Length == 0) {
-                    continue;
-                }
-
-                currentNode.namespaces[x] = BuildAllNamespaces(childNamespaceNames, fullBranchNamespace, currentNode.namespaces[x]);
-            }
-
-            return currentNode;
-        }
-
-        private Dictionary<string, CodeGenNamespaceNode> TimedNamespaceNamespaceNodeMemoize(CodeGenNamespaceNode[] namespaceTree) {
-            var timer = new Stopwatch();
-            timer.Start();
+        private Dictionary<string, CodeGenNamespaceNode> TimedMemoizeNamespaceTree(CodeGenNamespaceNode[] namespaceTree) {
             var namespacesMemo = new Dictionary<string, CodeGenNamespaceNode>();
-            foreach (var namespaceNode in namespaceTree) {
-                MemoizeNamespaceNodes(namespaceNode, namespacesMemo);
-            }
+            var time = _functionTimingService.Execute(() => {
+                foreach (var namespaceNode in namespaceTree) {
+                    _nameSpaceService.MemoizeNamespaceTree(namespaceNode, namespacesMemo);
+                }
+            });
 
-            timer.Stop();
-
-            _logger.Debug($"Built namespace tree; {timer.ElapsedMilliseconds} ms to build.");
+            _logger.Debug($"Built namespace tree; {time.TotalMilliseconds:F0} ms to build.");
             return namespacesMemo;
         }
 
-        private void MemoizeNamespaceNodes(CodeGenNamespaceNode currentNode, Dictionary<string, CodeGenNamespaceNode> namespacesMemo) {
-            namespacesMemo[currentNode.fullNameSpace] = currentNode;
-
-            if (currentNode.namespaces is null) {
-                return;
-            }
-
-            foreach (var namespaceNode in currentNode.namespaces) {
-                MemoizeNamespaceNodes(namespaceNode, namespacesMemo);
-            }
-        }
-
-        private Dictionary<string, string> TimedClassNamespaceMemoize(ClassNode rootNode) {
-            var timer = new Stopwatch();
-            timer.Start();
+        private Dictionary<string, string> TimedMemoizeTypeNamespaces(ClassNode rootNode) {
             var memoizedClassesAndNamespaces = new Dictionary<string, string>();
-            MemoizeClassesAndNamespaces(rootNode, memoizedClassesAndNamespaces);
-            timer.Stop();
+            var time = _functionTimingService.Execute(() => _nameSpaceService.MemoizeTypeNamespaces(rootNode, memoizedClassesAndNamespaces));
 
-            _logger.Debug($"Memoized classes and namespaces; {timer.ElapsedMilliseconds} ms to build.");
+            _logger.Debug($"Memoized classes and namespaces; {time.TotalMilliseconds:F0} ms to build.");
             return memoizedClassesAndNamespaces;
         }
 
-        private void MemoizeClassesAndNamespaces(ClassNode currentNode, Dictionary<string, string> memo) {
-            var className = _globalObjects.GetNameString(currentNode.ClassName);
-            ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(memo, className, out var previouslyExisted);
-
-            if (!previouslyExisted) {
-                value = currentNode.packageName;
-            }
-
-            foreach (var child in currentNode.children) {
-                MemoizeClassesAndNamespaces(child, memo);
-            }
-        }
-
-        private Dictionary<string, List<ClassNode>> TimedNamespaceClassMemoize(ClassNode rootNode) {
-            var timer = new Stopwatch();
-            timer.Start();
+        private Dictionary<string, List<ClassNode>> TimedNamespaceClassesMemoize(ClassNode rootNode) {
             var memoizedClassesAndNamespaces = new Dictionary<string, List<ClassNode>>();
-            MemoizeNamespacesAndClassNodes(rootNode, memoizedClassesAndNamespaces);
-            timer.Stop();
+            var time = _functionTimingService.Execute(() => MemoizeNamespacesClasses(rootNode, memoizedClassesAndNamespaces));
 
-            _logger.Debug($"Memoized namespaces and classes; {timer.ElapsedMilliseconds} ms to build.");
+            _logger.Debug($"Memoized namespaces and classes; {time.TotalMilliseconds:F0} ms to build.");
             return memoizedClassesAndNamespaces;
         }
 
-        private void MemoizeNamespacesAndClassNodes(ClassNode currentNode, Dictionary<string, List<ClassNode>> memo) {
+        private void MemoizeNamespacesClasses(ClassNode currentNode, Dictionary<string, List<ClassNode>> memo) {
             var classPackageName = currentNode.packageName;
             ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(memo, classPackageName, out var previouslyExisted);
 
@@ -200,20 +120,17 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             value!.Add(currentNode);
 
             foreach (var child in currentNode.children) {
-                MemoizeNamespacesAndClassNodes(child, memo);
+                MemoizeNamespacesClasses(child, memo);
             }
         }
 
-        private void TimedApplyClassesToNamespaces(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo) {
-            var timer = new Stopwatch();
-            timer.Start();
-            ApplyClassesToNamespace(namespaceClassesMemo, namespacesMemo);
-            timer.Stop();
+        private void TimedAddClassesToNamespaces(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo) {
+            var time = _functionTimingService.Execute(() => PopulateNamespaceClasses(namespaceClassesMemo, namespacesMemo));
 
-            _logger.Debug($"Applied classes to namespace tree; {timer.ElapsedMilliseconds} ms to build.");
+            _logger.Debug($"Applied classes to namespace tree; {time.TotalMilliseconds:F0} ms to build.");
         }
 
-        private void ApplyClassesToNamespace(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo) {
+        private void PopulateNamespaceClasses(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo) {
             foreach (var (nameSpace, classNodes) in namespaceClassesMemo) {
                 var namespaceNode = namespacesMemo[nameSpace];
                 var codeGenClassNodes = new CodeGenClassNode[classNodes.Count];
@@ -321,77 +238,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private void TimedGenerateImports(CodeGenNamespaceNode[] namespaceTree, Dictionary<string, string> classNamespaces) {
-            var timer = new Stopwatch();
-            timer.Start();
-            foreach (var namespaceNode in namespaceTree) {
-                ApplyImportsToNamespace(namespaceNode, classNamespaces);
-            }
-
-            timer.Stop();
-
-            _logger.Debug($"Applied imports to namespace tree; {timer.ElapsedMilliseconds} ms to build.");
-        }
-
-        private void ApplyImportsToNamespace(CodeGenNamespaceNode current, Dictionary<string, string> classNamespaces) {
-
-            var imports = new HashSet<string>();
-
-            // Lord have mercy on my soul for the amount of indentation
-            if (current.classes is not null) {
-                foreach (var classNode in current.classes) {
-                    if (classNode.baseType != null) {
-                        TryAddClassAsImport(classNode.baseType);
-                    }
-
-                    if (classNode.propertyNodes is not null) {
-                        foreach (var propertyNode in classNode.propertyNodes) {
-                            TryAddClassAsImport(propertyNode.returnType);
-                        }
-                    }
-
-                    if (classNode.methodNodes is not null) {
-                        foreach (var methodNode in classNode.methodNodes) {
-                            var returnType = methodNode.returnType;
-                            if (returnType != CodeGenConstants.VOID) {
-                                TryAddClassAsImport(returnType);
-                            }
-
-                            if (methodNode.arguments is not null) {
-                                foreach (var arg in methodNode.arguments) {
-                                    TryAddClassAsImport(arg.type);
-                                }
-                            }
-                        }
-                    }
+            var time = _functionTimingService.Execute(() => {
+                foreach (var namespaceNode in namespaceTree) {
+                    _importResolver.ApplyImports(namespaceNode, classNamespaces);
                 }
-            }
+            });
 
-            var importsBuilder = new StringBuilder();
-            foreach (var import in imports) {
-                importsBuilder.Append($"{CodeGenConstants.USING} ");
-                importsBuilder.Append(import.AsSpan(1));
-                importsBuilder.AppendLine(";");
-            }
-
-            current.imports = importsBuilder
-                .Replace('/', '.')
-                .ToString();
-
-            if (current.namespaces is not null) {
-                foreach (var child in current.namespaces) {
-                    ApplyImportsToNamespace(child, classNamespaces);
-                }
-            }
-
-            void TryAddClassAsImport(string className) {
-                var currentNameSpace = current.fullNameSpace;
-
-                if (classNamespaces.TryGetValue(className, out var argNamespace)
-                    && !currentNameSpace.StartsWith(argNamespace)
-                    && !argNamespace.StartsWith(currentNameSpace)) {
-                    imports.Add(argNamespace);
-                }
-            }
+            _logger.Debug($"Applied imports to namespace tree; {time.TotalMilliseconds:F0} ms to build.");
         }
     }
 }

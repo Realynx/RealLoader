@@ -26,8 +26,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
                 .AddSingleton<IReflectedGraphBuilder, ReflectedGraphBuilder>();
 
             services
+                .AddSingleton<IFunctionTimingService, FunctionTimingService>();
+
+            services
                 .AddSingleton<IPackageNameGenerator, PackageNameGenerator>()
                 .AddSingleton<INameDistanceService, NameDistanceService>()
+                .AddSingleton<INameSpaceService, NameSpaceService>()
+                .AddSingleton<IImportResolver, ImportResolver>()
 
                 .AddSingleton<ICodeGenGraphBuilder, CodeGenGraphBuilder>()
                 .AddSingleton<ISourceCodeGenerator, SourceCodeGenerator>()
