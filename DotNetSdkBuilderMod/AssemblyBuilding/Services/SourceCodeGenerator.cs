@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
@@ -12,13 +11,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
         private readonly IFileGenerator _fileGenerator;
         private readonly IReflectedGraphBuilder _reflectedGraphBuilder;
         private readonly ICodeGenGraphBuilder _codeGenGraphBuilder;
+        private readonly IFunctionTimingService _functionTimingService;
 
         public SourceCodeGenerator(ILogger logger, IFileGenerator fileGenerator, IReflectedGraphBuilder reflectedGraphBuilder,
-            ICodeGenGraphBuilder codeGenGraphBuilder) {
+            ICodeGenGraphBuilder codeGenGraphBuilder, IFunctionTimingService functionTimingService) {
             _logger = logger;
             _fileGenerator = fileGenerator;
             _reflectedGraphBuilder = reflectedGraphBuilder;
             _codeGenGraphBuilder = codeGenGraphBuilder;
+            _functionTimingService = functionTimingService;
         }
 
         public unsafe void BuildSourceCode() {
@@ -59,28 +60,16 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
         }
 
         private ClassNode TimeObjectTreeBuilder() {
-            var timer = new Stopwatch();
+            var time = _functionTimingService.Execute(_reflectedGraphBuilder.BuildRootNode, out var treeGraph);
 
-            timer.Start();
-            var treeGraph = _reflectedGraphBuilder.BuildRootNode();
-            timer.Stop();
-
-            if (treeGraph is null) {
-                _logger.Error("Failed to build tree graph.");
-            }
-
-            _logger.Debug($"Root Object Graph; {timer.ElapsedMilliseconds} ms to build.");
+            _logger.Debug($"Root Object Graph; {time.TotalMilliseconds:F1} ms to build.");
             return treeGraph;
         }
 
         private CodeGenAssemblyNode[] TimeAssemblyGraphBuilder(ClassNode rootNode) {
-            var timer = new Stopwatch();
+            var time = _functionTimingService.Execute(() => _codeGenGraphBuilder.BuildAssemblyGraphs(rootNode), out var assemblyGraph);
 
-            timer.Start();
-            var assemblyGraph = _codeGenGraphBuilder.BuildAssemblyGraphs(rootNode);
-            timer.Stop();
-
-            _logger.Debug($"Assembly Graph; {timer.ElapsedMilliseconds} ms to build.");
+            _logger.Debug($"Assembly Graph; {time.TotalMilliseconds:F1} ms to build.");
             return assemblyGraph;
         }
     }
