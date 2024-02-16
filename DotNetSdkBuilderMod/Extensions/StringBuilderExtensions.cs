@@ -1,18 +1,18 @@
 ﻿using System.Text;
 
+using DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen;
+
 namespace DotNetSdkBuilderMod.Extensions {
     public static class StringBuilderExtensions {
-        private const int INDENT_MULTIPLIER = 4;
-
         public static StringBuilder AppendIndentedLine(this StringBuilder sb, string str, int indentSize) {
             return sb
-                .Append(' ', indentSize * INDENT_MULTIPLIER)
+                .Append(CodeGenConstants.INDENT, indentSize * CodeGenConstants.INDENT_SIZE)
                 .AppendLine(str);
         }
 
         public static StringBuilder AppendIndented(this StringBuilder sb, string str, int indentSize) {
             return sb
-                .Append(' ', indentSize * INDENT_MULTIPLIER)
+                .Append(CodeGenConstants.INDENT, indentSize * CodeGenConstants.INDENT_SIZE)
                 .Append(str);
         }
 

@@ -50,7 +50,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             _fileGenerator.GenerateFile(classFile, namespaceNode);
             // _logger.Debug(classFile.ToString());
             sw.WriteLine(classFile.ToString());
-            sw.WriteLine("------------------------------");
 
             if (namespaceNode.namespaces is not null) {
                 foreach (var node in namespaceNode.namespaces) {
