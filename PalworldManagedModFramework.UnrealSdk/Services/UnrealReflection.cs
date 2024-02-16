@@ -3,7 +3,7 @@ using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStru
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
 namespace PalworldManagedModFramework.UnrealSdk.Services {
-    public class UnrealReflection {
+    public class UnrealReflection : IUnrealReflection {
         private readonly ILogger _logger;
         private readonly IGlobalObjects _globalObjects;
 
@@ -12,37 +12,51 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
             _globalObjects = globalObjects;
         }
 
-        public unsafe ICollection<FProperty> GetTypeFields(UClass uClass) {
-            var fields = new List<FProperty>();
-            for (FField* field = uClass.baseUStruct.childProperties; field is not null; field = field->next) {
-                fields.Add(*(FProperty*)field);
+        public unsafe FProperty*[] GetTypeFields(UClass* uClass) {
+            var fields = new List<nint>();
+            for (FField* field = uClass->baseUStruct.childProperties; field is not null; field = field->next) {
+                fields.Add((nint)field);
             }
 
-            return fields;
+            var pFields = new FProperty*[fields.Count];
+            for (var x = 0; x < pFields.Length; x++) {
+                pFields[x] = (FProperty*)fields[x];
+            }
+
+            return pFields;
         }
 
-        public unsafe ICollection<UFunction> GetTypeFunctions(UClass uClass) {
-            var fields = new List<UFunction>();
-            for (UField* field = uClass.baseUStruct.children; field is not null; field = field->next) {
-                fields.Add(*(UFunction*)field);
+        public unsafe UFunction*[] GetTypeFunctions(UClass* uClass) {
+            var fields = new List<nint>();
+            for (UField* field = uClass->baseUStruct.children; field is not null; field = field->next) {
+                fields.Add((nint)field);
             }
 
-            return fields;
+            var pFields = new UFunction*[fields.Count];
+            for (var x = 0; x < pFields.Length; x++) {
+                pFields[x] = (UFunction*)fields[x];
+            }
+
+            return pFields;
         }
 
-        public unsafe (FField? returnValue, FField[] parameters) GetFunctionSignature(UFunction uFunction) {
-            var hasReturnProperty = uFunction.returnValueOffset != 0xffff;
+        public unsafe FField*[] GetFunctionSignature(UFunction* uFunction, out FField* returnValue) {
+            var hasReturnProperty = uFunction->returnValueOffset != 0xffff;
 
-            var childProps = new List<FField>();
-            var x = 0;
-            for (FField* currentProp = uFunction.baseUstruct.childProperties; currentProp is not null; currentProp = currentProp->next) {
-                childProps.Add(*currentProp);
+            var childProps = new List<nint>();
+            for (FField* currentProp = uFunction->baseUstruct.childProperties; currentProp is not null; currentProp = currentProp->next) {
+                childProps.Add((nint)currentProp);
             }
 
-            var parameters = hasReturnProperty ? childProps[1..] : childProps;
-            FField? returnValue = hasReturnProperty ? childProps[0] : null;
+            returnValue = (FField*)(hasReturnProperty ? childProps[0] : IntPtr.Zero);
 
-            return (returnValue, parameters.ToArray());
+            var offset = hasReturnProperty ? 1 : 0;
+            var parameters = new FField*[childProps.Count - offset];
+            for (var x = offset; x < parameters.Length + offset; x++) {
+                parameters[x - offset] = (FField*)childProps[x];
+            }
+
+            return parameters;
         }
     }
 }

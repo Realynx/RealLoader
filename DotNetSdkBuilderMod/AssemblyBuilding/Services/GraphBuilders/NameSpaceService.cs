@@ -4,16 +4,16 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
+using PalworldManagedModFramework.UnrealSdk.Services;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
     public class NameSpaceService : INameSpaceService {
         private readonly ILogger _logger;
-        private readonly IGlobalObjects _globalObjects;
+        private readonly INamePoolService _namePoolService;
 
-        public NameSpaceService(ILogger logger, IGlobalObjects globalObjects) {
+        public NameSpaceService(ILogger logger, INamePoolService namePoolService) {
             _logger = logger;
-            _globalObjects = globalObjects;
+            _namePoolService = namePoolService;
         }
 
         public void GetUniqueNamespaces(ClassNode currentNode, HashSet<string> namespaces) {
@@ -70,7 +70,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         public void MemoizeTypeNamespaces(ClassNode currentNode, Dictionary<string, string> memo) {
-            var className = _globalObjects.GetNameString(currentNode.ClassName);
+            var className = _namePoolService.GetNameString(currentNode.ClassName);
             ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(memo, className, out var previouslyExisted);
 
             if (!previouslyExisted) {

@@ -62,8 +62,9 @@ namespace PalworldManagedModFramework.DI {
                 .AddSingleton<IAssemblyDiscovery, AssemblyDiscovery>()
                 .AddSingleton<IModLoader, ModLoader>()
                 .AddSingleton<ISandboxDIService, SandboxDIService>()
-                .AddSingleton<UnrealReflection>()
-                .AddSingleton<IGlobalObjects, GlobalObjects>();
+                .AddSingleton<IUnrealReflection, UnrealReflection>()
+                .AddSingleton<IGlobalObjects, GlobalObjects>()
+                .AddSingleton<INamePoolService, NamePoolService>();
         }
     }
 }

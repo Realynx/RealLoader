@@ -13,19 +13,22 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
     public class CodeGenGraphBuilder : ICodeGenGraphBuilder {
         private readonly ILogger _logger;
         private readonly IGlobalObjects _globalObjects;
-        private readonly UnrealReflection _unrealReflection;
+        private readonly IUnrealReflection _unrealReflection;
         private readonly INameSpaceService _nameSpaceService;
         private readonly IImportResolver _importResolver;
         private readonly IFunctionTimingService _functionTimingService;
+        private readonly INamePoolService _namePoolService;
 
-        public CodeGenGraphBuilder(ILogger logger, IGlobalObjects globalObjects, UnrealReflection unrealReflection,
-            INameSpaceService nameSpaceService, IImportResolver importResolver, IFunctionTimingService functionTimingService) {
+        public CodeGenGraphBuilder(ILogger logger, IGlobalObjects globalObjects, IUnrealReflection unrealReflection,
+            INameSpaceService nameSpaceService, IImportResolver importResolver, IFunctionTimingService functionTimingService,
+            INamePoolService namePoolService) {
             _logger = logger;
             _globalObjects = globalObjects;
             _unrealReflection = unrealReflection;
             _nameSpaceService = nameSpaceService;
             _importResolver = importResolver;
             _functionTimingService = functionTimingService;
+            _namePoolService = namePoolService;
         }
 
         public CodeGenAssemblyNode[] BuildAssemblyGraphs(ClassNode rootNode) {
@@ -159,14 +162,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 }
             }
 
-            var className = _globalObjects.GetNameString(classNode.ClassName);
+            var className = _namePoolService.GetNameString(classNode.ClassName);
 
             string? attributes = null;
 
-            var baseClass = classNode.nodeClass.baseUStruct.superStruct;
+            var baseClass = classNode.nodeClass->baseUStruct.superStruct;
             string? baseClassName = null;
             if (baseClass is not null) {
-                baseClassName = _globalObjects.GetNameString(baseClass->ObjectName);
+                baseClassName = _namePoolService.GetNameString(baseClass->ObjectName);
             }
 
             return new CodeGenClassNode {
@@ -179,12 +182,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             };
         }
 
-        private unsafe CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty property) {
-            var propertyName = _globalObjects.GetNameString(property.ObjectName);
+        private unsafe CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty* property) {
+            var propertyName = _namePoolService.GetNameString(property->ObjectName);
 
             string? attributes = null;
 
-            var returnType = _globalObjects.GetNameString(property.baseFField.classPrivate->ObjectName);
+            var returnType = _namePoolService.GetNameString(property->baseFField.classPrivate->ObjectName);
 
             return new CodeGenPropertyNode {
                 modifer = CodeGenConstants.PUBLIC,
@@ -196,30 +199,29 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             };
         }
 
-        private unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction method) {
-            var methodName = _globalObjects.GetNameString(method.baseUstruct.ObjectName);
+        private unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method) {
+            var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
 
             string? attributes = null;
 
-            var signature = _unrealReflection.GetFunctionSignature(method);
+            var parameters = _unrealReflection.GetFunctionSignature(method, out var returnValue);
             string returnType;
-            if (signature.returnValue.HasValue) {
-                var signatureName = signature.returnValue.Value.classPrivate->ObjectName;
-                var signatureString = _globalObjects.GetNameString(signatureName);
+            if (returnValue is not null) {
+                var signatureName = returnValue->classPrivate->ObjectName;
+                var signatureString = _namePoolService.GetNameString(signatureName);
                 returnType = signatureString;
             }
             else {
                 returnType = CodeGenConstants.VOID;
             }
 
-            var functionParams = signature.parameters;
             (string type, string name)[]? methodArgs = null;
-            if (functionParams.Length > 0) {
-                methodArgs = new (string type, string name)[functionParams.Length];
-                for (var i = 0; i < functionParams.Length; i++) {
-                    var currentParam = functionParams[i];
-                    var type = _globalObjects.GetNameString(currentParam.classPrivate->ObjectName);
-                    var name = _globalObjects.GetNameString(currentParam.ObjectName);
+            if (parameters.Length > 0) {
+                methodArgs = new (string type, string name)[parameters.Length];
+                for (var i = 0; i < parameters.Length; i++) {
+                    var currentParam = parameters[i];
+                    var type = _namePoolService.GetNameString(currentParam->classPrivate->ObjectName);
+                    var name = _namePoolService.GetNameString(currentParam->ObjectName);
                     methodArgs[i] = (type, name);
                 }
             }

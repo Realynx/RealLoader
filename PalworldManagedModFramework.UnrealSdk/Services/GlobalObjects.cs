@@ -1,8 +1,5 @@
-﻿using System.Text;
-
-using PalworldManagedModFramework.Sdk.Logging;
+﻿using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GObjectsStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
@@ -11,33 +8,28 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
     public class GlobalObjects : IGlobalObjects {
         private readonly ILogger _logger;
         private readonly IEnginePattern _enginePattern;
+        private readonly INamePoolService _namePoolService;
         private readonly unsafe FUObjectArray* _objectPoolAddress;
 
-        public unsafe GlobalObjects(ILogger logger, IEnginePattern enginePattern) {
+        public unsafe GlobalObjects(ILogger logger, IEnginePattern enginePattern, INamePoolService namePoolService) {
             _logger = logger;
             _enginePattern = enginePattern;
-
+            _namePoolService = namePoolService;
             _objectPoolAddress = (FUObjectArray*)_enginePattern.PGUObjectArray;
         }
 
-        public unsafe ICollection<UFunction> EnumerateUFunctions() {
-            var objectList = new List<UFunction>();
-
+        public unsafe UObjectBase*[] EnumerateObjects() {
             var fixedChunkedArray = _objectPoolAddress->ObjObjects;
             var objects = *fixedChunkedArray.objects;
 
+            var objectList = new UObjectBase*[fixedChunkedArray.numElements];
             for (var x = 0; x < fixedChunkedArray.numElements; x++) {
                 var currentItem = objects + x;
 
                 if (currentItem is not null) {
                     if (currentItem->uObject is not null) {
-                        var pObjectBase = (UFunction*)currentItem->uObject;
-
-                        if (!pObjectBase->functionFlags.HasFlag(Data.CoreUObject.FLags.EFunctionFlags.FUNC_Public)) {
-                            continue;
-                        }
-
-                        objectList.Add(*pObjectBase);
+                        var pObjectBase = currentItem->uObject;
+                        objectList[x] = pObjectBase;
                     }
                 }
             }
@@ -45,9 +37,7 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
             return objectList;
         }
 
-        public unsafe ICollection<UObjectBase> EnumerateObjects() {
-            var objectList = new List<UObjectBase>();
-
+        public unsafe UObjectBase* FindObjects(string name, StringComparison stringComparison = StringComparison.Ordinal) {
             var fixedChunkedArray = _objectPoolAddress->ObjObjects;
             var objects = *fixedChunkedArray.objects;
 
@@ -56,30 +46,12 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
 
                 if (currentItem is not null) {
                     if (currentItem->uObject is not null) {
-                        var objectBase = *currentItem->uObject;
-                        objectList.Add(objectBase);
-                    }
-                }
-            }
+                        var pUobject = currentItem->uObject;
 
-            return objectList;
-        }
-
-        public unsafe UObjectBase? FindObjects(string name, StringComparison stringComparison = StringComparison.Ordinal) {
-            var fixedChunkedArray = _objectPoolAddress->ObjObjects;
-            var objects = *fixedChunkedArray.objects;
-
-            for (var x = 0; x < fixedChunkedArray.numElements; x++) {
-                var currentItem = objects + x;
-
-                if (currentItem is not null) {
-                    if (currentItem->uObject is not null) {
-                        var uobject = currentItem->uObject;
-
-                        var nameEntryId = uobject->namePrivate.comparisonIndex;
-                        var objectName = GetNameString(nameEntryId);
+                        var nameEntryId = pUobject->namePrivate.comparisonIndex;
+                        var objectName = _namePoolService.GetNameString(nameEntryId);
                         if (objectName.Equals(name, stringComparison)) {
-                            return *uobject;
+                            return pUobject;
                         }
                     }
                 }
@@ -88,111 +60,23 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
             return null;
         }
 
-        public unsafe IDictionary<string, ICollection<UObjectBase>> EnumerateNamedObjects() {
-            var objectDictionary = new Dictionary<string, ICollection<UObjectBase>>();
-            var fixedChunkedArray = _objectPoolAddress->ObjObjects;
-            var objects = *fixedChunkedArray.objects;
+        public unsafe UObjectBase*[] EnumerateEverything() {
+            // var objectPoolAddress = (FUObjectArray*)_enginePattern.PGUObjectArray;
+            var rootObjects = EnumerateObjects();
+            var pointers = new List<nint>();
 
-            for (var x = 0; x < fixedChunkedArray.numElements; x++) {
-                var currentItem = objects + x;
-
-                if (currentItem is not null) {
-                    if (currentItem->uObject is not null) {
-                        var objectBase = *currentItem->uObject;
-                        var objectName = GetNameString(objectBase.namePrivate.comparisonIndex);
-
-                        if (!objectDictionary.TryAdd(objectName, new List<UObjectBase>() { objectBase })) {
-                            objectDictionary[objectName].Add(objectBase);
-                        }
-                    }
+            foreach (var pObject in rootObjects) {
+                for (UObjectBase* pCurrentObject = pObject; pCurrentObject is not null; pCurrentObject = (UObjectBase*)pCurrentObject->outerPrivate) {
+                    pointers.Add((nint)pCurrentObject);
                 }
             }
 
-            return objectDictionary;
-        }
-
-        public unsafe ICollection<UObjectBase> EnumerateParents() {
-            var uniqueParent = new HashSet<UObjectBase>();
-
-            foreach (var uObject in EnumerateObjects()) {
-                var parentMostObjectBase = uObject;
-                while (parentMostObjectBase.outerPrivate is not null) {
-                    parentMostObjectBase = parentMostObjectBase.outerPrivate->baseObjectBaseUtility.baseUObjectBase;
-                }
-
-                uniqueParent.Add(parentMostObjectBase);
+            var objectArray = new UObjectBase*[pointers.Count];
+            for (var x = 0; x < objectArray.Length; x++) {
+                objectArray[x] = (UObjectBase*)pointers[x];
             }
 
-            return uniqueParent.ToList();
-        }
-
-        public unsafe ICollection<UObjectBase> EnumeratePackages() {
-            var uniqueParent = new HashSet<UObjectBase>();
-
-            foreach (var uObject in EnumerateEverything()) {
-                var objectName = GetNameString(uObject.namePrivate.comparisonIndex);
-                if (objectName.StartsWith("/")) {
-                    uniqueParent.Add(uObject);
-                }
-            }
-
-            return uniqueParent.ToList();
-        }
-
-        public unsafe ICollection<UObjectBase> EnumerateEverything() {
-            var objectPoolAddress = (FUObjectArray*)_enginePattern.PGUObjectArray;
-
-            var rootObjects = EnumerateObjects()
-                .ToArray();
-
-            var threadingOptions = new ParallelOptions() {
-                MaxDegreeOfParallelism = 25
-            };
-
-            var threadDataBlocks = new List<UObjectBase>[rootObjects.Length];
-            Parallel.For(0, rootObjects.Length, threadingOptions, x => {
-                var parentMostObjectBase = rootObjects[x];
-                threadDataBlocks[x] = new List<UObjectBase>();
-
-                while (true) {
-                    if (parentMostObjectBase.outerPrivate is null) {
-                        break;
-                    }
-
-                    threadDataBlocks[x].Add(parentMostObjectBase);
-                    parentMostObjectBase = parentMostObjectBase.outerPrivate->baseObjectBaseUtility.baseUObjectBase;
-                }
-            });
-
-            return threadDataBlocks.SelectMany(i => i).ToArray();
-        }
-
-        public unsafe FNameEntry* GetName(FNameEntryId fnameEntryId) {
-            var namePool = _enginePattern.PNamePoolData;
-
-            // Windows lock object is 0x8 bytes
-            // Linux lock object is 0x38 bytes
-
-            var offsetSize = 0x10;
-            if (Environment.OSVersion.Platform == PlatformID.Unix) {
-                offsetSize = 0x40;
-            }
-
-            var nameBlockOffset = fnameEntryId.LowerOrderValue * 2;
-            var namePointerBlock = (nint*)(namePool + offsetSize + (fnameEntryId.HigherOrderValue * 8));
-
-            return (FNameEntry*)(*namePointerBlock + nameBlockOffset);
-        }
-
-        public unsafe string GetNameString(FNameEntryId fnameEntryId) {
-            var nameEntry = GetName(fnameEntryId);
-
-            if (nameEntry->header.BIsWide) {
-                return Encoding.Unicode.GetString(&nameEntry->stringContents, nameEntry->header.Len);
-            }
-            else {
-                return Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len);
-            }
+            return objectArray;
         }
     }
 }

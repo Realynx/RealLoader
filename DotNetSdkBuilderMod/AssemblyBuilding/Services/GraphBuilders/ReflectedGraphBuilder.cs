@@ -4,32 +4,36 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
-    public class ReflectedGraphBuilder : IReflectedGraphBuilder {
+    public unsafe class ReflectedGraphBuilder : IReflectedGraphBuilder {
         private readonly ILogger _logger;
         private readonly IGlobalObjects _globalObjects;
-        private readonly UnrealReflection _unrealReflection;
+        private readonly IUnrealReflection _unrealReflection;
         private readonly IPackageNameGenerator _packageNameGenerator;
+        private readonly INamePoolService _namePoolService;
 
-        private List<UObjectBase> _everyLoadedObjects;
-        private Dictionary<string, HashSet<UClass>> _classMemo;
+        private UObjectBase*[] _everyLoadedObjects;
+        private Dictionary<string, HashSet<nint>> _classMemo;
 
-        public ReflectedGraphBuilder(ILogger logger, IGlobalObjects globalObjects, UnrealReflection unrealReflection, IPackageNameGenerator packageNameGenerator) {
+        public ReflectedGraphBuilder(ILogger logger, IGlobalObjects globalObjects, IUnrealReflection unrealReflection,
+            IPackageNameGenerator packageNameGenerator, INamePoolService namePoolService) {
             _logger = logger;
             _globalObjects = globalObjects;
             _unrealReflection = unrealReflection;
             _packageNameGenerator = packageNameGenerator;
+            _namePoolService = namePoolService;
         }
 
-        public ClassNode? BuildRootNode() {
+        public unsafe ClassNode? BuildRootNode() {
             _logger.Debug("Building root node graph");
 
-            _everyLoadedObjects = _globalObjects.EnumerateEverything().ToList();
-            _classMemo = new Dictionary<string, HashSet<UClass>>();
+            _everyLoadedObjects = _globalObjects.EnumerateEverything();
+            _classMemo = new Dictionary<string, HashSet<nint>>();
 
             var rootNode = MemoizeClassNodes();
             if (rootNode is null) {
@@ -43,33 +47,34 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         private unsafe ClassNode? MemoizeClassNodes() {
             ClassNode? rootNode = null;
 
-            foreach (var obj in _everyLoadedObjects) {
-                var objectClass = *obj.classPrivate;
-                if (objectClass.baseUStruct.superStruct is null) {
-                    var functions = _unrealReflection.GetTypeFunctions(objectClass);
-                    var properties = _unrealReflection.GetTypeFields(objectClass);
-                    var packageName = _packageNameGenerator.GetPackageName((UObjectBaseUtility*)&obj);
+            foreach (UObjectBase* pObject in _everyLoadedObjects) {
+                var pObjectClass = pObject->classPrivate;
+
+                if (pObjectClass->baseUStruct.superStruct is null) {
+                    var functions = _unrealReflection.GetTypeFunctions(pObjectClass);
+                    var properties = _unrealReflection.GetTypeFields(pObjectClass);
+                    var packageName = _packageNameGenerator.GetPackageName((UObjectBaseUtility*)pObject);
 
                     rootNode = new ClassNode() {
-                        functions = functions.ToArray(),
-                        properties = properties.ToArray(),
+                        functions = functions,
+                        properties = properties,
                         packageName = packageName,
-                        nodeClass = objectClass
+                        nodeClass = pObjectClass
                     };
+                    continue;
                 }
-                else {
-                    var super = *objectClass.baseUStruct.superStruct;
-                    var superName = _globalObjects.GetNameString(super.ObjectName);
 
-                    ref var collectionValue = ref CollectionsMarshal
-                        .GetValueRefOrAddDefault(_classMemo, superName, out var previouslyExisted);
+                var super = pObjectClass->baseUStruct.superStruct;
+                var superName = _namePoolService.GetNameString(super->ObjectName);
 
-                    if (!previouslyExisted) {
-                        collectionValue = new HashSet<UClass>();
-                    }
+                ref var collectionValue = ref CollectionsMarshal
+                    .GetValueRefOrAddDefault(_classMemo, superName, out var previouslyExisted);
 
-                    collectionValue!.Add(objectClass);
+                if (!previouslyExisted) {
+                    collectionValue = new HashSet<nint>();
                 }
+
+                collectionValue!.Add((nint)pObjectClass);
             }
 
             return rootNode;
@@ -77,7 +82,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
         private unsafe ClassNode[] FindChildren(ClassNode currentnode) {
             var children = new List<ClassNode>();
-            var currentNodeName = _globalObjects.GetNameString(currentnode.ClassName);
+            var currentNodeName = _namePoolService.GetNameString(currentnode.ClassName);
 
             if (!_classMemo.TryGetValue(currentNodeName, out var memoChildren)) {
                 return Array.Empty<ClassNode>();
@@ -90,14 +95,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             }
 
             foreach (var memoChild in memoChildren) {
-                var classBase = currentnode.nodeClass.baseUStruct.baseUfield.baseUObject;
+                var classBase = currentnode.nodeClass->baseUStruct.baseUfield.baseUObject;
                 var packageName = string.Intern(_packageNameGenerator.GetPackageName((UObjectBaseUtility*)&classBase));
 
                 children.Add(new ClassNode() {
-                    functions = _unrealReflection.GetTypeFunctions(memoChild).ToArray(),
-                    properties = _unrealReflection.GetTypeFields(memoChild).ToArray(),
+                    functions = _unrealReflection.GetTypeFunctions((UClass*)memoChild),
+                    properties = _unrealReflection.GetTypeFields((UClass*)memoChild),
                     packageName = packageName,
-                    nodeClass = memoChild,
+                    nodeClass = (UClass*)memoChild,
                     parent = currentnode
                 });
             }
