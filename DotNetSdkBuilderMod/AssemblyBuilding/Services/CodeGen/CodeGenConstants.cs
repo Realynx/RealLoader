@@ -16,6 +16,8 @@
         internal const string COMMA = ",";
         internal const string DOT = ".";
         internal const string STAR = "*";
+        internal const string AMPERSAND = "&";
+        internal const string PLUS = "+";
         internal const string LAMBDA = "=>";
         internal const string EQUALS = "=";
         internal const string VALUE = "value";
@@ -35,7 +37,7 @@
         internal const string SET = "set";
         internal const string DELEGATE = "delegate";
         internal const string CODE_NAMESPACE = "DotNetSdkBuilderMod.Generated";
-        internal const string RUNTIME_ADDRESS_FIELD_NAME_SUFFIX = "_RuntimeAddress";
+        internal const string ADDRESS_FIELD_NAME = "Address";
         internal const char INDENT = ' ';
         internal const int INDENT_SIZE = 4;
     }

@@ -13,18 +13,15 @@ using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConsta
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
     public class CodeGenGraphBuilder : ICodeGenGraphBuilder {
         private readonly ILogger _logger;
-        private readonly IGlobalObjects _globalObjects;
         private readonly IUnrealReflection _unrealReflection;
         private readonly INameSpaceService _nameSpaceService;
         private readonly IImportResolver _importResolver;
         private readonly IFunctionTimingService _functionTimingService;
         private readonly INamePoolService _namePoolService;
 
-        public CodeGenGraphBuilder(ILogger logger, IGlobalObjects globalObjects, IUnrealReflection unrealReflection,
-            INameSpaceService nameSpaceService, IImportResolver importResolver, IFunctionTimingService functionTimingService,
-            INamePoolService namePoolService) {
+        public CodeGenGraphBuilder(ILogger logger, IUnrealReflection unrealReflection, INameSpaceService nameSpaceService,
+            IImportResolver importResolver, IFunctionTimingService functionTimingService, INamePoolService namePoolService) {
             _logger = logger;
-            _globalObjects = globalObjects;
             _unrealReflection = unrealReflection;
             _nameSpaceService = nameSpaceService;
             _importResolver = importResolver;
@@ -190,10 +187,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
             var returnType = _namePoolService.GetNameString(property->baseFField.classPrivate->ObjectName);
 
-            var runtimeAddressFieldName = $"{propertyName}{RUNTIME_ADDRESS_FIELD_NAME_SUFFIX}";
+            var fieldOffset = property->offset_Internal;
 
-            var getter = $"{GET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{runtimeAddressFieldName}{SEMICOLON}";
-            var setter = $"{SET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{runtimeAddressFieldName}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{VALUE}{SEMICOLON}";
+            var getter = $"{GET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{OPEN_ROUND_BRACKET}{ADDRESS_FIELD_NAME}{WHITE_SPACE}{PLUS}{WHITE_SPACE}{fieldOffset}{CLOSED_ROUND_BRACKET}{SEMICOLON}";
+            var setter = $"{SET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{OPEN_ROUND_BRACKET}{ADDRESS_FIELD_NAME}{WHITE_SPACE}{PLUS}{WHITE_SPACE}{fieldOffset}{CLOSED_ROUND_BRACKET}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{VALUE}{SEMICOLON}";
 
             return new CodeGenPropertyNode {
                 modifer = PUBLIC,
@@ -202,7 +199,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 returnType = returnType,
                 get = getter,
                 set = setter,
-                runtimeAddressFieldName = runtimeAddressFieldName
             };
         }
 

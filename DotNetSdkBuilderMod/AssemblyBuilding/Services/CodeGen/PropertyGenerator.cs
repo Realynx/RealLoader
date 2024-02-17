@@ -17,13 +17,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe void GenerateProperty(StringBuilder codeBuilder, CodeGenPropertyNode propertyNode) {
-            codeBuilder.AppendIndented(PRIVATE, 2);
-            codeBuilder.Append(WHITE_SPACE);
-            codeBuilder.Append(INT_PTR);
-            codeBuilder.Append(WHITE_SPACE);
-            codeBuilder.Append(propertyNode.runtimeAddressFieldName);
-            codeBuilder.AppendLine(SEMICOLON);
-
             codeBuilder.AppendIndented(propertyNode.modifer, 2);
             codeBuilder.Append(WHITE_SPACE);
 
