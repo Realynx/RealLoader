@@ -170,7 +170,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 modifiers = $"{PUBLIC}";
             }
 
-            var className = _namePoolService.GetNameString(classNode.ClassName);
+            var className = _namePoolService.GetNameString(classNode.ClassName).Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase);
 
             var attributes = new[] {
                 GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"{QUOTE}{classNode.packageName}/{className}{QUOTE}")
@@ -193,7 +193,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private unsafe CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty* property) {
-            var propertyName = _namePoolService.GetNameString(property->ObjectName);
+            var propertyName = _namePoolService.GetNameString(property->ObjectName).Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase);
 
             string[]? attributes = null;
 
@@ -215,7 +215,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method) {
-            var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
+            var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName).Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase);
 
             string[]? attributes = null;
 
