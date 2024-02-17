@@ -24,6 +24,7 @@
         //internal const string NEW_LINE = "\n"; // or Environment.NewLine for OS-specific new lines
         //internal const string TAB = "\t"; // or use "    " for spaces, depending on your coding standards
         internal const string USING = "using";
+        internal const string ASSEMBLY = "assembly";
         internal const string NAMESPACE = "namespace";
         internal const string CLASS = "class";
         internal const string PUBLIC = "public";
@@ -38,6 +39,8 @@
         internal const string DELEGATE = "delegate";
         internal const string CODE_NAMESPACE = "DotNetSdkBuilderMod.Generated";
         internal const string ADDRESS_FIELD_NAME = "Address";
+        internal const string FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE = "FullTypePath";
+        internal const string COMPATIBLE_GAME_VERSION_ATTRIBUTE = "CompatibleGameVersion";
         internal const char INDENT = ' ';
         internal const int INDENT_SIZE = 4;
     }

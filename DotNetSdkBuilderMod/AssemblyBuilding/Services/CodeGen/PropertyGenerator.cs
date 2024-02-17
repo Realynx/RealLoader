@@ -17,6 +17,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe void GenerateProperty(StringBuilder codeBuilder, CodeGenPropertyNode propertyNode) {
+            if (propertyNode.attributes != null) {
+                foreach (var attribute in propertyNode.attributes) {
+                    codeBuilder.AppendIndentedLine(attribute, 2);
+                }
+            }
+
             codeBuilder.AppendIndented(propertyNode.modifer, 2);
             codeBuilder.Append(WHITE_SPACE);
 

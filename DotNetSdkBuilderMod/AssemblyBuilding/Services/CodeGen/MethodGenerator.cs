@@ -17,6 +17,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe void GenerateMethod(StringBuilder codeBuilder, CodeGenMethodNode methodNode) {
+            if (methodNode.attributes != null) {
+                foreach (var attribute in methodNode.attributes) {
+                    codeBuilder.AppendIndentedLine(attribute, 2);
+                }
+            }
+
             codeBuilder.AppendIndented(methodNode.modifer, 2);
             codeBuilder.Append(WHITE_SPACE);
 

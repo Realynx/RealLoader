@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
@@ -55,7 +56,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             for (var i = 0; i < namespaceTree.Length; i++) {
                 assemblyNodes[i] = new CodeGenAssemblyNode {
                     namespaces = namespaceTree[i].namespaces,
-                    name = namespaceTree[i].name
+                    name = namespaceTree[i].name,
+                    attributes = new[] { GenerateAssemblyAttribute(COMPATIBLE_GAME_VERSION_ATTRIBUTE, "0.1.2") }, // TODO: Get game version
                 };
             }
 
@@ -162,7 +164,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
             var className = _namePoolService.GetNameString(classNode.ClassName);
 
-            string? attributes = null;
+            var attributes = new[] {
+                GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"{QUOTE}{classNode.packageName}/{className}{QUOTE}")
+            };
 
             var baseClass = classNode.nodeClass->baseUStruct.superStruct;
             string? baseClassName = null;
@@ -183,7 +187,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         private unsafe CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty* property) {
             var propertyName = _namePoolService.GetNameString(property->ObjectName);
 
-            string? attributes = null;
+            string[]? attributes = null;
 
             var returnType = _namePoolService.GetNameString(property->baseFField.classPrivate->ObjectName);
 
@@ -205,7 +209,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         private unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method) {
             var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
 
-            string? attributes = null;
+            string[]? attributes = null;
 
             var parameters = _unrealReflection.GetFunctionSignature(method, out var returnValue);
             string returnType;
@@ -236,6 +240,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 returnType = returnType,
                 arguments = methodArgs
             };
+        }
+
+        private string GenerateAssemblyAttribute([ConstantExpected] string attributeName, string attributeValue) {
+            return $"{OPEN_SQUARE_BRACKET}{ASSEMBLY}{COLON}{WHITE_SPACE}{attributeName}{OPEN_ROUND_BRACKET}{attributeValue}{CLOSED_ROUND_BRACKET}{CLOSED_SQUARE_BRACKET}";
+        }
+
+        private string GenerateAttribute([ConstantExpected] string attributeName, string attributeValue) {
+            return $"{OPEN_SQUARE_BRACKET}{attributeName}{OPEN_ROUND_BRACKET}{attributeValue}{CLOSED_ROUND_BRACKET}{CLOSED_SQUARE_BRACKET}";
         }
 
         private void TimedApplyImports(CodeGenNamespaceNode[] namespaceTree, Dictionary<string, string> classNamespaces) {

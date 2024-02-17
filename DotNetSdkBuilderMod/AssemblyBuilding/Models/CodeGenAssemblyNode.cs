@@ -5,6 +5,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     public class CodeGenAssemblyNode {
         public CodeGenNamespaceNode[] namespaces;
         public string name;
+        public string[] attributes;
     }
 
     [DebuggerDisplay("{fullNameSpace}: {namespaces?.Length ?? 0} sub-namespaces, {classes?.Length ?? 0} classes")]
@@ -19,9 +20,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
 
     [DebuggerDisplay("{baseType} {name}: {propertyNodes?.Length ?? 0} props, {methodNodes?.Length ?? 0} methods")]
     public class CodeGenClassNode : CodeGenCodeObjectNode {
-        public string baseType;
         public CodeGenPropertyNode[] propertyNodes;
         public CodeGenMethodNode[] methodNodes;
+
+        public string baseType;
     }
 
     [DebuggerDisplay("{returnType} {name} {get}, {set}")]
@@ -38,7 +40,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     }
 
     public class CodeGenCodeObjectNode {
-        public string attributes;
+        public string[] attributes;
         public string modifer;
         public string name;
     }
