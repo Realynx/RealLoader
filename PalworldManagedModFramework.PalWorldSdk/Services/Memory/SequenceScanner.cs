@@ -10,48 +10,56 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             _logger = logger;
         }
 
-        public IEnumerable<nint> ScanMemoryRegions(string signature, IEnumerable<MemoryRegion> memoryRegions) {
-            foreach (var scanRegion in memoryRegions) {
-                var foundAddresses = ScanMemoryRegion(signature, scanRegion);
+        public nint[][] ScanMemoryRegions(string[] signatures, IEnumerable<MemoryRegion> memoryRegions) {
+            var foundPatterns = new List<nint>[signatures.Length];
+            for (var x = 0; x < foundPatterns.Length; x++) {
+                foundPatterns[x] = new List<nint>();
+            }
 
-                if (foundAddresses.Length > 0) {
-                    foreach (var address in foundAddresses) {
-                        yield return address;
-                    }
+            foreach (var scanRegion in memoryRegions) {
+                var foundAddresses = ScanMemoryRegion(signatures, scanRegion);
+                for (var x = 0; x < foundPatterns.Length; x++) {
+                    foundPatterns[x].AddRange(foundAddresses[x]);
                 }
             }
+
+            return foundPatterns.Select(i => i.ToArray()).ToArray();
         }
 
-        public unsafe nint[] ScanMemoryRegion(string signature, MemoryRegion memoryRegion) {
-            var foundSequences = new List<nint>();
-
-            var scanPtr = (nint)memoryRegion.StartAddress;
-            var endPtr = (nint)memoryRegion.EndAddress;
-            var patternPtr = 0;
-
-            var patternMask = PatternResolver.DeriveMask(signature);
-            var patternLength = patternMask.pattern.Length;
-
-            while (scanPtr < endPtr) {
-                var scanByte = ((byte*)scanPtr)[patternPtr];
-
-                var matchedValue = patternMask.mask[patternPtr] == '?' || patternMask.pattern[patternPtr] == scanByte;
-                if (matchedValue) {
-                    patternPtr++;
-
-                    if (patternPtr == patternLength) {
-                        foundSequences.Add(scanPtr);
-                        scanPtr++;
-                        patternPtr = 0;
-                    }
-                }
-                else {
-                    scanPtr += Math.Max(1, patternPtr);
-                    patternPtr = 0;
-                }
+        public unsafe nint[][] ScanMemoryRegion(string[] signatures, MemoryRegion memoryRegion) {
+            var foundSequencesPerPattern = new List<nint>[signatures.Length];
+            for (var x = 0; x < foundSequencesPerPattern.Length; x++) {
+                foundSequencesPerPattern[x] = new List<nint>();
             }
 
-            return foundSequences.ToArray();
+            var patternMasks = signatures.Select(PatternResolver.DeriveMask).ToArray();
+            var patternPtrs = new int[patternMasks.Length];
+
+            var scanPtr = (byte*)memoryRegion.StartAddress;
+            var endPtr = (byte*)memoryRegion.EndAddress;
+
+            while (scanPtr < endPtr) {
+                for (var x = 0; x < patternMasks.Length; x++) {
+                    var mask = patternMasks[x].mask;
+                    var pattern = patternMasks[x].pattern;
+
+                    var patternPtr = patternPtrs[x];
+                    if (mask[patternPtr] == '?' || pattern[patternPtr] == *scanPtr) {
+                        patternPtrs[x]++;
+                        if (patternPtrs[x] == pattern.Length) {
+                            foundSequencesPerPattern[x].Add((nint)(scanPtr - pattern.Length + 1));
+                            patternPtrs[x] = 0;
+                        }
+                    }
+                    else {
+                        patternPtrs[x] = 0;
+                    }
+                }
+
+                scanPtr++;
+            }
+
+            return foundSequencesPerPattern.Select(i => i.ToArray()).ToArray();
         }
     }
 }

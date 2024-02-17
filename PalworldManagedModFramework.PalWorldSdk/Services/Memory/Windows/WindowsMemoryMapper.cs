@@ -31,31 +31,31 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
                         break;
                     }
 
-                    var readFlag = (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READ) ||
-                                    (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READWRITE) ||
-                                    (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_READONLY) ||
-                                    (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_READWRITE);
+                    var readFlag = memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READ) ||
+                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READWRITE) ||
+                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_READONLY) ||
+                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_READWRITE);
 
-                    var writeFlag = (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_READWRITE) ||
-                                    (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READWRITE) ||
-                                    (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_WRITECOPY) ||
-                                    (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_WRITECOPY);
+                    var writeFlag = memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_READWRITE) ||
+                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READWRITE) ||
+                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_WRITECOPY) ||
+                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_WRITECOPY);
 
-                    var executeFlag = (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE) ||
-                                      (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READ) ||
-                                      (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READWRITE) ||
-                                      (*memoryInfoStructs).Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_WRITECOPY);
+                    var executeFlag = memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE) ||
+                                      memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READ) ||
+                                      memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READWRITE) ||
+                                      memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_WRITECOPY);
 
                     mappedMemoryRegions.Add(new MemoryRegion {
-                        StartAddress = (*memoryInfoStructs).BaseAddress,
-                        EndAddress = (*memoryInfoStructs).BaseAddress + (*memoryInfoStructs).RegionSize,
-                        MemorySize = (*memoryInfoStructs).RegionSize,
+                        StartAddress = memoryInfoStructs->BaseAddress,
+                        EndAddress = memoryInfoStructs->BaseAddress + memoryInfoStructs->RegionSize,
+                        MemorySize = memoryInfoStructs->RegionSize,
                         ReadFlag = readFlag,
                         WriteFlag = writeFlag,
                         ExecuteFlag = executeFlag
                     });
 
-                    baseAddress = baseAddress + (nint)(*memoryInfoStructs).RegionSize;
+                    baseAddress = baseAddress + (nint)memoryInfoStructs->RegionSize;
                 }
 
                 return mappedMemoryRegions;

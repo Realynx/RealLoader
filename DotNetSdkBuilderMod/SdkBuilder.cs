@@ -20,8 +20,10 @@ namespace DotNetSdkBuilderMod {
         public unsafe void Load() {
             _logger.Debug("Loading SDK Builder!");
 
+
             // Need to wait for stuff to load into memory
-            Thread.Sleep(TimeSpan.FromSeconds(5));
+            Thread.Sleep(TimeSpan.FromSeconds(10));
+            _logger.Debug("Done sleeping");
 
             _sourceCodeGenerator.BuildSourceCode();
         }

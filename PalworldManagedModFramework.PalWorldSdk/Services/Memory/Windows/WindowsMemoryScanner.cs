@@ -30,14 +30,25 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
             return SequenceScan(signature).FirstOrDefault();
         }
 
-        public nint[] SequenceScan(string signature) {
+        public nint[][]? SequenceScan(params string[] signatures) {
+            var processModule = Process.GetCurrentProcess().MainModule!;
+
+            var endAddress = processModule.BaseAddress + processModule.ModuleMemorySize;
+            return SequenceScan(_baseAddress, endAddress, signatures);
+        }
+
+        public nint[]? SequenceScan(string signature) {
             var processModule = Process.GetCurrentProcess().MainModule!;
 
             var endAddress = processModule.BaseAddress + processModule.ModuleMemorySize;
             return SequenceScan(signature, _baseAddress, endAddress);
         }
 
-        public nint[] SequenceScan(string signature, nint startAddress, nint endAddress) {
+        public nint[]? SequenceScan(string signature, nint startAddress, nint endAddress) {
+            return SequenceScan(startAddress, endAddress, signature).FirstOrDefault();
+        }
+
+        public nint[][] SequenceScan(nint startAddress, nint endAddress, params string[] signature) {
             _processSuspender.PauseSelf();
 
             var memoryRegions = _memoryMapper.FindMemoryRegions()
@@ -47,7 +58,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
 
             _processSuspender.ResumeSelf();
 
-            return foundSequences.ToArray();
+            return foundSequences;
         }
     }
 }

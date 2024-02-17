@@ -1,10 +1,8 @@
-﻿using System.Diagnostics;
-
-using PalworldManagedModFramework.Sdk.Services.Memory.Models;
+﻿using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Interfaces {
     public interface ISequenceScanner {
-        nint[] ScanMemoryRegion(string signature, MemoryRegion memoryRegion);
-        IEnumerable<nint> ScanMemoryRegions(string signature, IEnumerable<MemoryRegion> memoryRegions);
+        nint[][] ScanMemoryRegion(string[] signatures, MemoryRegion memoryRegion);
+        nint[][] ScanMemoryRegions(string[] signatures, IEnumerable<MemoryRegion> memoryRegions);
     }
 }

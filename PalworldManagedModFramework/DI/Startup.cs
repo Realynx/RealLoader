@@ -56,7 +56,7 @@ namespace PalworldManagedModFramework.DI {
             services
                 .AddSingleton<IOperandResolver, OperandResolver>()
                 .AddSingleton<IPatternResolver, PatternResolver>()
-                .AddSingleton<UReflectionPointerScanner>()
+                .AddSingleton<PatternScanner>()
                 .AddSingleton<ISequenceScanner, SequenceScanner>()
                 .AddSingleton<ILogger, Logger>()
                 .AddSingleton<IAssemblyDiscovery, AssemblyDiscovery>()

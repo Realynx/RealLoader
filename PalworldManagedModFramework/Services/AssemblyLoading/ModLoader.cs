@@ -12,12 +12,12 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
         private readonly ILogger _logger;
         private readonly IAssemblyDiscovery _assemblyDiscovery;
         private readonly ModLoaderConfig _modLoaderConfig;
-        private readonly UReflectionPointerScanner _uReflectionPointerScanner;
+        private readonly PatternScanner _uReflectionPointerScanner;
         private readonly ISandboxDIService _sandboxDIService;
         private readonly HashSet<LoadedMod> _loadedMods = [];
 
         public ModLoader(ILogger logger, IAssemblyDiscovery assemblyDiscovery, ModLoaderConfig modLoaderConfig,
-            UReflectionPointerScanner uReflectionPointerScanner, ISandboxDIService sandboxDIService) {
+            PatternScanner uReflectionPointerScanner, ISandboxDIService sandboxDIService) {
             _logger = logger;
             _assemblyDiscovery = assemblyDiscovery;
             _modLoaderConfig = modLoaderConfig;
