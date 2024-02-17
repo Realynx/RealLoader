@@ -26,23 +26,84 @@
         internal const string USING = "using";
         internal const string ASSEMBLY = "assembly";
         internal const string NAMESPACE = "namespace";
+        internal const string OPERATOR = "operator";
         internal const string CLASS = "class";
         internal const string PUBLIC = "public";
         internal const string PRIVATE = "private";
         internal const string PROTECTED = "protected";
         internal const string INTERNAL = "internal";
         internal const string STATIC = "static";
+        internal const string EXPLICIT = "explicit";
+        internal const string IMPLICIT = "implicit";
         internal const string UNSAFE = "unsafe";
+        internal const string ABSTRACT = "abstract";
         internal const string VOID = "void";
         internal const string INT_PTR = "nint";
         internal const string GET = "get";
         internal const string SET = "set";
+        internal const string NEW = "new";
         internal const string DELEGATE = "delegate";
         internal const string CODE_NAMESPACE = "DotNetSdkBuilderMod.Generated";
         internal const string ADDRESS_FIELD_NAME = "Address";
+        internal const string OPERATOR_THIS_CLASS_NAME = "self"; // I don't like this but I can't think of anything better
         internal const string FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE = "FullTypePath";
         internal const string COMPATIBLE_GAME_VERSION_ATTRIBUTE = "CompatibleGameVersion";
+        internal const string DEPRECATED_ATTRIBUTE = "Obsolete";
         internal const char INDENT = ' ';
         internal const int INDENT_SIZE = 4;
+        internal const string CORE_U_OBJECT_EXTRA_MEMBERS = """
+// Framework members
+
+public Object(nint address) {
+    Address = address;
+}
+
+public bool Disposed { get; private set; } = true;
+
+private nint _addressUnsafe;
+public nint Address {
+    get {
+        if (Disposed) {
+            throw new ObjectDisposedException();
+        }
+
+        return _addressUnsafe;
+    }
+    private set {
+        _addressUnsafe = value;
+
+        if (_addressUnsafe == IntPtr.Zero) {
+            Disposed = true;
+        }
+        else {
+            Disposed = false;
+        }
+    }
+}
+
+public nint RegisterInUnreal() {
+    Address = Service.RegisterInUnreal(this);
+    return _addressUnsafe;
+}
+
+public void OnObjectRemovedFromGlobalObjectPool(object sender, ObjectRemovedEventArgs e) {
+    if (e.address == _addressUnsafe) {
+        Address = IntPtr.Zero;
+    }
+}
+
+public void ProcessEvent(nint function, void* arguments) {
+    // TODO
+}
+
+private bool _disposing;
+
+public void Dispose() {
+    if (!disposing) {
+        _disposing = true;
+        Service.DeleteInUnreal(this);
+    }
+}
+"""; // TODO: Compile as a regular class and use it to replace Script/CoreUObject/Object
     }
 }

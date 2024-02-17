@@ -1,4 +1,4 @@
-﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags {
+﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags {
     public enum EIntegerType : byte {
         Uint8_0 = 0x0,
         Uint16_0 = 0x1,

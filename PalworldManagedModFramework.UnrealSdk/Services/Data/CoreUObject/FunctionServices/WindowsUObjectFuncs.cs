@@ -1,5 +1,5 @@
 ﻿using PalworldManagedModFramework.Sdk.Attributes;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 
 namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FunctionServices {

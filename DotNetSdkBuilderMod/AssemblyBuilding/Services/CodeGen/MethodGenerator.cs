@@ -23,7 +23,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
-            codeBuilder.AppendIndented(methodNode.modifer, 2);
+            codeBuilder.AppendIndented(methodNode.modifier, 2);
             codeBuilder.Append(WHITE_SPACE);
 
             codeBuilder.Append(methodNode.returnType);

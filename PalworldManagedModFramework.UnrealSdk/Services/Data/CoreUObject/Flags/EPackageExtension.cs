@@ -1,4 +1,4 @@
-﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags {
+﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags {
     public enum EPackageExtension : byte {
         Unspecified_5 = 0x0,
         Asset_1 = 0x1,
