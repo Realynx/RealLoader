@@ -31,8 +31,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             codeBuilder.Append(propertyNode.name);
 
-            var hasGetter = !string.IsNullOrWhiteSpace(propertyNode.get);
-            var hasSetter = !string.IsNullOrWhiteSpace(propertyNode.set);
+            var hasGetter = propertyNode.get is not null;
+            var hasSetter = propertyNode.set is not null;
 
             if (!hasGetter && !hasSetter) {
                 codeBuilder.AppendLine(COLON);
@@ -42,11 +42,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
 
                 if (hasGetter) {
-                    codeBuilder.AppendIndentedLine(propertyNode.get, 3);
+                    codeBuilder.AppendIndentedLine(propertyNode.get!, 3);
                 }
 
                 if (hasSetter) {
-                    codeBuilder.AppendIndentedLine(propertyNode.set, 3);
+                    codeBuilder.AppendIndentedLine(propertyNode.set!, 3);
                 }
 
                 codeBuilder.AppendIndentedLine(CLOSED_CURLY_BRACKET, 2);

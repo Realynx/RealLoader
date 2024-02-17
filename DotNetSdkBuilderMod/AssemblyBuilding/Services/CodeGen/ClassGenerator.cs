@@ -37,7 +37,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             codeBuilder.Append(WHITE_SPACE);
 
             var baseClass = classNode.baseType;
-            if (!string.IsNullOrWhiteSpace(baseClass)) {
+            if (baseClass is not null) {
                 codeBuilder.Append(COLON);
                 codeBuilder.Append(WHITE_SPACE);
                 codeBuilder.Append(baseClass);

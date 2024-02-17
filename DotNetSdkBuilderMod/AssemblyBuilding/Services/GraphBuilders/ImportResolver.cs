@@ -1,8 +1,7 @@
-using System.Text;
-
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
-using DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
+
+using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
     public class ImportResolver : IImportResolver {
@@ -25,7 +24,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                     if (classNode.methodNodes is not null) {
                         foreach (var methodNode in classNode.methodNodes) {
                             var returnType = methodNode.returnType;
-                            if (returnType != CodeGenConstants.VOID) {
+                            if (returnType != VOID) {
                                 TryAddClassAsImport(returnType);
                             }
 
@@ -39,16 +38,20 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 }
             }
 
-            var importsBuilder = new StringBuilder();
-            foreach (var import in imports) {
-                importsBuilder.Append($"{CodeGenConstants.USING} ");
-                importsBuilder.Append(import.AsSpan(1));
-                importsBuilder.AppendLine(";");
-            }
+            if (imports.Count > 0) {
+                var namespaceImports = new string[imports.Count];
+                var i = 0;
+                foreach (var package in imports) {
+                    var import = package
+                        .TrimStart('/')
+                        .Replace('/', '.');
 
-            current.imports = importsBuilder
-                .Replace('/', '.')
-                .ToString();
+                    namespaceImports[i] = $"{USING}{WHITE_SPACE}{import}{SEMICOLON}";
+                    i++;
+                }
+
+                current.imports = namespaceImports;
+            }
 
             if (current.namespaces is not null) {
                 foreach (var child in current.namespaces) {
@@ -57,7 +60,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             }
 
             void TryAddClassAsImport(string className) {
-                var currentNameSpace = current.fullNameSpace;
+                var currentNameSpace = current.packageName;
 
                 if (classNamespaces.TryGetValue(className, out var classNamespace) && !currentNameSpace.StartsWith(classNamespace)) {
                     imports.Add(classNamespace);

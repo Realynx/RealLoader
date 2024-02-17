@@ -55,7 +55,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var assemblyNodes = new CodeGenAssemblyNode[namespaceTree.Length];
             for (var i = 0; i < namespaceTree.Length; i++) {
                 assemblyNodes[i] = new CodeGenAssemblyNode {
-                    namespaces = namespaceTree[i].namespaces,
+                    namespaces = namespaceTree[i].namespaces!,
                     name = namespaceTree[i].name,
                     attributes = new[] { GenerateAssemblyAttribute(COMPATIBLE_GAME_VERSION_ATTRIBUTE, "0.1.2") }, // TODO: Get game version
                 };
@@ -77,7 +77,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var time = _functionTimingService.Execute(() => _nameSpaceService.BuildNamespaceTree(namespaces, string.Empty, namespaceTree));
 
             _logger.Debug($"Built namespace tree; {time.TotalMilliseconds:F1} ms to build.");
-            return namespaceTree.namespaces;
+            return namespaceTree.namespaces!;
         }
 
         private Dictionary<string, CodeGenNamespaceNode> TimedMemoizeNamespaceTree(CodeGenNamespaceNode[] namespaceTree) {
