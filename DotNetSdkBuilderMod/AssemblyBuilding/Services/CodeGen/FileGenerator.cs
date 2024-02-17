@@ -23,14 +23,16 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(namespaceNode.imports)) {
-                codeBuilder.AppendLine(namespaceNode.imports);
+            if (namespaceNode.imports is not null) {
+                foreach (var import in namespaceNode.imports) {
+                    codeBuilder.AppendLine(import);
+                }
             }
 
             codeBuilder.Append(NAMESPACE);
             codeBuilder.Append(WHITE_SPACE);
 
-            var fullyQualifiedNamespace = namespaceNode.fullNameSpace.TrimStart('/').Replace('/', '.');
+            var fullyQualifiedNamespace = namespaceNode.packageName.TrimStart('/').Replace('/', '.');
             codeBuilder.Append(fullyQualifiedNamespace);
 
             codeBuilder.Append(WHITE_SPACE);

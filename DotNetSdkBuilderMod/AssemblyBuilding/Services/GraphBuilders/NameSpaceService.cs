@@ -37,7 +37,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 var branchNamespace = rootLevel[x];
 
                 currentNode.namespaces[x] = new CodeGenNamespaceNode {
-                    fullNameSpace = fullBranchNamespace,
+                    packageName = fullBranchNamespace,
                     name = branchNamespace
                 };
 
@@ -58,14 +58,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         public void MemoizeNamespaceTree(CodeGenNamespaceNode currentNode, Dictionary<string, CodeGenNamespaceNode> namespacesMemo) {
-            namespacesMemo[currentNode.fullNameSpace] = currentNode;
+            namespacesMemo[currentNode.packageName] = currentNode;
 
-            if (currentNode.namespaces is null) {
-                return;
-            }
-
-            foreach (var namespaceNode in currentNode.namespaces) {
-                MemoizeNamespaceTree(namespaceNode, namespacesMemo);
+            if (currentNode.namespaces is not null) {
+                foreach (var namespaceNode in currentNode.namespaces) {
+                    MemoizeNamespaceTree(namespaceNode, namespacesMemo);
+                }
             }
         }
 
