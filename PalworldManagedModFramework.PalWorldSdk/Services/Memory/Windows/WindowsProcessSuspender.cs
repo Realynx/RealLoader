@@ -39,7 +39,23 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
                 if (pOpenThread == IntPtr.Zero) {
                     continue;
                 }
-                WindowsNativeMethods.ResumeThread(pOpenThread);
+                
+                uint suspendCount = 1;
+                uint trycount = 0;
+                
+                do {
+                    suspendCount = WindowsNativeMethods.ResumeThread(pOpenThread);
+                    trycount++;
+
+                } while (suspendCount > 0 &&  trycount < 5);
+
+                if (suspendCount == unchecked((uint)-1)) {
+                    var err = WindowsNativeMethods.GetLastError();
+                    throw new Exception($"Unable to resume thread error code: {err}");
+                } else if(suspendCount > 0) {
+                    throw new Exception($"Unable to resume thread suspendCount: {suspendCount}");
+                }
+
                 WindowsNativeMethods.CloseHandle(pOpenThread);
             }
         }
