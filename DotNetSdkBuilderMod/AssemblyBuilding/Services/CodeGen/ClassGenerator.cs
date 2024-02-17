@@ -11,14 +11,16 @@ using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConsta
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class ClassGenerator : IClassGenerator {
         private readonly ILogger _logger;
+        private readonly IAttributeGenerator _attributeGenerator;
         private readonly IConstructorGenerator _constructorGenerator;
         private readonly IPropertyGenerator _propertyGenerator;
         private readonly IMethodGenerator _methodGenerator;
         private readonly IOperatorGenerator _operatorGenerator;
 
-        public ClassGenerator(ILogger logger, IConstructorGenerator constructorGenerator, IPropertyGenerator propertyGenerator,
-            IMethodGenerator methodGenerator, IOperatorGenerator operatorGenerator) {
+        public ClassGenerator(ILogger logger, IAttributeGenerator attributeGenerator, IConstructorGenerator constructorGenerator,
+            IPropertyGenerator propertyGenerator, IMethodGenerator methodGenerator, IOperatorGenerator operatorGenerator) {
             _logger = logger;
+            _attributeGenerator = attributeGenerator;
             _constructorGenerator = constructorGenerator;
             _propertyGenerator = propertyGenerator;
             _methodGenerator = methodGenerator;
@@ -26,9 +28,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe void GenerateClass(StringBuilder codeBuilder, CodeGenClassNode classNode) {
-            if (classNode.attributes != null) {
+            if (classNode.attributes is not null) {
                 foreach (var attribute in classNode.attributes) {
-                    codeBuilder.AppendIndentedLine(attribute, 1);
+                    _attributeGenerator.GenerateAttribute(codeBuilder, attribute, 1);
                 }
             }
 

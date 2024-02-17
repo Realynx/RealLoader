@@ -1,35 +1,30 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Runtime.InteropServices;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.UnrealSdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
-using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
     public class CodeGenGraphBuilder : ICodeGenGraphBuilder {
         private readonly ILogger _logger;
-        private readonly IUnrealReflection _unrealReflection;
         private readonly INameSpaceService _nameSpaceService;
         private readonly IImportResolver _importResolver;
         private readonly IFunctionTimingService _functionTimingService;
-        private readonly INamePoolService _namePoolService;
+        private readonly ICodeGenAttributeNodeFactory _attributeNodeFactory;
+        private readonly ICodeGenClassNodeFactory _classNodeFactory;
 
-        public CodeGenGraphBuilder(ILogger logger, IUnrealReflection unrealReflection, INameSpaceService nameSpaceService,
-            IImportResolver importResolver, IFunctionTimingService functionTimingService, INamePoolService namePoolService) {
+        public CodeGenGraphBuilder(ILogger logger, INameSpaceService nameSpaceService, IImportResolver importResolver,
+            IFunctionTimingService functionTimingService, ICodeGenAttributeNodeFactory attributeNodeFactory, ICodeGenClassNodeFactory classNodeFactory) {
             _logger = logger;
-            _unrealReflection = unrealReflection;
             _nameSpaceService = nameSpaceService;
             _importResolver = importResolver;
             _functionTimingService = functionTimingService;
-            _namePoolService = namePoolService;
+            _attributeNodeFactory = attributeNodeFactory;
+            _classNodeFactory = classNodeFactory;
         }
 
         public CodeGenAssemblyNode[] BuildAssemblyGraphs(ClassNode rootNode) {
@@ -62,7 +57,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 assemblyNodes[i] = new CodeGenAssemblyNode {
                     namespaces = namespaceTree[i].namespaces!,
                     name = namespaceTree[i].name,
-                    attributes = new[] { GenerateAssemblyAttribute(COMPATIBLE_GAME_VERSION_ATTRIBUTE, "0.1.2") }, // TODO: Get game version
+                    attributes = new[] {
+                        _attributeNodeFactory.GenerateAssemblyAttribute(COMPATIBLE_GAME_VERSION_ATTRIBUTE, "0.1.2")
+                    }, // TODO: Get game version
                 };
             }
 
@@ -157,255 +154,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
                 for (var i = 0; i < classNodes.Count; i++) {
                     var currentClassNode = classNodes[i];
-                    codeGenClassNodes[i] = GenerateCodeGenClassNode(currentClassNode, castFlagNames);
+                    codeGenClassNodes[i] = _classNodeFactory.GenerateCodeGenClassNode(currentClassNode, castFlagNames);
                 }
 
                 namespaceNode.classes = codeGenClassNodes;
             }
-        }
-
-        private unsafe CodeGenClassNode GenerateCodeGenClassNode(ClassNode classNode, Dictionary<EClassCastFlags, string> castFlagNames) {
-            var className = _namePoolService.GetNameString(classNode.ClassName);
-
-            CodeGenConstructorNode[]? classConstructors = null;
-            // TODO: Gather constructors
-            if (true) {
-                var constructors = new List<CodeGenConstructorNode> {
-                    GenerateDefaultConstructor(classNode, className)
-                };
-                // constructors.Add(GenerateCodeGenConstructorNode());
-                classConstructors = constructors.ToArray();
-            }
-
-            var classProperties = classNode.properties;
-            CodeGenPropertyNode[]? properties = null;
-            if (classProperties.Length > 0) {
-                properties = new CodeGenPropertyNode[classProperties.Length];
-                for (var i = 0; i < classProperties.Length; i++) {
-                    properties[i] = GenerateCodeGenPropertyNode(classProperties[i]);
-                }
-            }
-
-            var classMethods = classNode.functions;
-            CodeGenMethodNode[]? methods = null;
-            if (classMethods.Length > 0) {
-                methods = new CodeGenMethodNode[classMethods.Length];
-                for (var i = 0; i < classMethods.Length; i++) {
-                    methods[i] = GenerateCodeGenMethodNode(classMethods[i]);
-                }
-            }
-
-            var modifiers = new StringBuilder(PUBLIC);
-            if (properties is not null || methods is not null) {
-                modifiers.Append($"{WHITE_SPACE}{UNSAFE}");
-            }
-            if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Abstract)) {
-                modifiers.Append($"{WHITE_SPACE}{ABSTRACT}");
-            }
-
-            var attributes = new List<string> { GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"{QUOTE}{classNode.packageName}/{className}{QUOTE}") };
-            if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Deprecated)) {
-                attributes.Add(GenerateAttribute(DEPRECATED_ATTRIBUTE));
-            }
-
-            var baseClass = classNode.nodeClass->baseUStruct.superStruct;
-            string? baseClassName = null;
-            if (baseClass is not null) {
-                baseClassName = _namePoolService.GetNameString(baseClass->ObjectName);
-            }
-
-            CodeGenOperatorNode[]? operators = null;
-            if (classNode.nodeClass->ClassCastFlags is not EClassCastFlags.CASTCLASS_None) {
-                var canCastTo = new List<string>();
-
-                var classCastFlags = (ulong)classNode.nodeClass->ClassCastFlags;
-                var castFlagsEnd = (ulong)EClassCastFlags.CASTCLASS_FLargeWorldCoordinatesRealProperty;
-                for (ulong i = 1; i < castFlagsEnd; i <<= 1) {
-                    if ((classCastFlags & i) == i) {
-                        var castClass = castFlagNames[(EClassCastFlags)i];
-                        if (!IsClassOrBaseClass(castClass, classNode.nodeClass->baseUStruct)) {
-                            canCastTo.Add(castClass);
-                        }
-                    }
-                }
-
-                if (canCastTo.Count > 0) {
-                    operators = new CodeGenOperatorNode[canCastTo.Count];
-                    for (var i = 0; i < canCastTo.Count; i++) {
-                        operators[i] = GenerateCastOperator(canCastTo[i], className);
-                    }
-                }
-            }
-
-            return new CodeGenClassNode {
-                constructorNodes = classConstructors,
-                propertyNodes = properties,
-                methodNodes = methods,
-                modifier = modifiers.ToString(),
-                name = className,
-                attributes = attributes.ToArray(),
-                baseType = baseClassName,
-                operatorNodes = operators,
-            };
-        }
-
-        private unsafe bool IsClassOrBaseClass(string otherClasName, UStruct uStruct) {
-            var structName = _namePoolService.GetNameString(uStruct.ObjectName);
-            if (structName == otherClasName) {
-                return true;
-            }
-
-            var baseClass = uStruct.superStruct;
-            if (baseClass is null) {
-                return false;
-            }
-
-            return IsClassOrBaseClass(otherClasName, *baseClass);
-        }
-
-        private unsafe CodeGenConstructorNode GenerateDefaultConstructor(ClassNode classNode, string className) {
-            string[]? attributes = null;
-
-            var arguments = new (string type, string name)[] {
-                (INT_PTR, CONSTRUCTOR_ADDRESS_NAME)
-            };
-
-            string? baseConstructor = null;
-            string[]? body = null;
-            if (classNode.nodeClass->baseUStruct.superStruct is not null) {
-                baseConstructor = $"{BASE}{OPEN_ROUND_BRACKET}{CONSTRUCTOR_ADDRESS_NAME}{CLOSED_ROUND_BRACKET}";
-            }
-            else {
-                body = new[] {
-                    $"{ADDRESS_FIELD_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{CONSTRUCTOR_ADDRESS_NAME}{SEMICOLON}"
-                };
-            }
-
-            return new CodeGenConstructorNode {
-                modifier = PUBLIC,
-                name = className,
-                attributes = attributes,
-                arguments = arguments,
-                baseConstructor = baseConstructor,
-                body = body,
-            };
-        }
-
-        private unsafe CodeGenConstructorNode GenerateCodeGenConstructorNode() {
-            // TODO
-            string name = null!;
-
-            string[]? attributes = null;
-
-            (string type, string name)[]? arguments = null;
-
-            string? baseConstructor = null;
-
-            string[]? body = null;
-
-            return new CodeGenConstructorNode
-            {
-                modifier = PUBLIC,
-                name = name,
-                attributes = attributes,
-                arguments = arguments,
-                baseConstructor = baseConstructor,
-                body = body,
-            };
-        }
-
-        private unsafe CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty* property) {
-            var propertyName = _namePoolService.GetNameString(property->ObjectName);
-
-            string[]? attributes = null;
-            if (property->propertyFlags.HasFlag(EPropertyFlags.CPF_Deprecated)) {
-                attributes = new[] { GenerateAttribute(DEPRECATED_ATTRIBUTE) };
-            }
-
-            var returnType = _namePoolService.GetNameString(property->baseFField.classPrivate->ObjectName);
-
-            var fieldOffset = property->offset_Internal;
-
-            var getter = $"{GET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{OPEN_ROUND_BRACKET}{ADDRESS_FIELD_NAME}{WHITE_SPACE}{PLUS}{WHITE_SPACE}{fieldOffset}{CLOSED_ROUND_BRACKET}{SEMICOLON}";
-            var setter = $"{SET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{OPEN_ROUND_BRACKET}{ADDRESS_FIELD_NAME}{WHITE_SPACE}{PLUS}{WHITE_SPACE}{fieldOffset}{CLOSED_ROUND_BRACKET}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{VALUE}{SEMICOLON}";
-
-            return new CodeGenPropertyNode {
-                modifier = PUBLIC,
-                name = propertyName,
-                attributes = attributes,
-                returnType = returnType,
-                get = getter,
-                set = setter,
-            };
-        }
-
-        private unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method) {
-            string modifiers;
-            if (method->functionFlags.HasFlag(EFunctionFlags.FUNC_Static)) {
-                modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}";
-            }
-            else {
-                modifiers = $"{PUBLIC}";
-            }
-
-            var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
-
-            string[]? attributes = null;
-
-            var parameters = _unrealReflection.GetFunctionSignature(method, out var returnValue);
-            string returnType;
-            if (returnValue is not null) {
-                var signatureName = returnValue->classPrivate->ObjectName;
-                var signatureString = _namePoolService.GetNameString(signatureName);
-                returnType = signatureString;
-            }
-            else {
-                returnType = VOID;
-            }
-
-            (string type, string name)[]? methodArgs = null;
-            if (parameters.Length > 0) {
-                methodArgs = new (string type, string name)[parameters.Length];
-                for (var i = 0; i < parameters.Length; i++) {
-                    var currentParam = parameters[i];
-                    var type = _namePoolService.GetNameString(currentParam->classPrivate->ObjectName);
-                    var name = _namePoolService.GetNameString(currentParam->ObjectName);
-                    methodArgs[i] = (type, name);
-                }
-            }
-
-            return new CodeGenMethodNode {
-                modifier = modifiers,
-                name = methodName,
-                attributes = attributes,
-                returnType = returnType,
-                arguments = methodArgs
-            };
-        }
-
-        private CodeGenOperatorNode GenerateCastOperator(string canCastTo, string className) {
-            var modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}{WHITE_SPACE}{EXPLICIT}{WHITE_SPACE}{OPERATOR}";
-            var result = $"{NEW}{WHITE_SPACE}{canCastTo}{OPEN_ROUND_BRACKET}{OPERATOR_THIS_CLASS_NAME}{DOT}{ADDRESS_FIELD_NAME}{CLOSED_ROUND_BRACKET}";
-
-            return new CodeGenOperatorNode {
-                name = className,
-                modifier = modifiers,
-                returnType = canCastTo,
-                attributes = null,
-                result = result,
-            };
-        }
-
-        private string GenerateAssemblyAttribute([ConstantExpected] string attributeName, string attributeValue) {
-            return $"{OPEN_SQUARE_BRACKET}{ASSEMBLY}{COLON}{WHITE_SPACE}{attributeName}{OPEN_ROUND_BRACKET}{attributeValue}{CLOSED_ROUND_BRACKET}{CLOSED_SQUARE_BRACKET}";
-        }
-
-        private string GenerateAttribute([ConstantExpected] string attributeName, string attributeValue) {
-            return $"{OPEN_SQUARE_BRACKET}{attributeName}{OPEN_ROUND_BRACKET}{attributeValue}{CLOSED_ROUND_BRACKET}{CLOSED_SQUARE_BRACKET}";
-        }
-
-        private string GenerateAttribute([ConstantExpected] string attributeName) {
-            return $"{OPEN_SQUARE_BRACKET}{attributeName}{CLOSED_SQUARE_BRACKET}";
         }
 
         private void TimedApplyImports(CodeGenNamespaceNode[] namespaceTree, Dictionary<string, string> classNamespaces) {

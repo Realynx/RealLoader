@@ -34,9 +34,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
                 .AddSingleton<INameSpaceService, NameSpaceService>()
                 .AddSingleton<IImportResolver, ImportResolver>()
 
+                .AddSingleton<ICodeGenAttributeNodeFactory, CodeGenAttributeNodeFactory>()
+                .AddSingleton<ICodeGenMethodNodeFactory, CodeGenMethodNodeFactory>()
+                .AddSingleton<ICodeGenPropertyNodeFactory, CodeGenPropertyNodeFactory>()
+                .AddSingleton<ICodeGenConstructorNodeFactory, CodeGenConstructorNodeFactory>()
+                .AddSingleton<ICodeGenClassNodeFactory, CodeGenClassNodeFactory>()
                 .AddSingleton<ICodeGenGraphBuilder, CodeGenGraphBuilder>()
                 .AddSingleton<ISourceCodeGenerator, SourceCodeGenerator>()
 
+                .AddSingleton<IAttributeGenerator, AttributeGenerator>()
                 .AddSingleton<IFileGenerator, FileGenerator>()
                 .AddSingleton<IClassGenerator, ClassGenerator>()
                 .AddSingleton<IConstructorGenerator, ConstructorGenerator>()
