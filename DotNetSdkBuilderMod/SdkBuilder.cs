@@ -3,7 +3,7 @@
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 
 namespace DotNetSdkBuilderMod {
