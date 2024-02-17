@@ -219,9 +219,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                     }
                 }
 
-                operators = new CodeGenOperatorNode[canCastTo.Count];
-                for (var i = 0; i < canCastTo.Count; i++) {
-                    operators[i] = GenerateCastOperator(canCastTo[i], className);
+                if (canCastTo.Count > 0) {
+                    operators = new CodeGenOperatorNode[canCastTo.Count];
+                    for (var i = 0; i < canCastTo.Count; i++) {
+                        operators[i] = GenerateCastOperator(canCastTo[i], className);
+                    }
                 }
             }
 

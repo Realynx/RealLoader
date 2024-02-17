@@ -18,7 +18,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public string[]? imports;
     }
 
-    [DebuggerDisplay("{baseType} {name}: {propertyNodes?.Length ?? 0} props, {methodNodes?.Length ?? 0} methods")]
+    [DebuggerDisplay("{baseType} {name}: {propertyNodes?.Length ?? 0} props, {methodNodes?.Length ?? 0} methods, {operators?.Length ?? 0} operators")]
     public class CodeGenClassNode : CodeGenCodeObjectNode {
         public CodeGenPropertyNode[]? propertyNodes;
         public CodeGenMethodNode[]? methodNodes;
