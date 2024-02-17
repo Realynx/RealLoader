@@ -22,7 +22,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
         [DllImport("kernel32.dll")]
         public static extern uint SuspendThread(IntPtr hThread);
 
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", SetLastError = true)]
         public static extern uint ResumeThread(IntPtr hThread);
 
         [DllImport("kernel32.dll", SetLastError = true)]
