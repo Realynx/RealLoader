@@ -32,6 +32,7 @@
         internal const string PROTECTED = "protected";
         internal const string INTERNAL = "internal";
         internal const string STATIC = "static";
+        internal const string UNSAFE = "unsafe";
         internal const string VOID = "void";
         internal const string INT_PTR = "nint";
         internal const string GET = "get";

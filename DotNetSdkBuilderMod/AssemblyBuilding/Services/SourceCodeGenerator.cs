@@ -48,8 +48,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             var classFile = new StringBuilder();
 
             _fileGenerator.GenerateFile(classFile, namespaceNode);
-            // _logger.Debug(classFile.ToString());
-            sw.WriteLine(classFile.ToString());
+            if (classFile.Length > 0) {
+                // _logger.Debug(classFile.ToString());
+                sw.WriteLine(classFile.ToString());
+                sw.WriteLine();
+            }
 
             if (namespaceNode.namespaces is not null) {
                 foreach (var node in namespaceNode.namespaces) {

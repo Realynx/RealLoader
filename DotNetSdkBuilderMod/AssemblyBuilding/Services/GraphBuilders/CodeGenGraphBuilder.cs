@@ -162,6 +162,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 }
             }
 
+            string modifiers;
+            if (properties is not null || methods is not null) {
+                modifiers = $"{PUBLIC}{WHITE_SPACE}{UNSAFE}";
+            }
+            else {
+                modifiers = $"{PUBLIC}";
+            }
+
             var className = _namePoolService.GetNameString(classNode.ClassName);
 
             var attributes = new[] {
@@ -177,7 +185,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             return new CodeGenClassNode {
                 propertyNodes = properties,
                 methodNodes = methods,
-                modifer = PUBLIC,
+                modifer = modifiers,
                 name = className,
                 attributes = attributes,
                 baseType = baseClassName
