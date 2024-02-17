@@ -191,7 +191,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 modifiers.Append($"{WHITE_SPACE}{ABSTRACT}");
             }
 
-            var className = _namePoolService.GetNameString(classNode.ClassName).Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase);
+            var className = _namePoolService.GetNameString(classNode.ClassName).Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase);
 
             var attributes = new List<string> { GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"{QUOTE}{classNode.packageName}/{className}{QUOTE}") };
             if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Deprecated)) {
@@ -251,7 +251,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private unsafe CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty* property) {
-            var propertyName = _namePoolService.GetNameString(property->ObjectName).Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase);
+            var propertyName = _namePoolService.GetNameString(property->ObjectName).Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase);
 
             string[]? attributes = null;
             if (property->propertyFlags.HasFlag(EPropertyFlags.CPF_Deprecated)) {
@@ -284,7 +284,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 modifiers = $"{PUBLIC}";
             }
 
-            var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName).Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase);
+            var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName).Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase);
 
             string[]? attributes = null;
 
