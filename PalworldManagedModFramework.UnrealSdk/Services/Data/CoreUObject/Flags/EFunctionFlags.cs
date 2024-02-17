@@ -1,4 +1,4 @@
-﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags {
+﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags {
     /// <summary>
     /// <see href="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/CoreUObject/Public/UObject/Script.h#L127"/>
     /// </summary>

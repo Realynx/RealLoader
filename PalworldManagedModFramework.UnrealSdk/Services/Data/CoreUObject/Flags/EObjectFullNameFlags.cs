@@ -1,4 +1,4 @@
-﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags {
+﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags {
     /// <summary>
     /// Enum which specifies the mode in which full object names are constructed
     /// |

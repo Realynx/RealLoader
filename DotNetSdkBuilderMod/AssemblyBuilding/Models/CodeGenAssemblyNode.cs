@@ -22,6 +22,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     public class CodeGenClassNode : CodeGenCodeObjectNode {
         public CodeGenPropertyNode[]? propertyNodes;
         public CodeGenMethodNode[]? methodNodes;
+        public CodeGenOperatorNode[]? operators;
 
         public string? baseType;
     }
@@ -39,9 +40,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public (string type, string name)[]? arguments;
     }
 
+    [DebuggerDisplay("{modifier} {returnType}({name}) => {result}")]
+    public class CodeGenOperatorNode : CodeGenCodeObjectNode {
+        public string returnType;
+        public string result;
+    }
+
     public class CodeGenCodeObjectNode {
         public string[]? attributes;
-        public string modifer;
+        public string modifier;
         public string name;
     }
 }

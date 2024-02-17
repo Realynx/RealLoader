@@ -1,7 +1,8 @@
-﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags {
+﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags {
     /// <summary>
     /// <see href="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h#L187"/>
     /// </summary>
+    [Flags]
     public enum EClassFlags : uint {
         /// <summary> No Flags </summary>
         CLASS_None = 0x00000000u,

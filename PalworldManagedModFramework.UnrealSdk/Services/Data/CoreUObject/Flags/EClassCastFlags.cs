@@ -1,7 +1,8 @@
-﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags {
+﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags {
     /// <summary>
     /// <see href="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h#L317"/>
     /// </summary>
+    [Flags]
     public enum EClassCastFlags : ulong {
         CASTCLASS_None = 0x0000000000000000,
         CASTCLASS_UField = 0x0000000000000001,

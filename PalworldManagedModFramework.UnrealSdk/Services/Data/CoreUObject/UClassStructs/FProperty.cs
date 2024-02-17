@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags;
 
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameStructs;
 

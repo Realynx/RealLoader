@@ -1,4 +1,4 @@
-﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags {
+﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags {
     public enum ELifetimeCondition : byte {
         COND_None = 0x0,
         COND_InitialOnly = 0x1,

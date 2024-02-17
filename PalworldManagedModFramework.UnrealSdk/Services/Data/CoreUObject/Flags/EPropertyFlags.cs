@@ -1,7 +1,8 @@
-﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags {
+﻿namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags {
     /// <summary>
     /// <see cref="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h#L393"/>
     /// </summary>
+    [Flags]
     public enum EPropertyFlags : ulong {
         CPF_None = 0,
 

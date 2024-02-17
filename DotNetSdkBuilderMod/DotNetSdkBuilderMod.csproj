@@ -11,18 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="AssemblyBuilding\Services\Interfaces\INamespaceGenerator.cs" />
-    <Compile Remove="AssemblyBuilding\Services\NameSpaceGenerator.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="AssemblyBuilding\Services\CodeGen\NewFile1.txt" />
-    <None Remove="AssemblyBuilding\Services\GraphBuilders\NameSpaceGenerator" />
-    <None Remove="AssemblyBuilding\Services\GraphBuilders\NewFile1.txt" />
-    <None Remove="AssemblyBuilding\Services\Interfaces\NewFile1.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.Sdk.csproj" />
     <ProjectReference Include="..\PalworldManagedModFramework.UnrealSdk\PalworldManagedModFramework.UnrealSdk.csproj" />
   </ItemGroup>
@@ -45,6 +33,7 @@
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SdkBuilderDir)' != ''">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SdkBuilderDir)" OverwriteReadOnlyFiles="true" />
+    <Copy SourceFiles="$(TargetDir)\SdkBuilderConfig.json" DestinationFolder="$(SdkBuilderDir)" OverwriteReadOnlyFiles="true" />
     <Exec Command="echo Copied SdkBuilder successfully" />
   </Target>
 

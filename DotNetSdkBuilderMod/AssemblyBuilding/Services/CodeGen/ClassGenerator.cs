@@ -13,11 +13,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private readonly ILogger _logger;
         private readonly IPropertyGenerator _propertyGenerator;
         private readonly IMethodGenerator _methodGenerator;
+        private readonly IOperatorGenerator _operatorGenerator;
 
-        public ClassGenerator(ILogger logger, IPropertyGenerator propertyGenerator, IMethodGenerator methodGenerator) {
+        public ClassGenerator(ILogger logger, IPropertyGenerator propertyGenerator, IMethodGenerator methodGenerator, IOperatorGenerator operatorGenerator) {
             _logger = logger;
             _propertyGenerator = propertyGenerator;
             _methodGenerator = methodGenerator;
+            _operatorGenerator = operatorGenerator;
         }
 
         public unsafe void GenerateClass(StringBuilder codeBuilder, CodeGenClassNode classNode) {
@@ -27,7 +29,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
-            codeBuilder.AppendIndented(classNode.modifer, 1);
+            codeBuilder.AppendIndented(classNode.modifier, 1);
             codeBuilder.Append(WHITE_SPACE);
 
             codeBuilder.Append(CLASS);
@@ -44,7 +46,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 codeBuilder.Append(WHITE_SPACE);
             }
 
-            if (classNode.propertyNodes is null && classNode.methodNodes is null) {
+            if (classNode.propertyNodes is null && classNode.methodNodes is null && classNode.operators is null) {
                 codeBuilder.Append(OPEN_CURLY_BRACKET);
                 codeBuilder.Append(WHITE_SPACE);
                 codeBuilder.AppendLine(CLOSED_CURLY_BRACKET);
@@ -67,7 +69,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
-            if (classNode.propertyNodes is not null || classNode.methodNodes is not null) {
+            if (classNode.operators is not null) {
+                foreach (var classOperator in classNode.operators) {
+                    _operatorGenerator.GenerateOperator(codeBuilder, classOperator);
+                    codeBuilder.AppendLine();
+                }
+            }
+
+            if (classNode.propertyNodes is not null || classNode.methodNodes is not null || classNode.operators is not null) {
                 // Remove trailing newline between members end and class closing bracket
                 codeBuilder.RemoveLine();
             }

@@ -1,12 +1,13 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.UnrealSdk.Services;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
@@ -44,8 +45,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             _logger.Debug("Building namespace-classes dictionary...");
             var namespaceClasses = TimedNamespaceClassesMemoize(rootNode);
 
+            _logger.Debug("Building class cast flag dictionary...");
+            var castFlagNames = TimedCastFlagNameMemoize();
+
             _logger.Debug("Applying classes to namespace tree...");
-            TimedAddClassesToNamespaces(namespaceClasses, memoizedNamespaceNodes);
+            TimedAddClassesToNamespaces(namespaceClasses, memoizedNamespaceNodes, castFlagNames);
 
             _logger.Debug("Building class-namespace dictionary...");
             var classNamespaces = TimedMemoizeTypeNamespaces(rootNode);
@@ -124,27 +128,43 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             }
         }
 
-        private void TimedAddClassesToNamespaces(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo) {
-            var time = _functionTimingService.Execute(() => PopulateNamespaceClasses(namespaceClassesMemo, namespacesMemo));
+        private Dictionary<EClassCastFlags, string> TimedCastFlagNameMemoize() {
+            var castFlagNames = new Dictionary<EClassCastFlags, string>();
+            var time = _functionTimingService.Execute(() => {
+                var names = Enum.GetNames<EClassCastFlags>();
+                var values = Enum.GetValues<EClassCastFlags>();
+
+                // Skip the first value
+                for (var i = 1; i < names.Length; i++) {
+                    castFlagNames[values[i]] = names[i].Substring(11);
+                }
+            });
+
+            _logger.Debug($"Memoized cast flag names; {time.TotalMilliseconds:F1} ms to build.");
+            return castFlagNames;
+        }
+
+        private void TimedAddClassesToNamespaces(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo, Dictionary<EClassCastFlags, string> castFlagNames) {
+            var time = _functionTimingService.Execute(() => PopulateNamespaceClasses(namespaceClassesMemo, namespacesMemo, castFlagNames));
 
             _logger.Debug($"Applied classes to namespace tree; {time.TotalMilliseconds:F1} ms to build.");
         }
 
-        private void PopulateNamespaceClasses(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo) {
+        private void PopulateNamespaceClasses(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo, Dictionary<EClassCastFlags, string> castFlagNames) {
             foreach (var (nameSpace, classNodes) in namespaceClassesMemo) {
                 var namespaceNode = namespacesMemo[nameSpace];
                 var codeGenClassNodes = new CodeGenClassNode[classNodes.Count];
 
                 for (var i = 0; i < classNodes.Count; i++) {
                     var currentClassNode = classNodes[i];
-                    codeGenClassNodes[i] = GenerateCodeGenClassNode(currentClassNode);
+                    codeGenClassNodes[i] = GenerateCodeGenClassNode(currentClassNode, castFlagNames);
                 }
 
                 namespaceNode.classes = codeGenClassNodes;
             }
         }
 
-        private unsafe CodeGenClassNode GenerateCodeGenClassNode(ClassNode classNode) {
+        private unsafe CodeGenClassNode GenerateCodeGenClassNode(ClassNode classNode, Dictionary<EClassCastFlags, string> castFlagNames) {
             var classProperties = classNode.properties;
             CodeGenPropertyNode[]? properties = null;
             if (classProperties.Length > 0) {
@@ -163,12 +183,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 }
             }
 
-            string modifiers;
+            var modifiers = new StringBuilder(PUBLIC);
             if (properties is not null || methods is not null) {
-                modifiers = $"{PUBLIC}{WHITE_SPACE}{UNSAFE}";
+                modifiers.Append($"{WHITE_SPACE}{UNSAFE}");
             }
-            else {
-                modifiers = $"{PUBLIC}";
+            if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Abstract)) {
+                modifiers.Append($"{WHITE_SPACE}{ABSTRACT}");
             }
 
             var className = _namePoolService.GetNameString(classNode.ClassName).Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase);
@@ -184,14 +204,50 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 baseClassName = _namePoolService.GetNameString(baseClass->ObjectName);
             }
 
+            CodeGenOperatorNode[]? operators = null;
+            if (classNode.nodeClass->ClassCastFlags is not EClassCastFlags.CASTCLASS_None) {
+                var canCastTo = new List<string>();
+
+                var classCastFlags = (ulong)classNode.nodeClass->ClassCastFlags;
+                var castFlagsEnd = (ulong)EClassCastFlags.CASTCLASS_FLargeWorldCoordinatesRealProperty;
+                for (ulong i = 1; i < castFlagsEnd; i <<= 1) {
+                    if ((classCastFlags & i) == i) {
+                        var castClass = castFlagNames[(EClassCastFlags)i];
+                        if (!IsClassOrBaseClass(castClass, classNode.nodeClass->baseUStruct)) {
+                            canCastTo.Add(castClass);
+                        }
+                    }
+                }
+
+                operators = new CodeGenOperatorNode[canCastTo.Count];
+                for (var i = 0; i < canCastTo.Count; i++) {
+                    operators[i] = GenerateCastOperator(canCastTo[i], className);
+                }
+            }
+
             return new CodeGenClassNode {
                 propertyNodes = properties,
                 methodNodes = methods,
-                modifer = modifiers,
+                modifier = modifiers.ToString(),
                 name = className,
                 attributes = attributes.ToArray(),
-                baseType = baseClassName
+                baseType = baseClassName,
+                operators = operators,
             };
+        }
+
+        private unsafe bool IsClassOrBaseClass(string otherClasName, UStruct uStruct) {
+            var structName = _namePoolService.GetNameString(uStruct.ObjectName);
+            if (structName == otherClasName) {
+                return true;
+            }
+
+            var baseClass = uStruct.superStruct;
+            if (baseClass is null) {
+                return false;
+            }
+
+            return IsClassOrBaseClass(otherClasName, *baseClass);
         }
 
         private unsafe CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty* property) {
@@ -210,7 +266,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var setter = $"{SET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{OPEN_ROUND_BRACKET}{ADDRESS_FIELD_NAME}{WHITE_SPACE}{PLUS}{WHITE_SPACE}{fieldOffset}{CLOSED_ROUND_BRACKET}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{VALUE}{SEMICOLON}";
 
             return new CodeGenPropertyNode {
-                modifer = PUBLIC,
+                modifier = PUBLIC,
                 name = propertyName,
                 attributes = attributes,
                 returnType = returnType,
@@ -220,6 +276,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method) {
+            string modifiers;
+            if (method->functionFlags.HasFlag(EFunctionFlags.FUNC_Static)) {
+                modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}";
+            }
+            else {
+                modifiers = $"{PUBLIC}";
+            }
+
             var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName).Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase);
 
             string[]? attributes = null;
@@ -247,11 +311,24 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             }
 
             return new CodeGenMethodNode {
-                modifer = PUBLIC,
+                modifier = modifiers,
                 name = methodName,
                 attributes = attributes,
                 returnType = returnType,
                 arguments = methodArgs
+            };
+        }
+
+        private CodeGenOperatorNode GenerateCastOperator(string canCastTo, string className) {
+            var modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}{WHITE_SPACE}{EXPLICIT}{WHITE_SPACE}{OPERATOR}";
+            var result = $"{NEW}{WHITE_SPACE}{canCastTo}{OPEN_ROUND_BRACKET}{OPERATOR_THIS_CLASS_NAME}{DOT}{ADDRESS_FIELD_NAME}{CLOSED_ROUND_BRACKET}";
+
+            return new CodeGenOperatorNode {
+                name = className,
+                modifier = modifiers,
+                returnType = canCastTo,
+                attributes = null,
+                result = result,
             };
         }
 
