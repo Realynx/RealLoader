@@ -3,7 +3,6 @@
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameStructs;
 
 namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs {
-
     /// <summary>
     /// <see href="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h#L361"/>
     /// |
@@ -16,6 +15,7 @@ namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClass
                 return baseUfield.baseUObject.namePrivate.comparisonIndex;
             }
         }
+
         // Inherits
         public UField baseUfield;
 
@@ -83,13 +83,12 @@ namespace PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClass
         /// </summary>
         public FProperty* postConstructLink;
 
-
         /// <summary>
         /// Array of object references embedded in script code and referenced by FProperties. Mirrored for easy access by realtime garbage collection code
         /// </summary>
         public TArray<nint> scriptAndPropertyObjectReferences;
 
-        // 	typedef TArray<TPair<TFieldPath<FField>, int32>> FUnresolvedScriptPropertiesArray;
+        // typedef TArray<TPair<TFieldPath<FField>, int32>> FUnresolvedScriptPropertiesArray;
         public void* unresolvedScriptProperties;
 
         /// <summary>

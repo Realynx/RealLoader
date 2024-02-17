@@ -6,6 +6,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.UnrealSdk.Services;
+using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FLags;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
@@ -172,9 +173,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
             var className = _namePoolService.GetNameString(classNode.ClassName).Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase);
 
-            var attributes = new[] {
-                GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"{QUOTE}{classNode.packageName}/{className}{QUOTE}")
-            };
+            var attributes = new List<string> { GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"{QUOTE}{classNode.packageName}/{className}{QUOTE}") };
+            if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Deprecated)) {
+                attributes.Add(GenerateAttribute(DEPRECATED_ATTRIBUTE));
+            }
 
             var baseClass = classNode.nodeClass->baseUStruct.superStruct;
             string? baseClassName = null;
@@ -187,7 +189,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 methodNodes = methods,
                 modifer = modifiers,
                 name = className,
-                attributes = attributes,
+                attributes = attributes.ToArray(),
                 baseType = baseClassName
             };
         }
@@ -196,6 +198,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var propertyName = _namePoolService.GetNameString(property->ObjectName).Replace(" ", "-", StringComparison.InvariantCultureIgnoreCase);
 
             string[]? attributes = null;
+            if (property->propertyFlags.HasFlag(EPropertyFlags.CPF_Deprecated)) {
+                attributes = new[] { GenerateAttribute(DEPRECATED_ATTRIBUTE) };
+            }
 
             var returnType = _namePoolService.GetNameString(property->baseFField.classPrivate->ObjectName);
 
@@ -256,6 +261,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
         private string GenerateAttribute([ConstantExpected] string attributeName, string attributeValue) {
             return $"{OPEN_SQUARE_BRACKET}{attributeName}{OPEN_ROUND_BRACKET}{attributeValue}{CLOSED_ROUND_BRACKET}{CLOSED_SQUARE_BRACKET}";
+        }
+
+        private string GenerateAttribute([ConstantExpected] string attributeName) {
+            return $"{OPEN_SQUARE_BRACKET}{attributeName}{CLOSED_SQUARE_BRACKET}";
         }
 
         private void TimedApplyImports(CodeGenNamespaceNode[] namespaceTree, Dictionary<string, string> classNamespaces) {
