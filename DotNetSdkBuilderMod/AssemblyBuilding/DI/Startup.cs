@@ -39,6 +39,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
 
                 .AddSingleton<IFileGenerator, FileGenerator>()
                 .AddSingleton<IClassGenerator, ClassGenerator>()
+                .AddSingleton<IConstructorGenerator, ConstructorGenerator>()
                 .AddSingleton<IPropertyGenerator, PropertyGenerator>()
                 .AddSingleton<IMethodGenerator, MethodGenerator>()
                 .AddSingleton<IOperatorGenerator, OperatorGenerator>();

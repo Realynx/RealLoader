@@ -165,6 +165,18 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private unsafe CodeGenClassNode GenerateCodeGenClassNode(ClassNode classNode, Dictionary<EClassCastFlags, string> castFlagNames) {
+            var className = _namePoolService.GetNameString(classNode.ClassName);
+
+            CodeGenConstructorNode[]? classConstructors = null;
+            // TODO: Gather constructors
+            if (true) {
+                var constructors = new List<CodeGenConstructorNode> {
+                    GenerateDefaultConstructor(classNode, className)
+                };
+                // constructors.Add(GenerateCodeGenConstructorNode());
+                classConstructors = constructors.ToArray();
+            }
+
             var classProperties = classNode.properties;
             CodeGenPropertyNode[]? properties = null;
             if (classProperties.Length > 0) {
@@ -190,8 +202,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Abstract)) {
                 modifiers.Append($"{WHITE_SPACE}{ABSTRACT}");
             }
-
-            var className = _namePoolService.GetNameString(classNode.ClassName).Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase);
 
             var attributes = new List<string> { GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"{QUOTE}{classNode.packageName}/{className}{QUOTE}") };
             if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Deprecated)) {
@@ -228,13 +238,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             }
 
             return new CodeGenClassNode {
+                constructorNodes = classConstructors,
                 propertyNodes = properties,
                 methodNodes = methods,
                 modifier = modifiers.ToString(),
                 name = className,
                 attributes = attributes.ToArray(),
                 baseType = baseClassName,
-                operators = operators,
+                operatorNodes = operators,
             };
         }
 
@@ -252,8 +263,59 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             return IsClassOrBaseClass(otherClasName, *baseClass);
         }
 
+        private unsafe CodeGenConstructorNode GenerateDefaultConstructor(ClassNode classNode, string className) {
+            string[]? attributes = null;
+
+            var arguments = new (string type, string name)[] {
+                (INT_PTR, CONSTRUCTOR_ADDRESS_NAME)
+            };
+
+            string? baseConstructor = null;
+            string[]? body = null;
+            if (classNode.nodeClass->baseUStruct.superStruct is not null) {
+                baseConstructor = $"{BASE}{OPEN_ROUND_BRACKET}{CONSTRUCTOR_ADDRESS_NAME}{CLOSED_ROUND_BRACKET}";
+            }
+            else {
+                body = new[] {
+                    $"{ADDRESS_FIELD_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{CONSTRUCTOR_ADDRESS_NAME}{SEMICOLON}"
+                };
+            }
+
+            return new CodeGenConstructorNode {
+                modifier = PUBLIC,
+                name = className,
+                attributes = attributes,
+                arguments = arguments,
+                baseConstructor = baseConstructor,
+                body = body,
+            };
+        }
+
+        private unsafe CodeGenConstructorNode GenerateCodeGenConstructorNode() {
+            // TODO
+            string name = null!;
+
+            string[]? attributes = null;
+
+            (string type, string name)[]? arguments = null;
+
+            string? baseConstructor = null;
+
+            string[]? body = null;
+
+            return new CodeGenConstructorNode
+            {
+                modifier = PUBLIC,
+                name = name,
+                attributes = attributes,
+                arguments = arguments,
+                baseConstructor = baseConstructor,
+                body = body,
+            };
+        }
+
         private unsafe CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty* property) {
-            var propertyName = _namePoolService.GetNameString(property->ObjectName).Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase);
+            var propertyName = _namePoolService.GetNameString(property->ObjectName);
 
             string[]? attributes = null;
             if (property->propertyFlags.HasFlag(EPropertyFlags.CPF_Deprecated)) {
@@ -286,7 +348,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 modifiers = $"{PUBLIC}";
             }
 
-            var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName).Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase);
+            var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
 
             string[]? attributes = null;
 

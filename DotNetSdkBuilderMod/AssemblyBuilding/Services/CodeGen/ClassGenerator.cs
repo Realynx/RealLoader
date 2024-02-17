@@ -11,12 +11,15 @@ using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConsta
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class ClassGenerator : IClassGenerator {
         private readonly ILogger _logger;
+        private readonly IConstructorGenerator _constructorGenerator;
         private readonly IPropertyGenerator _propertyGenerator;
         private readonly IMethodGenerator _methodGenerator;
         private readonly IOperatorGenerator _operatorGenerator;
 
-        public ClassGenerator(ILogger logger, IPropertyGenerator propertyGenerator, IMethodGenerator methodGenerator, IOperatorGenerator operatorGenerator) {
+        public ClassGenerator(ILogger logger, IConstructorGenerator constructorGenerator, IPropertyGenerator propertyGenerator,
+            IMethodGenerator methodGenerator, IOperatorGenerator operatorGenerator) {
             _logger = logger;
+            _constructorGenerator = constructorGenerator;
             _propertyGenerator = propertyGenerator;
             _methodGenerator = methodGenerator;
             _operatorGenerator = operatorGenerator;
@@ -46,7 +49,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 codeBuilder.Append(WHITE_SPACE);
             }
 
-            if (classNode.propertyNodes is null && classNode.methodNodes is null && classNode.operators is null) {
+            if (classNode.constructorNodes is null && classNode.propertyNodes is null && classNode.methodNodes is null && classNode.operatorNodes is null) {
                 codeBuilder.Append(OPEN_CURLY_BRACKET);
                 codeBuilder.Append(WHITE_SPACE);
                 codeBuilder.AppendLine(CLOSED_CURLY_BRACKET);
@@ -54,6 +57,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
 
             codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
+            if (classNode.constructorNodes is not null) {
+                foreach (var constructor in classNode.constructorNodes) {
+                    _constructorGenerator.GenerateConstructor(codeBuilder, constructor);
+                    codeBuilder.AppendLine();
+                }
+            }
 
             if (classNode.propertyNodes is not null) {
                 foreach (var property in classNode.propertyNodes) {
@@ -69,14 +78,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
-            if (classNode.operators is not null) {
-                foreach (var classOperator in classNode.operators) {
+            if (classNode.operatorNodes is not null) {
+                foreach (var classOperator in classNode.operatorNodes) {
                     _operatorGenerator.GenerateOperator(codeBuilder, classOperator);
                     codeBuilder.AppendLine();
                 }
             }
 
-            if (classNode.propertyNodes is not null || classNode.methodNodes is not null || classNode.operators is not null) {
+            if (classNode.constructorNodes is not null || classNode.propertyNodes is not null || classNode.methodNodes is not null || classNode.operatorNodes is not null) {
                 // Remove trailing newline between members end and class closing bracket
                 codeBuilder.RemoveLine();
             }

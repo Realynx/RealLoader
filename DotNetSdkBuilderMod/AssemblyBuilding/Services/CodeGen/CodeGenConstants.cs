@@ -37,6 +37,7 @@
         internal const string IMPLICIT = "implicit";
         internal const string UNSAFE = "unsafe";
         internal const string ABSTRACT = "abstract";
+        internal const string BASE = "base";
         internal const string VOID = "void";
         internal const string INT_PTR = "nint";
         internal const string GET = "get";
@@ -45,6 +46,7 @@
         internal const string DELEGATE = "delegate";
         internal const string CODE_NAMESPACE = "DotNetSdkBuilderMod.Generated";
         internal const string ADDRESS_FIELD_NAME = "Address";
+        internal const string CONSTRUCTOR_ADDRESS_NAME = "address";
         internal const string OPERATOR_THIS_CLASS_NAME = "self"; // I don't like this but I can't think of anything better
         internal const string FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE = "FullTypePath";
         internal const string COMPATIBLE_GAME_VERSION_ATTRIBUTE = "CompatibleGameVersion";

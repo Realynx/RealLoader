@@ -18,13 +18,21 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public string[]? imports;
     }
 
-    [DebuggerDisplay("{baseType} {name}: {propertyNodes?.Length ?? 0} props, {methodNodes?.Length ?? 0} methods, {operators?.Length ?? 0} operators")]
+    [DebuggerDisplay("{baseType} {name}: {constructorNodes?.Length ?? 0} ctors, {propertyNodes?.Length ?? 0} props, {methodNodes?.Length ?? 0} methods, {operatorNodes?.Length ?? 0} operators")]
     public class CodeGenClassNode : CodeGenCodeObjectNode {
+        public CodeGenConstructorNode[]? constructorNodes;
         public CodeGenPropertyNode[]? propertyNodes;
         public CodeGenMethodNode[]? methodNodes;
-        public CodeGenOperatorNode[]? operators;
+        public CodeGenOperatorNode[]? operatorNodes;
 
         public string? baseType;
+    }
+
+    [DebuggerDisplay("{name}: {arguments?.Length ?? 0} arguments")]
+    public class CodeGenConstructorNode : CodeGenCodeObjectNode {
+        public (string type, string name)[]? arguments;
+        public string? baseConstructor;
+        public string[]? body;
     }
 
     [DebuggerDisplay("{returnType} {name} {get}, {set}")]
