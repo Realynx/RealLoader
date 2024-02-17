@@ -75,7 +75,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             var resolvedAddress = _operandResolver.ResolveInstructionAddress(patternOffsetAddress, patternMask.operandOffset, machineCodeAttribute);
 
             if (instance is not null) {
-                if (machineCodeAttribute.PatternType == OperandType.Function) {
+                if (machineCodeAttribute.PatternType == PatternType.Function) {
                     var delegateValue = Marshal
                         .GetDelegateForFunctionPointer(resolvedAddress, member.PropertyType);
                     member.SetValue(instance, delegateValue);

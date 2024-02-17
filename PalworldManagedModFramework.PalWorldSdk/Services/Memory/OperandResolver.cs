@@ -14,21 +14,21 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
 
         public unsafe nint ResolveInstructionAddress(nint matchedAddress, nint operandOffset, MachineCodePatternAttribute patternAttribute) {
             switch (patternAttribute.PatternType) {
-                case OperandType.DirectAddress_32:
+                case PatternType.DirectAddress_32:
                     var operandAddressValue = *(int*)(matchedAddress + operandOffset - 4);
                     return operandAddressValue;
 
-                case OperandType.IP_RelativeOffset_32:
+                case PatternType.IP_RelativeOffset_32:
                     var operandRelativeOffset = *(int*)(matchedAddress + operandOffset - 4);
                     return matchedAddress + operandOffset + operandRelativeOffset;
 
                 // TODO: This is untested and possibly YAGNI
-                case OperandType.Base_RelativeOffset_32:
+                case PatternType.Base_RelativeOffset_32:
                     operandRelativeOffset = *(int*)(matchedAddress + operandOffset - 4);
                     var baseAddress = _memoryMapper.GetBaseAddress();
                     return baseAddress + operandRelativeOffset;
 
-                case OperandType.Function:
+                case PatternType.Function:
                     return matchedAddress + operandOffset;
             }
 

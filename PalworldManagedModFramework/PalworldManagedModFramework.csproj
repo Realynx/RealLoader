@@ -20,6 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Iced" Version="1.21.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 		<PackageReference Include="Microsoft.NETCore.DotNetAppHost" Version="8.0.1" />

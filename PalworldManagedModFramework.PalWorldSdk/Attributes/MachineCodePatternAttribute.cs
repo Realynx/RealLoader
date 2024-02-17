@@ -2,16 +2,16 @@
     [AttributeUsage(AttributeTargets.Property)]
     public class MachineCodePatternAttribute : Attribute {
 
-        public MachineCodePatternAttribute(string pattern, OperandType patternType) {
+        public MachineCodePatternAttribute(string pattern, PatternType patternType) {
             Pattern = pattern;
             PatternType = patternType;
         }
 
         public string Pattern { get; }
-        public OperandType PatternType { get; }
+        public PatternType PatternType { get; }
     }
 
-    public enum OperandType {
+    public enum PatternType {
         Function,
         DirectAddress_32,
         IP_RelativeOffset_32,
