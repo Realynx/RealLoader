@@ -5,7 +5,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     public class CodeGenAssemblyNode {
         public CodeGenNamespaceNode[] namespaces;
         public string name;
-        public string[]? attributes;
+        public CodeGenAttributeNode[]? attributes;
     }
 
     [DebuggerDisplay("{packageName}: {namespaces?.Length ?? 0} sub-namespaces, {classes?.Length ?? 0} classes, {imports?.Length ?? 0} imports")]
@@ -18,13 +18,21 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public string[]? imports;
     }
 
-    [DebuggerDisplay("{baseType} {name}: {propertyNodes?.Length ?? 0} props, {methodNodes?.Length ?? 0} methods, {operators?.Length ?? 0} operators")]
+    [DebuggerDisplay("{baseType} {name}: {constructorNodes?.Length ?? 0} ctors, {propertyNodes?.Length ?? 0} props, {methodNodes?.Length ?? 0} methods, {operatorNodes?.Length ?? 0} operators")]
     public class CodeGenClassNode : CodeGenCodeObjectNode {
+        public CodeGenConstructorNode[]? constructorNodes;
         public CodeGenPropertyNode[]? propertyNodes;
         public CodeGenMethodNode[]? methodNodes;
-        public CodeGenOperatorNode[]? operators;
+        public CodeGenOperatorNode[]? operatorNodes;
 
         public string? baseType;
+    }
+
+    [DebuggerDisplay("{name}: {arguments?.Length ?? 0} arguments")]
+    public class CodeGenConstructorNode : CodeGenCodeObjectNode {
+        public (string type, string name)[]? arguments;
+        public string? baseConstructor;
+        public string[]? body;
     }
 
     [DebuggerDisplay("{returnType} {name} {get}, {set}")]
@@ -46,8 +54,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public string result;
     }
 
+    [DebuggerDisplay("[{name}({value})]")]
+    public class CodeGenAttributeNode {
+        public string name;
+        public string? value;
+    }
+
     public class CodeGenCodeObjectNode {
-        public string[]? attributes;
+        public CodeGenAttributeNode[]? attributes;
         public string modifier;
         public string name;
     }
