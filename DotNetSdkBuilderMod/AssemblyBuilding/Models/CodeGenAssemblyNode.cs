@@ -30,7 +30,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
 
     [DebuggerDisplay("{name}: {arguments?.Length ?? 0} arguments")]
     public class CodeGenConstructorNode : CodeGenCodeObjectNode {
-        public (string type, string name)[]? arguments;
+        public CodeGenArgumentNode[]? arguments;
         public string? baseConstructor;
         public string[]? body;
     }
@@ -45,7 +45,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     [DebuggerDisplay("{returnType} {name}: {arguments?.Length ?? 0} arguments")]
     public class CodeGenMethodNode : CodeGenCodeObjectNode {
         public string returnType;
-        public (string type, string name)[]? arguments;
+        public CodeGenArgumentNode[]? arguments;
     }
 
     [DebuggerDisplay("{modifier} {returnType}({name}) => {result}")]
@@ -56,8 +56,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
 
     [DebuggerDisplay("[{name}({value})]")]
     public class CodeGenAttributeNode {
+        public string nameSpace;
         public string name;
         public string? value;
+    }
+
+    [DebuggerDisplay("{type} {name}")]
+    public class CodeGenArgumentNode {
+        public string type;
+        public string name;
     }
 
     public class CodeGenCodeObjectNode {

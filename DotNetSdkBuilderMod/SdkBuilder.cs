@@ -23,7 +23,7 @@ namespace DotNetSdkBuilderMod {
             _logger.Debug("Loading SDK Builder!");
 
             _logger.Debug("Waiting for classes to load into memory...");
-            Thread.Sleep(TimeSpan.FromSeconds(10));
+            Thread.Sleep(TimeSpan.FromSeconds(7));
             _logger.Debug("Done sleeping");
 
             _sourceCodeGenerator.BuildSourceCode();

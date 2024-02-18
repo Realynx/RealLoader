@@ -17,7 +17,20 @@ namespace DotNetSdkBuilderMod.Extensions {
         }
 
         public static StringBuilder RemoveLine(this StringBuilder sb) {
+            if (sb.Length < Environment.NewLine.Length) {
+                return sb;
+            }
+
             return sb.Remove(sb.Length - Environment.NewLine.Length, Environment.NewLine.Length);
+        }
+
+        public static StringBuilder TrimStart(this StringBuilder sb, char character) {
+            var removeLength = 0;
+            while (sb.Length > removeLength + 1 && sb[removeLength] == character) {
+                removeLength++;
+            }
+
+            return sb.Remove(0, removeLength);
         }
     }
 }

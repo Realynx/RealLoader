@@ -15,8 +15,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         public unsafe CodeGenConstructorNode GenerateDefaultConstructor(ClassNode classNode, string className) {
             CodeGenAttributeNode[]? attributes = null;
 
-            var arguments = new (string type, string name)[] {
-                (INT_PTR, CONSTRUCTOR_ADDRESS_NAME)
+            var arguments = new[] {
+                new CodeGenArgumentNode {
+                    type = INT_PTR,
+                    name = CONSTRUCTOR_ADDRESS_NAME
+                }
             };
 
             string? baseConstructor = null;
@@ -46,7 +49,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             CodeGenAttributeNode[]? attributes = null;
 
-            (string type, string name)[]? arguments = null;
+            CodeGenArgumentNode[]? arguments = null;
 
             string? baseConstructor = null;
 

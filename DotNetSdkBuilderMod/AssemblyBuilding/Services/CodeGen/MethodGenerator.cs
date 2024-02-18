@@ -12,10 +12,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class MethodGenerator : IMethodGenerator {
         private readonly ILogger _logger;
         private readonly IAttributeGenerator _attributeGenerator;
+        private readonly IArgumentGenerator _argumentGenerator;
 
-        public MethodGenerator(ILogger logger, IAttributeGenerator attributeGenerator) {
+        public MethodGenerator(ILogger logger, IAttributeGenerator attributeGenerator, IArgumentGenerator argumentGenerator) {
             _logger = logger;
             _attributeGenerator = attributeGenerator;
+            _argumentGenerator = argumentGenerator;
         }
 
         public unsafe void GenerateMethod(StringBuilder codeBuilder, CodeGenMethodNode methodNode) {
@@ -36,8 +38,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             codeBuilder.Append(OPEN_ROUND_BRACKET);
 
             if (methodNode.arguments is not null) {
-                var joinedArgs = string.Join($"{COMMA}{WHITE_SPACE}", methodNode.arguments.Select(x => $"{x.type}{WHITE_SPACE}{x.name}"));
-                codeBuilder.Append(joinedArgs);
+                _argumentGenerator.GenerateArguments(codeBuilder, methodNode.arguments);
             }
 
             codeBuilder.Append(CLOSED_ROUND_BRACKET);

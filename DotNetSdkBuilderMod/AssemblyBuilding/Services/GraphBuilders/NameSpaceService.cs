@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
@@ -78,6 +79,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             foreach (var child in currentNode.children) {
                 MemoizeTypeNamespaces(child, memo);
             }
+        }
+
+        public Dictionary<string, string> MemoizeAssemblyTypeNamespaces(Assembly assembly) {
+            var memo = new Dictionary<string, string>();
+            foreach (var type in assembly.GetTypes()) {
+                memo[type.Name] = type.Namespace!;
+            }
+
+            return memo;
         }
     }
 }

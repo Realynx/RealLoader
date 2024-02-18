@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
@@ -47,10 +48,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             TimedAddClassesToNamespaces(namespaceClasses, memoizedNamespaceNodes, castFlagNames);
 
             _logger.Debug("Building class-namespace dictionary...");
-            var classNamespaces = TimedMemoizeTypeNamespaces(rootNode);
+            var customClassNamespaces = TimedMemoizeTypeNamespaces(rootNode);
+
+            _logger.Debug("Building dotnet class-namespace dictionary...");
+            var dotnetClassNamespaces = TimedMemoizeDotnetTypeNamespaces();
 
             _logger.Debug("Applying imports...");
-            TimedApplyImports(namespaceTree, classNamespaces);
+            TimedApplyImports(namespaceTree, customClassNamespaces, dotnetClassNamespaces);
 
             var assemblyNodes = new CodeGenAssemblyNode[namespaceTree.Length];
             for (var i = 0; i < namespaceTree.Length; i++) {
@@ -99,6 +103,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var time = _functionTimingService.Execute(() => _nameSpaceService.MemoizeTypeNamespaces(rootNode, memoizedClassesAndNamespaces));
 
             _logger.Debug($"Memoized classes and namespaces; {time.TotalMilliseconds:F1} ms to build.");
+            return memoizedClassesAndNamespaces;
+        }
+
+        private Dictionary<string, string> TimedMemoizeDotnetTypeNamespaces() {
+            var assembly = Assembly.GetAssembly(typeof(string))!;
+            var time = _functionTimingService.Execute(() => _nameSpaceService.MemoizeAssemblyTypeNamespaces(assembly), out var memoizedClassesAndNamespaces);
+
+            _logger.Debug($"Memoized dotnet classes and namespaces; {time.TotalMilliseconds:F1} ms to build.");
             return memoizedClassesAndNamespaces;
         }
 
@@ -161,10 +173,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             }
         }
 
-        private void TimedApplyImports(CodeGenNamespaceNode[] namespaceTree, Dictionary<string, string> classNamespaces) {
+        private void TimedApplyImports(CodeGenNamespaceNode[] namespaceTree, Dictionary<string, string> customClassNamespaces, Dictionary<string, string> dotnetClassNamespaces) {
             var time = _functionTimingService.Execute(() => {
                 foreach (var namespaceNode in namespaceTree) {
-                    _importResolver.ApplyImports(namespaceNode, classNamespaces);
+                    _importResolver.ApplyImports(namespaceNode, customClassNamespaces, dotnetClassNamespaces);
                 }
             });
 

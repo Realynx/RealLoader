@@ -44,14 +44,19 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 returnType = VOID;
             }
 
-            (string type, string name)[]? methodArgs = null;
+            CodeGenArgumentNode[]? methodArgs = null;
             if (parameters.Length > 0) {
-                methodArgs = new (string type, string name)[parameters.Length];
+                methodArgs = new CodeGenArgumentNode[parameters.Length];
                 for (var i = 0; i < parameters.Length; i++) {
                     var currentParam = parameters[i];
+
                     var type = _namePoolService.GetNameString(currentParam->classPrivate->ObjectName);
                     var name = _namePoolService.GetNameString(currentParam->ObjectName);
-                    methodArgs[i] = (type, name);
+
+                    methodArgs[i] = new CodeGenArgumentNode {
+                        type = type,
+                        name = name
+                    };
                 }
             }
 

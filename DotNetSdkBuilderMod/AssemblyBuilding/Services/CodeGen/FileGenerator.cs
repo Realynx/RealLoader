@@ -27,6 +27,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 foreach (var import in namespaceNode.imports) {
                     codeBuilder.AppendLine(import);
                 }
+
+                codeBuilder.AppendLine();
             }
 
             codeBuilder.Append(NAMESPACE);

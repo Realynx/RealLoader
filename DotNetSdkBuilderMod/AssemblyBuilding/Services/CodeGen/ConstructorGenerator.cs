@@ -4,10 +4,20 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 using DotNetSdkBuilderMod.Extensions;
 
+using PalworldManagedModFramework.Sdk.Logging;
+
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class ConstructorGenerator : IConstructorGenerator {
+        private readonly ILogger _logger;
+        private readonly IArgumentGenerator _argumentGenerator;
+
+        public ConstructorGenerator(ILogger logger, IArgumentGenerator argumentGenerator) {
+            _logger = logger;
+            _argumentGenerator = argumentGenerator;
+        }
+
         public void GenerateConstructor(StringBuilder codeBuilder, CodeGenConstructorNode constructorNode) {
             codeBuilder.AppendIndented(constructorNode.modifier, 2);
             codeBuilder.Append(WHITE_SPACE);
@@ -16,8 +26,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             codeBuilder.Append(OPEN_ROUND_BRACKET);
 
             if (constructorNode.arguments is not null) {
-                var joinedArgs = string.Join($"{COMMA}{WHITE_SPACE}", constructorNode.arguments.Select(x => $"{x.type}{WHITE_SPACE}{x.name}"));
-                codeBuilder.Append(joinedArgs);
+                _argumentGenerator.GenerateArguments(codeBuilder, constructorNode.arguments);
             }
 
             codeBuilder.Append(CLOSED_ROUND_BRACKET);

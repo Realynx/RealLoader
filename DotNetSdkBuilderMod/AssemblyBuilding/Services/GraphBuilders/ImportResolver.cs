@@ -1,70 +1,137 @@
+using System.Text;
+
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
+using DotNetSdkBuilderMod.Extensions;
+
+using PalworldManagedModFramework.Sdk.Logging;
 
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
     public class ImportResolver : IImportResolver {
-        public void ApplyImports(CodeGenNamespaceNode current, Dictionary<string, string> classNamespaces) {
-            var imports = new HashSet<string>();
+        private readonly ILogger _logger;
 
-            // Lord have mercy on my soul for the amount of indentation
-            if (current.classes is not null) {
-                foreach (var classNode in current.classes) {
-                    if (classNode.baseType != null) {
-                        TryAddClassAsImport(classNode.baseType);
+        public ImportResolver(ILogger logger) {
+            _logger = logger;
+        }
+
+        public void ApplyImports(CodeGenNamespaceNode currentNode, Dictionary<string, string> customClassNamespaces, Dictionary<string, string> dotnetClassNamespaces) {
+            if (currentNode.classes is not null) {
+                var imports = new HashSet<string>();
+
+                foreach (var classNode in currentNode.classes) {
+                    ResolveImportsForClass(classNode, currentNode.packageName, imports, customClassNamespaces, dotnetClassNamespaces);
+                }
+
+                if (imports.Count > 0) {
+                    var namespaceImports = new string[imports.Count];
+                    var i = 0;
+                    foreach (var package in imports) {
+                        var import = new StringBuilder(package)
+                            .TrimStart('/')
+                            .Replace('/', '.')
+                            .ToString();
+
+                        namespaceImports[i] = $"{USING}{WHITE_SPACE}{import}{SEMICOLON}";
+                        i++;
                     }
 
-                    if (classNode.propertyNodes is not null) {
-                        foreach (var propertyNode in classNode.propertyNodes) {
-                            TryAddClassAsImport(propertyNode.returnType);
+                    currentNode.imports = namespaceImports;
+                }
+            }
+
+            if (currentNode.namespaces is not null) {
+                foreach (var child in currentNode.namespaces) {
+                    ApplyImports(child, customClassNamespaces, dotnetClassNamespaces);
+                }
+            }
+        }
+
+        private static void ResolveImportsForClass(CodeGenClassNode classNode, string currentPackage, HashSet<string> imports, Dictionary<string, string> customClassNamespaces, Dictionary<string, string> dotnetClassNamespaces) {
+            if (classNode.attributes is not null) {
+                foreach (var attributeNode in classNode.attributes) {
+                    TryAddAttributeAsImport(attributeNode.name, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
+                }
+            }
+
+            if (classNode.baseType is not null) {
+                TryAddClassAsImport(classNode.baseType, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
+            }
+
+            if (classNode.constructorNodes is not null) {
+                foreach (var constructorNode in classNode.constructorNodes) {
+                    if (constructorNode.arguments is not null) {
+                        foreach (var argumentNode in constructorNode.arguments) {
+                            TryAddClassAsImport(argumentNode.type, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
+                        }
+                    }
+                }
+            }
+
+            if (classNode.propertyNodes is not null) {
+                foreach (var propertyNode in classNode.propertyNodes) {
+                    TryAddClassAsImport(propertyNode.returnType, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
+
+                    if (propertyNode.attributes is not null) {
+                        foreach (var attributeNode in propertyNode.attributes) {
+                            TryAddAttributeAsImport(attributeNode.name, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
+                        }
+                    }
+                }
+            }
+
+            if (classNode.methodNodes is not null) {
+                foreach (var methodNode in classNode.methodNodes) {
+                    var returnType = methodNode.returnType;
+                    if (returnType != VOID) {
+                        TryAddClassAsImport(returnType, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
+                    }
+
+                    if (methodNode.attributes is not null) {
+                        foreach (var attributeNode in methodNode.attributes) {
+                            TryAddAttributeAsImport(attributeNode.name, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
                         }
                     }
 
-                    if (classNode.methodNodes is not null) {
-                        foreach (var methodNode in classNode.methodNodes) {
-                            var returnType = methodNode.returnType;
-                            if (returnType != VOID) {
-                                TryAddClassAsImport(returnType);
-                            }
-
-                            if (methodNode.arguments is not null) {
-                                foreach (var arg in methodNode.arguments) {
-                                    TryAddClassAsImport(arg.type);
-                                }
-                            }
+                    if (methodNode.arguments is not null) {
+                        foreach (var argumentNode in methodNode.arguments) {
+                            TryAddClassAsImport(argumentNode.type, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
                         }
                     }
                 }
             }
 
-            if (imports.Count > 0) {
-                var namespaceImports = new string[imports.Count];
-                var i = 0;
-                foreach (var package in imports) {
-                    var import = package
-                        .TrimStart('/')
-                        .Replace('/', '.');
-
-                    namespaceImports[i] = $"{USING}{WHITE_SPACE}{import}{SEMICOLON}";
-                    i++;
-                }
-
-                current.imports = namespaceImports;
-            }
-
-            if (current.namespaces is not null) {
-                foreach (var child in current.namespaces) {
-                    ApplyImports(child, classNamespaces);
+            if (classNode.operatorNodes is not null) {
+                foreach (var operatorNode in classNode.operatorNodes) {
+                    TryAddClassAsImport(operatorNode.returnType, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
                 }
             }
+        }
 
-            void TryAddClassAsImport(string className) {
-                var currentNameSpace = current.packageName;
+        private static void TryAddClassAsImport(string className, string currentPackage, HashSet<string> imports, Dictionary<string, string> customClassNamespaces, Dictionary<string, string> dotnetClassNamespaces) {
+            if (className == VOID) {
+                return;
+            }
 
-                if (classNamespaces.TryGetValue(className, out var classNamespace) && !currentNameSpace.StartsWith(classNamespace)) {
-                    imports.Add(classNamespace);
-                }
+            if (customClassNamespaces.TryGetValue(className, out var customClassNamespace) && !currentPackage.StartsWith(customClassNamespace)) {
+                imports.Add(customClassNamespace);
+            }
+
+            if (dotnetClassNamespaces.TryGetValue(className, out var dotnetClassNamespace)) {
+                imports.Add(dotnetClassNamespace);
+            }
+        }
+
+        private static void TryAddAttributeAsImport(string attributeName, string currentPackage, HashSet<string> imports, Dictionary<string, string> customClassNamespaces, Dictionary<string, string> dotnetClassNamespaces) {
+            var attributeType = $"{attributeName}Attribute";
+
+            if (customClassNamespaces.TryGetValue(attributeType, out var customClassNamespace) && !currentPackage.StartsWith(customClassNamespace)) {
+                imports.Add(customClassNamespace);
+            }
+
+            if (dotnetClassNamespaces.TryGetValue(attributeType, out var dotnetClassNamespace)) {
+                imports.Add(dotnetClassNamespace);
             }
         }
     }
