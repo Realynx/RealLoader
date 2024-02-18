@@ -11,15 +11,19 @@ using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConsta
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class MethodGenerator : IMethodGenerator {
         private readonly ILogger _logger;
+        private readonly IAttributeGenerator _attributeGenerator;
+        private readonly IArgumentGenerator _argumentGenerator;
 
-        public MethodGenerator(ILogger logger) {
+        public MethodGenerator(ILogger logger, IAttributeGenerator attributeGenerator, IArgumentGenerator argumentGenerator) {
             _logger = logger;
+            _attributeGenerator = attributeGenerator;
+            _argumentGenerator = argumentGenerator;
         }
 
         public unsafe void GenerateMethod(StringBuilder codeBuilder, CodeGenMethodNode methodNode) {
-            if (methodNode.attributes != null) {
+            if (methodNode.attributes is not null) {
                 foreach (var attribute in methodNode.attributes) {
-                    codeBuilder.AppendIndentedLine(attribute, 2);
+                    _attributeGenerator.GenerateAttribute(codeBuilder, attribute, 2);
                 }
             }
 
@@ -34,8 +38,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             codeBuilder.Append(OPEN_ROUND_BRACKET);
 
             if (methodNode.arguments is not null) {
-                var joinedArgs = string.Join($"{COMMA}{WHITE_SPACE}", methodNode.arguments.Select(x => $"{x.type}{WHITE_SPACE}{x.name}"));
-                codeBuilder.Append(joinedArgs);
+                _argumentGenerator.GenerateArguments(codeBuilder, methodNode.arguments);
             }
 
             codeBuilder.Append(CLOSED_ROUND_BRACKET);

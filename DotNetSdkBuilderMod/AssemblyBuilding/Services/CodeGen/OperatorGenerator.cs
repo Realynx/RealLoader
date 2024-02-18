@@ -4,10 +4,18 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 using DotNetSdkBuilderMod.Extensions;
 
+using PalworldManagedModFramework.Sdk.Logging;
+
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class OperatorGenerator : IOperatorGenerator {
+        private readonly ILogger _logger;
+
+        public OperatorGenerator(ILogger logger) {
+            _logger = logger;
+        }
+
         public void GenerateOperator(StringBuilder codeBuilder, CodeGenOperatorNode operatorNode) {
             codeBuilder.AppendIndented(operatorNode.modifier, 2);
             codeBuilder.Append(WHITE_SPACE);

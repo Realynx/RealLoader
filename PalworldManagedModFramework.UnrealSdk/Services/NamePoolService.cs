@@ -35,10 +35,10 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
             var nameEntry = GetName(fnameEntryId);
 
             if (nameEntry->header.BIsWide) {
-                return Encoding.Unicode.GetString(&nameEntry->stringContents, nameEntry->header.Len);
+                return Encoding.Unicode.GetString(&nameEntry->stringContents, nameEntry->header.Len).Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase);
             }
             else {
-                return Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len);
+                return Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len).Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase);
             }
         }
     }

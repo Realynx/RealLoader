@@ -1,4 +1,5 @@
 ﻿using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
@@ -42,18 +43,23 @@ namespace PalworldManagedModFramework.UnrealSdk.Services {
 
         public unsafe FField*[] GetFunctionSignature(UFunction* uFunction, out FField* returnValue) {
             var hasReturnProperty = uFunction->returnValueOffset != 0xffff;
+            var returnValueAddress = uFunction->baseUstruct.childProperties + uFunction->returnValueOffset;
+
+            returnValue = (FField*)IntPtr.Zero;
 
             var childProps = new List<nint>();
             for (FField* currentProp = uFunction->baseUstruct.childProperties; currentProp is not null; currentProp = currentProp->next) {
-                childProps.Add((nint)currentProp);
+                if (hasReturnProperty && currentProp == returnValueAddress) {
+                    returnValue = currentProp;
+                }
+                else {
+                    childProps.Add((nint)currentProp);
+                }
             }
 
-            returnValue = (FField*)(hasReturnProperty ? childProps[0] : IntPtr.Zero);
-
-            var offset = hasReturnProperty ? 1 : 0;
-            var parameters = new FField*[childProps.Count - offset];
-            for (var x = offset; x < parameters.Length + offset; x++) {
-                parameters[x - offset] = (FField*)childProps[x];
+            var parameters = new FField*[childProps.Count];
+            for (var x = 0; x < parameters.Length; x++) {
+                parameters[x] = (FField*)childProps[x];
             }
 
             return parameters;

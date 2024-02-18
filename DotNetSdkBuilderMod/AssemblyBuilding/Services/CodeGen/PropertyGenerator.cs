@@ -11,15 +11,17 @@ using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConsta
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class PropertyGenerator : IPropertyGenerator {
         private readonly ILogger _logger;
+        private readonly IAttributeGenerator _attributeGenerator;
 
-        public PropertyGenerator(ILogger logger) {
+        public PropertyGenerator(ILogger logger, IAttributeGenerator attributeGenerator) {
             _logger = logger;
+            _attributeGenerator = attributeGenerator;
         }
 
         public unsafe void GenerateProperty(StringBuilder codeBuilder, CodeGenPropertyNode propertyNode) {
-            if (propertyNode.attributes != null) {
+            if (propertyNode.attributes is not null) {
                 foreach (var attribute in propertyNode.attributes) {
-                    codeBuilder.AppendIndentedLine(attribute, 2);
+                    _attributeGenerator.GenerateAttribute(codeBuilder, attribute, 2);
                 }
             }
 
