@@ -43,7 +43,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
         public static extern bool SetWindowPos(IntPtr handle, IntPtr relativeToOtherHandle, int x, int y, int with, int height, SetWindowsPosFlags flags);
     }
 
-    public class WindowsStructs {
+    public static class WindowsStructs {
         [StructLayout(LayoutKind.Sequential)]
         public struct MEMORY_BASIC_INFORMATION64 {
             public ulong BaseAddress;
