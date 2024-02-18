@@ -8,6 +8,7 @@ using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConsta
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class CodeGenConstructorNodeFactory : ICodeGenConstructorNodeFactory {
         private readonly ILogger _logger;
+
         public CodeGenConstructorNodeFactory(ILogger logger) {
             _logger = logger;
         }
@@ -18,7 +19,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             var arguments = new[] {
                 new CodeGenArgumentNode {
                     type = INT_PTR,
-                    name = CONSTRUCTOR_ADDRESS_NAME
+                    name = CONSTRUCTOR_ADDRESS_NAME,
+                    attributes = null,
                 }
             };
 

@@ -56,13 +56,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
 
     [DebuggerDisplay("[{name}({value})]")]
     public class CodeGenAttributeNode {
-        public string nameSpace;
         public string name;
         public string? value;
     }
 
     [DebuggerDisplay("{type} {name}")]
     public class CodeGenArgumentNode {
+        public CodeGenAttributeNode[]? attributes;
         public string type;
         public string name;
     }
