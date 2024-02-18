@@ -11,13 +11,14 @@ namespace PalworldManagedModFramework.Services.Detour.Models {
             PTrampoline = pTrampoline;
         }
 
-        public byte[] OriginalCodes { get; set; }
+        public byte[] OriginalCodes { get; }
         public byte* PHook { get; }
         public int HookSize { get; }
         public nint Redirect { get; }
         public byte* PTrampoline { get; }
 
         public void Dispose() {
+            //TODO: Setup calling uninstall on parent factory.
             Marshal.FreeHGlobal((nint)PTrampoline);
         }
     }

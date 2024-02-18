@@ -12,8 +12,12 @@ using PalworldManagedModFramework.Sdk.Services.Memory.Windows;
 
 using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
+using PalworldManagedModFramework.Services.Detour;
 using PalworldManagedModFramework.Services.Detour.AssemblerServices;
 using PalworldManagedModFramework.Services.Detour.AssemblerServices.Interfaces;
+using PalworldManagedModFramework.Services.Detour.Interfaces;
+using PalworldManagedModFramework.Services.Detour.Linux;
+using PalworldManagedModFramework.Services.Detour.Windows;
 using PalworldManagedModFramework.Services.MemoryScanning;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning.Linux;
@@ -44,7 +48,8 @@ namespace PalworldManagedModFramework.DI {
                     //.AddSingleton<IUObjectFuncs, LinuxUObjectFuncs>()
                     .AddSingleton<IProcessSuspender, LinuxProcessSuspender>()
                     .AddSingleton<IMemoryMapper, LinuxMemoryMapper>()
-                    .AddSingleton<IMemoryScanner, LinuxMemoryScanner>();
+                    .AddSingleton<IMemoryScanner, LinuxMemoryScanner>()
+                    .AddSingleton<IMemoryAllocate, LinuxMemoryAllocate>();
             }
             else if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
                 services
@@ -52,20 +57,25 @@ namespace PalworldManagedModFramework.DI {
                     .AddSingleton<IUObjectFuncs, WindowsUObjectFuncs>()
                     .AddSingleton<IProcessSuspender, WindowsProcessSuspender>()
                     .AddSingleton<IMemoryMapper, WindowsMemoryMapper>()
-                    .AddSingleton<IMemoryScanner, WindowsMemoryScanner>();
+                    .AddSingleton<IMemoryScanner, WindowsMemoryScanner>()
+                    .AddSingleton<IMemoryAllocate, WindowsMemoryAllocate>();
             }
 
 
             //To be tested on both OS
-            services.AddSingleton<IShellCodeFactory, ShellCodeFactory>();
+            services
+                .AddSingleton<IShellCodeFactory, ShellCodeFactory>();
 
 
             services
+                .AddSingleton<ILogger, Logger>()
+
                 .AddSingleton<IOperandResolver, OperandResolver>()
                 .AddSingleton<IPatternResolver, PatternResolver>()
                 .AddSingleton<PatternScanner>()
                 .AddSingleton<ISequenceScanner, SequenceScanner>()
-                .AddSingleton<ILogger, Logger>()
+                .AddSingleton<IStackHookService, StackHookService>()
+
                 .AddSingleton<IAssemblyDiscovery, AssemblyDiscovery>()
                 .AddSingleton<IModLoader, ModLoader>()
                 .AddSingleton<ISandboxDIService, SandboxDIService>()

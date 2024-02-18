@@ -13,9 +13,6 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
 
         [DllImport("libc.so.6", SetLastError = true, EntryPoint = "waitpid")]
         public static extern int WaitPid(int pid, out int status, int options);
-
-        [DllImport("libc.so.6", SetLastError = true, EntryPoint = "mprotect")]
-        public static extern int MemoryProtect(IntPtr addr, UIntPtr length, LinuxStructs.MProtectProtect protect);
     }
 
     public static class LinuxStructs {
@@ -81,21 +78,6 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
             EDOM = 33,           // Math argument out of domain of func
             ERANGE = 34,         // Math result not representable
                                  // Add more as needed
-        }
-
-        [Flags]
-        public enum MProtectProtect {
-            PROT_NONE = 0,  // The memory cannot be accessed at all.
-            PROT_READ = 1 << 0,  // The memory can be read.
-            PROT_WRITE = 1 << 1, // The memory can be modified.
-            PROT_EXEC = 1 << 2,  // The memory can be executed.
-        }
-
-        public enum MProtectErrors {
-            EACCES, // The memory cannot be given the specified access. This can happen, for example, if you mmap(2) a file to which you have read-only access, then ask mprotect() to mark it PROT_WRITE.
-            EINVAL, // addr is not a valid pointer, or not a multiple of the system page size.
-            ENOMEM, // Internal kernel structures could not be allocated.
-            ENOMEM2, // Addresses in the range [addr, addr+len-1] are invalid for the address space of the process, or specify one or more pages that are not mapped.
         }
     }
 }

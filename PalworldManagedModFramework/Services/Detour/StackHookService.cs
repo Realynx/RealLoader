@@ -1,19 +1,20 @@
-﻿using System.Runtime.InteropServices;
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 using PalworldManagedModFramework.Services.Detour.AssemblerServices.Interfaces;
+using PalworldManagedModFramework.Services.Detour.Interfaces;
 using PalworldManagedModFramework.Services.Detour.Models;
 
 namespace PalworldManagedModFramework.Services.Detour {
-    public class StackHookService {
+    public class StackHookService : IStackHookService {
         private readonly ILogger _logger;
         private readonly IShellCodeFactory _shellCodeFactory;
+        private readonly IMemoryAllocate _memoryAllocate;
         private readonly List<InstalledHook> _installedHooks = new();
 
-        public StackHookService(ILogger logger, IShellCodeFactory shellCodeFactory) {
+        public StackHookService(ILogger logger, IShellCodeFactory shellCodeFactory, IMemoryAllocate memoryAllocate) {
             _logger = logger;
             _shellCodeFactory = shellCodeFactory;
+            _memoryAllocate = memoryAllocate;
         }
 
         public unsafe void InstallHook(nint hookAddress, nint redirect) {
@@ -24,13 +25,19 @@ namespace PalworldManagedModFramework.Services.Detour {
             var overwrittenCodes = OverwriteBytes(hookAddress, hookInstructionBytes);
             var reExecuteAddress = hookAddress + hookInstructionBytes.Length;
 
-            var reEntryInstructions = _shellCodeFactory.BuildTrampoline64(overwrittenCodes, reExecuteAddress);
-            var trampoline = Marshal.AllocHGlobal(reEntryInstructions.Length);
-
-            //TODO: Set Vprotect To execute
+            var trampolineCodes = _shellCodeFactory.BuildTrampoline64(overwrittenCodes, reExecuteAddress);
+            var trampoline = _memoryAllocate.Allocate(MemoryProtection.Execute, (uint)trampolineCodes.Length);
 
             var installedHook = new InstalledHook(overwrittenCodes, (byte*)hookAddress, hookInstructionBytes.Length, redirect, (byte*)trampoline);
             _installedHooks.Add(installedHook);
+        }
+
+        public unsafe void UninstallHook(InstalledHook installedHook) {
+            _installedHooks.Remove(installedHook);
+            // TODO: Check these bytes match the real detour bytes safe check?
+            var detourBytes = OverwriteBytes((nint)installedHook.PHook, installedHook.OriginalCodes);
+
+            _memoryAllocate.Free((nint)installedHook.PHook);
         }
 
         private unsafe byte[] OverwriteBytes(nint hookAddress, byte[] hookInstructionBytes) {
@@ -42,15 +49,6 @@ namespace PalworldManagedModFramework.Services.Detour {
             }
 
             return overwrittenInstructions;
-        }
-
-        public unsafe void UninstallHook(InstalledHook installedHook) {
-            _installedHooks.Remove(installedHook);
-            var detourBytes = OverwriteBytes((nint)installedHook.PHook, installedHook.OriginalCodes);
-
-            //TODO: Reset Vprotect?
-
-            Marshal.FreeHGlobal((nint)installedHook.PTrampoline);
         }
     }
 }
