@@ -60,7 +60,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public string? value;
     }
 
-    [DebuggerDisplay("{type} {name}")]
+    [DebuggerDisplay("{type} {name}, {attributes?.Length ?? 0} attributes")]
     public class CodeGenArgumentNode {
         public CodeGenAttributeNode[]? attributes;
         public string type;

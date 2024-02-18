@@ -4,7 +4,7 @@ namespace PalworldManagedModFramework.Services.Detour.Linux {
     public static class NativeFunctions {
 
         [DllImport("libc.so.6", SetLastError = true, EntryPoint = "mmap")]
-        public static extern IntPtr MemoryMap(nint addr, nuint length, MProtectProtect protect, MMapFlags flags, int fileDescriptor, int offset);
+        public static extern nint MemoryMap(nint addr, nuint length, MProtectProtect protect, MMapFlags flags, int fileDescriptor, int offset);
 
         [DllImport("libc.so.6", SetLastError = true, EntryPoint = "munmap")]
         public static extern int MemoryUnmap(nint addr, nuint length);
@@ -42,6 +42,27 @@ namespace PalworldManagedModFramework.Services.Detour.Linux {
             MAP_STACK,
             MAP_SYNC,
             MAP_UNINITIALIZED,
+        }
+
+        public enum MMapErrors {
+            EACCES,
+            EAGAIN,
+            EBADF,
+            EEXIST,
+            EINVAL,
+            EINVAL2,
+            EINVAL3,
+            ENFILE,
+            ENODEV,
+            ENOMEM,
+            ENOMEM2,
+            ENOMEM3,
+            EOVERFLOW,
+            EPERM,
+            EPERM2,
+            ETXTBSY,
+            SIGSEGV,
+            SIGBUS,
         }
     }
 }

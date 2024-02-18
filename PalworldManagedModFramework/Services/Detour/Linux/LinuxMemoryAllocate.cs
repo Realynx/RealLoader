@@ -2,7 +2,6 @@
 
 using PalworldManagedModFramework.Services.Detour.Models;
 
-using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
 using PalworldManagedModFramework.Services.Detour.Interfaces;
 
 using static PalworldManagedModFramework.Services.Detour.Linux.NativeFunctions;
@@ -24,26 +23,33 @@ namespace PalworldManagedModFramework.Services.Detour.Linux {
                 _ => throw new ArgumentOutOfRangeException(nameof(protection), protection, "Invalid memory protection type.")
             };
 
-            var mapFlags = MMapFlags.MAP_SHARED | MMapFlags.MAP_ANONYMOUS;
-            MemoryMap(nint.Zero, length, linuxProtection, mapFlags, -1, 0);
+            var allocatedMemory = MemoryMap(nint.Zero, length, linuxProtection, MMapFlags.MAP_SHARED | MMapFlags.MAP_ANONYMOUS, -1, 0);
+
+            if (allocatedMemory == -1) {
+                _logger.LogError($"Failed to allocate memory. Length: {length}, Protection: {linuxProtection}");
+                return nint.Zero;
+            }
+            else {
+                _logger.LogInformation($"Memory allocated. Address: 0x{allocatedMemory:x}, Length: {length}, Protection: {linuxProtection}");
+                return allocatedMemory;
+            }
         }
 
+        public bool Free(nint address, nuint length) {
+            var result = MemoryUnmap(address, length);
 
-        public bool Free(nint address) {
-
-        }
-
-        public MemoryProtection AllowExecute(nint startAddress, nint endAddress) {
-            var length = endAddress - startAddress;
-            var result = LinuxNativeMethods.MemoryProtect(startAddress, (nuint)length, LinuxStructs.MProtectProtect.PROT_EXEC);
-
-            throw new NotImplementedException();
-        }
-
-        public MemoryProtection SetProtection(MemoryProtection memoryProtection, nint startAddress, nint endAddress) {
-            var length = endAddress - startAddress;
-            LinuxNativeMethods.MemoryProtect(startAddress, (nuint)length, );
-            throw new NotImplementedException();
+            if (result == -1) {
+                _logger.LogError($"Failed to free memory at address: {address}");
+                return false;
+            }
+            else if (result == 0) {
+                _logger.LogInformation($"Memory freed at address: {address}");
+                return true;
+            }
+            else {
+                _logger.LogWarning($"Unexpected result from munmap: {result}. Assuming success.");
+                return true;
+            }
         }
     }
 }

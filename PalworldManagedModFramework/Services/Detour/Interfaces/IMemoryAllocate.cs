@@ -3,6 +3,6 @@
 namespace PalworldManagedModFramework.Services.Detour.Interfaces {
     public interface IMemoryAllocate {
         nint Allocate(MemoryProtection protection, uint length);
-        bool Free(nint address);
+        bool Free(nint address, nuint length);
     }
 }

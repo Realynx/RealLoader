@@ -27,13 +27,13 @@ namespace PalworldManagedModFramework.Services.Detour.Windows {
                 _logger.LogError($"Failed to allocate memory. Length: {length}, Protection: {winProtection}");
             }
             else {
-                _logger.LogInformation($"Memory allocated. Address: {allocatedMemory}, Length: {length}, Protection: {winProtection}");
+                _logger.LogInformation($"Memory allocated. Address: 0x{allocatedMemory:X}, Length: {length}, Protection: {winProtection}");
             }
 
             return allocatedMemory;
         }
 
-        public bool Free(nint address) {
+        public bool Free(nint address, nuint _) {
             var result = VirtualFree(address, 0, StateEnum.MEM_RELEASE);
 
             if (!result) {
