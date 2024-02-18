@@ -12,6 +12,8 @@ using PalworldManagedModFramework.Sdk.Services.Memory.Windows;
 
 using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
+using PalworldManagedModFramework.Services.Detour.AssemblerServices;
+using PalworldManagedModFramework.Services.Detour.AssemblerServices.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning;
 using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning.Linux;
@@ -52,6 +54,11 @@ namespace PalworldManagedModFramework.DI {
                     .AddSingleton<IMemoryMapper, WindowsMemoryMapper>()
                     .AddSingleton<IMemoryScanner, WindowsMemoryScanner>();
             }
+
+
+            //To be tested on both OS
+            services.AddSingleton<IShellCodeFactory, ShellCodeFactory>();
+
 
             services
                 .AddSingleton<IOperandResolver, OperandResolver>()

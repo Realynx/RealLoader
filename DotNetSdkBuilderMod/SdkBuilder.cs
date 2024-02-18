@@ -32,8 +32,8 @@ namespace DotNetSdkBuilderMod {
         }
 
 
-        [Hook("48 89 5C ? ? 48 89 74 ? ? ? 48 83 ? ? 41 ? ? ? ? 44 8B 44 ? ? 41 ? ? 48 ? ? E8 1C 39 09 ? ? ? 89 ? ? 48 8B 5C ? ?", execute: true, overideReturn: false)]
-        public unsafe void UStructCtorHook(UStruct* instance, int ctorFlags, int param2, int param3, EObjectFlags param4) {
+        [Hook("48 89 8E 80 00 ? ? 48 89 8E 88 00 ? ? 48 89 8E 90 00 ? ? 48 89 8E 98 00 ? ? 48 89 8E A0 00 ? ? 48 89 8E A8 00 ? ? 48 8B 74 ? ? | 48 83 ? ? ? C3", execute: true, overideReturn: false)]
+        public static unsafe void UStructCtorHook(UStruct* instance, int ctorFlags, int param2, int param3, EObjectFlags param4) {
             _logger.Info($"Constructed 0x{(nint)instance:X}");
         }
 
