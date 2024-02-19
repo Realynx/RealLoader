@@ -49,20 +49,22 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             var endPtr = (byte*)memoryRegion.EndAddress;
 
             while (scanPtr < endPtr) {
+                var scannedByte = *scanPtr;
+
                 for (var x = 0; x < patterns.Length; x++) {
                     var mask = patterns[x].Mask;
                     var pattern = patterns[x].Pattern;
 
-                    var patternPtr = patternPtrs[x];
-                    if (mask[patternPtr] == '?' || pattern[patternPtr] == *scanPtr) {
-                        patternPtrs[x]++;
-                        if (patternPtrs[x] == pattern.Length) {
+                    ref var patternPtr = ref patternPtrs[x];
+                    if (mask[patternPtr] == '?' || pattern[patternPtr] == scannedByte) {
+                        patternPtr++;
+                        if (patternPtr == pattern.Length) {
                             foundSequencesPerPattern[x].Add((nint)(scanPtr - pattern.Length + 1));
-                            patternPtrs[x] = 0;
+                            patternPtr = 0;
                         }
                     }
                     else {
-                        patternPtrs[x] = 0;
+                        patternPtr = 0;
                     }
                 }
 
