@@ -2,8 +2,8 @@
 
 namespace PalworldManagedModFramework.Services.Detour.Models {
 
-    public unsafe record InstalledHook : IDisposable {
-        public InstalledHook(byte[] originalCodes, byte* pHook, int hookSize, nint redirect, byte* pTrampoline) {
+    public record InstalledHook : IDisposable {
+        public InstalledHook(byte[] originalCodes, nint pHook, int hookSize, nint redirect, nint pTrampoline) {
             OriginalCodes = originalCodes;
             PHook = pHook;
             HookSize = hookSize;
@@ -12,10 +12,10 @@ namespace PalworldManagedModFramework.Services.Detour.Models {
         }
 
         public byte[] OriginalCodes { get; }
-        public byte* PHook { get; }
+        public nint PHook { get; }
         public int HookSize { get; }
         public nint Redirect { get; }
-        public byte* PTrampoline { get; }
+        public nint PTrampoline { get; }
 
         public void Dispose() {
             //TODO: Setup calling uninstall on parent factory.

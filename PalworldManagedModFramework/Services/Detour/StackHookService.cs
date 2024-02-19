@@ -28,7 +28,7 @@ namespace PalworldManagedModFramework.Services.Detour {
             var trampolineCodes = _shellCodeFactory.BuildTrampoline64(overwrittenCodes, reExecuteAddress);
             var trampoline = _memoryAllocate.Allocate(MemoryProtection.Execute, (uint)trampolineCodes.Length);
 
-            var installedHook = new InstalledHook(overwrittenCodes, (byte*)hookAddress, hookInstructionBytes.Length, redirect, (byte*)trampoline);
+            var installedHook = new InstalledHook(overwrittenCodes, hookAddress, hookInstructionBytes.Length, redirect, trampoline);
             _installedHooks.Add(installedHook);
         }
 
