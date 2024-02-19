@@ -37,11 +37,11 @@ namespace PalworldManagedModFramework.Services.Detour.Windows {
             var result = VirtualFree(address, 0, StateEnum.MEM_RELEASE);
 
             if (!result) {
-                _logger.LogError($"Failed to free memory at address: {address}");
+                _logger.LogError($"Failed to free memory at address: 0x{address:X}");
                 return false;
             }
             else {
-                _logger.LogInformation($"Memory freed at address: {address}");
+                _logger.LogInformation($"Memory freed at address: 0x{address:X}");
                 return true;
             }
         }
