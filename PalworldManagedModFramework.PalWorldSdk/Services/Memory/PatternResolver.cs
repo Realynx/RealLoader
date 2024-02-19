@@ -9,8 +9,9 @@ using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory {
-    public class PatternResolver : IPatternResolver {
-        private static readonly Regex _hexRegex = new(@"[0-9a-fA-F]{2}");
+    public partial class PatternResolver : IPatternResolver {
+        [GeneratedRegex(@"[0-9a-fA-F]{2}")]
+        private static partial Regex HexRegex();
 
         private readonly ILogger _logger;
         private readonly IOperandResolver _operandResolver;
@@ -103,7 +104,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
 
             for (var x = 0; x < hexValues.Length; x++) {
                 switch (hexValues[x]) {
-                    case var hex when _hexRegex.IsMatch(hex):
+                    case var hex when HexRegex().IsMatch(hex):
                         buffer.Add(byte.Parse(hex, NumberStyles.HexNumber));
                         mask.Add('x');
                         bytePosition++;
@@ -119,6 +120,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
                         if (operandOffset != -1) {
                             throw new Exception("Multiple offset indicators '|' found in the pattern.");
                         }
+
                         operandOffset = bytePosition;
                         break;
                 }

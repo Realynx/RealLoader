@@ -7,9 +7,11 @@ using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
-    public class LinuxMemoryMapper : IMemoryMapper {
+    public partial class LinuxMemoryMapper : IMemoryMapper {
         private const string LINUX_MAPS_PATH = "/proc/self/maps";
-        private readonly Regex _linuxMapRegex = new Regex(@"([0-9a-fA-F]+)-([0-9a-fA-F]+) ([r-])([w-])([x-])([p-]) ([0-9a-fA-F]+) .+");
+        
+        [GeneratedRegex(@"([0-9a-fA-F]+)-([0-9a-fA-F]+) ([r-])([w-])([x-])([p-]) ([0-9a-fA-F]+) .+")]
+        private static partial Regex LinuxMapRegex();
 
         private readonly ILogger _logger;
 
@@ -31,13 +33,13 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
             _logger.Debug("Enumerating memory regions");
 
             var linuxMapsFile = File.ReadAllText(LINUX_MAPS_PATH);
-            var memoryRegions = _linuxMapRegex.Matches(linuxMapsFile);
+            var memoryRegions = LinuxMapRegex().Matches(linuxMapsFile);
 
-            for (var i = 0; i < memoryRegions!.Count; i++) {
-                var regionMatch = memoryRegions![i];
+            for (var i = 0; i < memoryRegions.Count; i++) {
+                var regionMatch = memoryRegions[i];
 
                 var safePreviousIndex = i > 0 ? i - 1 : 0;
-                if (memoryRegions![safePreviousIndex].Value.Contains("[heap]")) {
+                if (memoryRegions[safePreviousIndex].Value.Contains("[heap]")) {
                     break;
                 }
 

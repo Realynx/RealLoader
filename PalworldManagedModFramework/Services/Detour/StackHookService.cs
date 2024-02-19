@@ -35,9 +35,9 @@ namespace PalworldManagedModFramework.Services.Detour {
         public unsafe void UninstallHook(InstalledHook installedHook) {
             _installedHooks.Remove(installedHook);
             // TODO: Check these bytes match the real detour bytes safe check?
-            var detourBytes = OverwriteBytes((nint)installedHook.PHook, installedHook.OriginalCodes);
+            var detourBytes = OverwriteBytes(installedHook.PHook, installedHook.OriginalCodes);
 
-            _memoryAllocate.Free((nint)installedHook.PHook);
+            _memoryAllocate.Free(installedHook.PHook);
         }
 
         private unsafe byte[] OverwriteBytes(nint hookAddress, byte[] hookInstructionBytes) {
