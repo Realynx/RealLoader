@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using System.Runtime.CompilerServices;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
@@ -18,37 +18,40 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
                 foundPatterns[x] = new List<nint>();
             }
 
-            var sw = Stopwatch.StartNew();
+            var patterns = signatures.Select(PatternResolver.DeriveMask).ToArray();
 
             foreach (var scanRegion in memoryRegions) {
-                var foundAddresses = ScanMemoryRegion(signatures, scanRegion);
+                var foundAddresses = ScanMemoryRegionImpl(patterns, scanRegion);
                 for (var x = 0; x < foundPatterns.Length; x++) {
                     foundPatterns[x].AddRange(foundAddresses[x]);
                 }
             }
 
-            sw.Stop();
-            _logger.Debug($"Scanning took {sw.ElapsedMilliseconds} ms.");
-
             return foundPatterns.Select(i => i.ToArray()).ToArray();
         }
 
-        public unsafe nint[][] ScanMemoryRegion(string[] signatures, MemoryRegion memoryRegion) {
-            var foundSequencesPerPattern = new List<nint>[signatures.Length];
+        public nint[][] ScanMemoryRegion(string[] signatures, MemoryRegion memoryRegion) {
+            var patterns = signatures.Select(PatternResolver.DeriveMask).ToArray();
+
+            return ScanMemoryRegionImpl(patterns, memoryRegion).Select(i => i.ToArray()).ToArray();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        private unsafe List<nint>[] ScanMemoryRegionImpl(ByteCodePattern[] patterns, MemoryRegion memoryRegion) {
+            var foundSequencesPerPattern = new List<nint>[patterns.Length];
             for (var x = 0; x < foundSequencesPerPattern.Length; x++) {
                 foundSequencesPerPattern[x] = new List<nint>();
             }
 
-            var patternMasks = signatures.Select(PatternResolver.DeriveMask).ToArray();
-            var patternPtrs = new int[patternMasks.Length];
+            var patternPtrs = new int[patterns.Length];
 
             var scanPtr = (byte*)memoryRegion.StartAddress;
             var endPtr = (byte*)memoryRegion.EndAddress;
 
             while (scanPtr < endPtr) {
-                for (var x = 0; x < patternMasks.Length; x++) {
-                    var mask = patternMasks[x].Mask;
-                    var pattern = patternMasks[x].Pattern;
+                for (var x = 0; x < patterns.Length; x++) {
+                    var mask = patterns[x].Mask;
+                    var pattern = patterns[x].Pattern;
 
                     var patternPtr = patternPtrs[x];
                     if (mask[patternPtr] == '?' || pattern[patternPtr] == *scanPtr) {
@@ -66,7 +69,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
                 scanPtr++;
             }
 
-            return foundSequencesPerPattern.Select(i => i.ToArray()).ToArray();
+            return foundSequencesPerPattern;
         }
     }
 }

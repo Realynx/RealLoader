@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 using PalworldManagedModFramework.Sdk.Attributes;
@@ -28,6 +29,7 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
 
         public void ScanMemoryForUnrealReflectionPointers() {
             _logger.Debug("Starting Pattern Scan");
+            var sw = Stopwatch.StartNew();
 
             using var bulkScanner = new BulkScanner(_patternResolver);
             bulkScanner
@@ -42,6 +44,8 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
 
             _patternResolver.ResolvePattern
 
+            sw.Stop();
+            _logger.Debug($"Scanning took {sw.ElapsedMilliseconds} ms.");
         }
 
         public static unsafe delegate* unmanaged<UStruct*, int, int, int, EObjectFlags, void> UStructCtorHook_Original;

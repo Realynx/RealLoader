@@ -14,7 +14,6 @@ namespace DotNetSdkBuilderMod {
         public SdkBuilder(CancellationToken cancellationToken, ILogger logger, ISourceCodeGenerator sourceCodeGenerator) {
             _cancellationToken = cancellationToken;
             _logger = logger;
-            LoggerStatic = logger;
             _sourceCodeGenerator = sourceCodeGenerator;
         }
 
@@ -29,8 +28,6 @@ namespace DotNetSdkBuilderMod {
 
             // Debuging hook functions
         }
-
-
 
         public void Unload() {
 
