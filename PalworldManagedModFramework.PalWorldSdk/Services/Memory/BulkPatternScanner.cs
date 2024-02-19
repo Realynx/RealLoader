@@ -6,6 +6,8 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
     public class BulkPatternScanner {
         private readonly ILogger _logger;
 
+        private readonly Dictionary<>
+
         public BulkPatternScanner(ILogger logger) {
             _logger = logger;
         }
