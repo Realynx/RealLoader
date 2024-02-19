@@ -2,7 +2,7 @@
 
 namespace PalworldManagedModFramework.Services.Detour.Interfaces {
     public interface IStackHookService {
-        void InstallHook(nint hookAddress, nint redirect);
+        InstalledHook InstallHook(nint hookAddress, nint redirect);
         void UninstallHook(InstalledHook installedHook);
     }
 }

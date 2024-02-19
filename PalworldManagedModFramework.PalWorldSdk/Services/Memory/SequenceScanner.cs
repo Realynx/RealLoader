@@ -1,4 +1,6 @@
-﻿using PalworldManagedModFramework.Sdk.Logging;
+﻿using System.Diagnostics;
+
+using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
@@ -16,12 +18,17 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
                 foundPatterns[x] = new List<nint>();
             }
 
+            var sw = Stopwatch.StartNew();
+
             foreach (var scanRegion in memoryRegions) {
                 var foundAddresses = ScanMemoryRegion(signatures, scanRegion);
                 for (var x = 0; x < foundPatterns.Length; x++) {
                     foundPatterns[x].AddRange(foundAddresses[x]);
                 }
             }
+
+            sw.Stop();
+            _logger.Debug($"Scanning took {sw.ElapsedMilliseconds} ms.");
 
             return foundPatterns.Select(i => i.ToArray()).ToArray();
         }
@@ -40,8 +47,8 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
 
             while (scanPtr < endPtr) {
                 for (var x = 0; x < patternMasks.Length; x++) {
-                    var mask = patternMasks[x].mask;
-                    var pattern = patternMasks[x].pattern;
+                    var mask = patternMasks[x].Mask;
+                    var pattern = patternMasks[x].Pattern;
 
                     var patternPtr = patternPtrs[x];
                     if (mask[patternPtr] == '?' || pattern[patternPtr] == *scanPtr) {

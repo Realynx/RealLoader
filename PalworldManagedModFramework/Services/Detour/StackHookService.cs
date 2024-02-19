@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Numerics;
+
+using Microsoft.Extensions.Logging;
 
 using PalworldManagedModFramework.Services.Detour.AssemblerServices.Interfaces;
 using PalworldManagedModFramework.Services.Detour.Interfaces;
@@ -17,7 +19,7 @@ namespace PalworldManagedModFramework.Services.Detour {
             _memoryAllocate = memoryAllocate;
         }
 
-        public unsafe void InstallHook(nint hookAddress, nint redirect) {
+        public unsafe InstalledHook InstallHook(nint hookAddress, nint redirect) {
             var hookInstructionBytes = _shellCodeFactory.BuildStackDetour64(redirect);
             var instructionString = BitConverter.ToString(hookInstructionBytes).Replace("-", " ");
             _logger.LogDebug($"Hook Instructions: {instructionString}");
@@ -30,6 +32,7 @@ namespace PalworldManagedModFramework.Services.Detour {
 
             var installedHook = new InstalledHook(overwrittenCodes, hookAddress, hookInstructionBytes.Length, redirect, trampoline);
             _installedHooks.Add(installedHook);
+            return installedHook;
         }
 
         public unsafe void UninstallHook(InstalledHook installedHook) {
@@ -37,15 +40,34 @@ namespace PalworldManagedModFramework.Services.Detour {
             // TODO: Check these bytes match the real detour bytes safe check?
             var detourBytes = OverwriteBytes(installedHook.PHook, installedHook.OriginalCodes);
 
+            var originalDetour = _shellCodeFactory.BuildStackDetour64(installedHook.Redirect);
+            if (!detourBytes.AsSpan().SequenceEqual(originalDetour)) {
+                throw new Exception("The bytes overwritten did not contain the uninstalled hook.");
+            }
+
             _memoryAllocate.Free(installedHook.PHook);
         }
 
-        private unsafe byte[] OverwriteBytes(nint hookAddress, byte[] hookInstructionBytes) {
-            byte* patternInstructions = (byte*)hookAddress;
-            var overwrittenInstructions = new byte[hookInstructionBytes.Length];
-            for (var x = 0; x < overwrittenInstructions.Length; x++) {
-                overwrittenInstructions[x] = patternInstructions[x];
-                patternInstructions[x] = hookInstructionBytes[x];
+        private unsafe byte[] OverwriteBytes(nint hookAddress, ReadOnlySpan<byte> hookInstructionBytes) {
+            var length = hookInstructionBytes.Length;
+
+            var destinationInstructions = new Span<byte>((byte*)hookAddress, length);
+            var overwrittenInstructions = new byte[length];
+
+            var i = 0;
+
+            var vectorSize = Vector<byte>.Count;
+            for (; i <= length - vectorSize; i += vectorSize) {
+                var destinationOffset = destinationInstructions.Slice(i);
+                var hookBytesOffset = hookInstructionBytes.Slice(i);
+
+                new Vector<byte>(destinationOffset).CopyTo(overwrittenInstructions, i);
+                new Vector<byte>(hookBytesOffset).CopyTo(destinationOffset);
+            }
+
+            for (; i < length; i++) {
+                overwrittenInstructions[i] = destinationInstructions[i];
+                destinationInstructions[i] = hookInstructionBytes[i];
             }
 
             return overwrittenInstructions;

@@ -19,11 +19,15 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
             return this;
         }
 
-        public BulkScanner ResolveHookFunctions(object instance, string methodToResolve) {
-            var methodInfo = instance.GetType().GetMethod(methodToResolve);
-            _patternMethods.TryAdd(methodInfo, instance);
+        public BulkScanner ResolveHookFunctions<TType>(string methodToResolve) {
+            var methodInfo = typeof(TType).GetMethod(methodToResolve);
+            _patternMethods.TryAdd(methodInfo, null);
 
             return this;
+        }
+
+        public nint?[] ScanAllProperties() {
+            return _patternResolver.ResolvePatterns(_patternProperties.Keys.ToArray(), _patternProperties.Values.ToArray());
         }
 
         public nint?[] ScanAllProperties() {

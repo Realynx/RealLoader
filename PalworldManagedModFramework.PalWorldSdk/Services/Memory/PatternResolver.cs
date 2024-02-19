@@ -7,6 +7,7 @@ using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
+using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory {
     public partial class PatternResolver : IPatternResolver {
@@ -70,10 +71,12 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
                             ?? throw new InvalidOperationException($"Type must have {nameof(MachineCodePatternAttribute)}");
         }
 
+        //TODO: Move into new service, 
         private nint UpdatePropertyValue(PropertyInfo member, object? instance, MachineCodePatternAttribute machineCodeAttribute, nint patternOffsetAddress) {
             _logger.Debug($"{member.Name} pattern found: 0x{patternOffsetAddress:X}");
+
             var patternMask = DeriveMask(machineCodeAttribute.Pattern);
-            var resolvedAddress = _operandResolver.ResolveInstructionAddress(patternOffsetAddress, patternMask.operandOffset, machineCodeAttribute);
+            var resolvedAddress = _operandResolver.ResolveInstructionAddress(patternOffsetAddress, patternMask.OperandOffset, machineCodeAttribute);
 
             if (instance is not null) {
                 if (machineCodeAttribute.PatternType == PatternType.Function) {
@@ -89,7 +92,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             return resolvedAddress;
         }
 
-        public static (char[] mask, byte[] pattern, int operandOffset) DeriveMask(string signature) {
+        public static ByteCodePattern DeriveMask(string signature) {
             var hexValues = signature.Split(' ');
 
             if (hexValues.Length < 2) {
@@ -131,7 +134,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             }
 
             operandOffset = operandOffset == -1 ? 0 : operandOffset;
-            return (mask.ToArray(), buffer.ToArray(), operandOffset);
+            return new ByteCodePattern(mask.ToArray(), buffer.ToArray(), operandOffset);
         }
     }
 }
