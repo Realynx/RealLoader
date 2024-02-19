@@ -33,7 +33,7 @@ namespace PalworldManagedModFramework.Services.Detour.Windows {
             return allocatedMemory;
         }
 
-        public bool Free(nint address, nuint _) {
+        public bool Free(nint address) {
             var result = VirtualFree(address, 0, StateEnum.MEM_RELEASE);
 
             if (!result) {

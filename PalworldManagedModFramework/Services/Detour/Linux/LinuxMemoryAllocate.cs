@@ -10,6 +10,7 @@ using static PalworldManagedModFramework.Services.Detour.Linux.NativeFunctions;
 namespace PalworldManagedModFramework.Services.Detour.Linux {
     public class LinuxMemoryAllocate : IMemoryAllocate {
         private readonly ILogger _logger;
+        private readonly Dictionary<nint, nuint> _mappedAddresses = new();
 
         public LinuxMemoryAllocate(ILogger logger) {
             _logger = logger;
@@ -31,11 +32,17 @@ namespace PalworldManagedModFramework.Services.Detour.Linux {
             }
             else {
                 _logger.LogInformation($"Memory allocated. Address: 0x{allocatedMemory:x}, Length: {length}, Protection: {linuxProtection}");
+                _mappedAddresses[allocatedMemory] = length;
                 return allocatedMemory;
             }
         }
 
-        public bool Free(nint address, nuint length) {
+        public bool Free(nint address) {
+            if (!_mappedAddresses.TryGetValue(address, out var length)) {
+                _logger.LogError($"Tried to free memory that was not mapped by us. Address: {address}.");
+                return false;
+            }
+
             var result = MemoryUnmap(address, length);
 
             if (result == -1) {
