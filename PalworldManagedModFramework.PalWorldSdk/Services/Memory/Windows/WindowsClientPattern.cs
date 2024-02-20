@@ -1,5 +1,5 @@
 ﻿using PalworldManagedModFramework.Sdk.Attributes;
-using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
     public class WindowsClientPattern : IEnginePattern {

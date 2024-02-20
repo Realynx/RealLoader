@@ -12,6 +12,7 @@
     }
 
     public enum PatternType {
+        Hook,
         Function,
         DirectAddress_32,
         IP_RelativeOffset_32,

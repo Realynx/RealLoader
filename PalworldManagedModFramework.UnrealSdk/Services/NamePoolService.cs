@@ -1,7 +1,7 @@
 ﻿using System.Text;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameStructs;
 
 namespace PalworldManagedModFramework.UnrealSdk.Services {

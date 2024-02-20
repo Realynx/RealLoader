@@ -1,6 +1,6 @@
 ﻿using Iced.Intel;
 
-namespace PalworldManagedModFramework.Services.Detour.AssemblerServices {
+namespace PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices {
 
     class CodeWriterImpl : CodeWriter {
         private readonly List<byte> _bytes = new List<byte>();

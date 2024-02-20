@@ -5,6 +5,12 @@ using Microsoft.Extensions.Hosting;
 using PalworldManagedModFramework.Models.Config;
 
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.Detour;
+using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices;
+using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Detour.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Detour.Linux;
+using PalworldManagedModFramework.Sdk.Services.Detour.Windows;
 using PalworldManagedModFramework.Sdk.Services.Memory;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
@@ -12,15 +18,7 @@ using PalworldManagedModFramework.Sdk.Services.Memory.Windows;
 
 using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
-using PalworldManagedModFramework.Services.Detour;
-using PalworldManagedModFramework.Services.Detour.AssemblerServices;
-using PalworldManagedModFramework.Services.Detour.AssemblerServices.Interfaces;
-using PalworldManagedModFramework.Services.Detour.Interfaces;
-using PalworldManagedModFramework.Services.Detour.Linux;
-using PalworldManagedModFramework.Services.Detour.Windows;
 using PalworldManagedModFramework.Services.MemoryScanning;
-using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
-using PalworldManagedModFramework.Services.MemoryScanning.Linux;
 using PalworldManagedModFramework.Services.SandboxDI;
 using PalworldManagedModFramework.Services.SandboxDI.Interfaces;
 using PalworldManagedModFramework.UnrealSdk.Services;
@@ -66,15 +64,21 @@ namespace PalworldManagedModFramework.DI {
             services
                 .AddSingleton<IShellCodeFactory, ShellCodeFactory>();
 
+            // TODO: Create extention classes with batches of these add singletons in logical groupings.
 
             services
                 .AddSingleton<ILogger, Logger>()
 
                 .AddSingleton<IOperandResolver, OperandResolver>()
-                .AddSingleton<IPatternResolver, PatternResolver>()
+                .AddSingleton<IPropertyManager, PropertyManager>()
+                .AddSingleton<IBulkTypePatternScanner, BulkTypePatternScanner>()
                 .AddSingleton<PatternScanner>()
                 .AddSingleton<ISequenceScanner, SequenceScanner>()
-                .AddSingleton<IStackHookService, StackHookService>()
+                .AddSingleton<IStackDetourService, StackDetourService>()
+                .AddSingleton<IInstructionPatcher, InstructionPatcher>()
+                .AddSingleton<IDetourManager, DetourManager>()
+                .AddSingleton<IDetourAttributeScanner, DetourAttributeScanner>()
+                .AddSingleton<IShellCodeReader, ShellCodeReader>()
 
                 .AddSingleton<IAssemblyDiscovery, AssemblyDiscovery>()
                 .AddSingleton<IModLoader, ModLoader>()

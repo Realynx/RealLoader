@@ -1,7 +1,7 @@
 ﻿using PalworldManagedModFramework.Sdk.Attributes;
-using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 
-namespace PalworldManagedModFramework.Services.MemoryScanning.Linux {
+namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
     public class LinuxServerPattern : IEnginePattern {
         [MachineCodePattern("53 89 FB 80 3D ? ? ? ? ? 75 ? BF ? ? ? ? | E8 ? ? ? ? C6 05 ? ? ? ? 01", PatternType.DirectAddress_32)]
         public nint PNamePoolData { get; set; }

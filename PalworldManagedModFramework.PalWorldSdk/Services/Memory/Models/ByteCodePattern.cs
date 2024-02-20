@@ -17,12 +17,10 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Models {
         public int OperandOffset { get; }
         public PatternType PatternType { get; }
 
-
-
         [GeneratedRegex(@"[0-9a-fA-F]{2}")]
         private static partial Regex HexRegex();
 
-        public static ByteCodePattern DeriveMask(string signature) {
+        public static ByteCodePattern DeriveMask(string signature, PatternType patternType) {
             var hexValues = signature.Split(' ');
 
             if (hexValues.Length < 2) {
@@ -64,7 +62,20 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Models {
             }
 
             operandOffset = operandOffset == -1 ? 0 : operandOffset;
-            return new ByteCodePattern(mask.ToArray(), buffer.ToArray(), operandOffset);
+            return new ByteCodePattern(mask.ToArray(), buffer.ToArray(), operandOffset, patternType);
+        }
+
+        public virtual bool Equals(ByteCodePattern? other) {
+            if ((object)this == (object)other) {
+                return true;
+            }
+
+            if (other is null) {
+                return false;
+            }
+
+            return Mask.AsSpan().SequenceEqual(other.Mask) && Pattern.AsSpan().SequenceEqual(other.Pattern)
+                && OperandOffset == other.OperandOffset && PatternType == other.PatternType;
         }
     }
 }

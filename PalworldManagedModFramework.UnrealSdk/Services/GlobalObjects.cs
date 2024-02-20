@@ -1,5 +1,5 @@
 ﻿using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Services.MemoryScanning.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GObjectsStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;

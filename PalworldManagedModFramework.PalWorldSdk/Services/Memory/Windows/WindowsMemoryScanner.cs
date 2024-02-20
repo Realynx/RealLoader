@@ -2,7 +2,6 @@
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
-using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {

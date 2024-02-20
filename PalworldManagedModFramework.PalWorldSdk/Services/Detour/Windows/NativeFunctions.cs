@@ -1,12 +1,15 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace PalworldManagedModFramework.Services.Detour.Windows {
+namespace PalworldManagedModFramework.Sdk.Services.Detour.Windows {
     public static class NativeFunctions {
         [DllImport("kernel32.dll")]
         public static extern uint VirtualAlloc(nint lpStartAddr, uint size, StateEnum flAllocationType, Protection flProtect);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool VirtualFree(nint lpAddress, uint dwSize, StateEnum dwFreeType);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static unsafe extern bool VirtualProtect(nint lpAddress, uint dwSize, Protection flNewProtect, out uint lpflOldProtect);
 
 
         public enum StateEnum {

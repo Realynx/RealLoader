@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace PalworldManagedModFramework.Services.Detour.Linux {
+namespace PalworldManagedModFramework.Sdk.Services.Detour.Linux {
     public static class NativeFunctions {
 
         [DllImport("libc.so.6", SetLastError = true, EntryPoint = "mmap")]
@@ -8,6 +8,12 @@ namespace PalworldManagedModFramework.Services.Detour.Linux {
 
         [DllImport("libc.so.6", SetLastError = true, EntryPoint = "munmap")]
         public static extern int MemoryUnmap(nint addr, nuint length);
+
+        [DllImport("libc.so.6", SetLastError = true, EntryPoint = "mprotect")]
+        public static extern int MemoryProtect(nint addr, nuint length, MProtectProtect protect);
+
+        [DllImport("libc.so.6", SetLastError = true, EntryPoint = "read_mprotection")]
+        public static extern int GetMemoryProtect(nint addr);
 
         [Flags]
         public enum MProtectProtect {
@@ -18,30 +24,29 @@ namespace PalworldManagedModFramework.Services.Detour.Linux {
         }
 
         [Flags]
-        public enum MMapFlags {
-            MAP_SHARED,
-            MAP_SHARED_VALIDATE,
-            MAP_PRIVATE,
-            MAP_32BIT,
-            [Obsolete]
-            MAP_ANON,
-            MAP_ANONYMOUS,
-            MAP_DENYWRITE,
-            MAP_EXECUTABLE,
-            MAP_FILE,
-            MAP_FIXED,
-            MAP_FIXED_NOREPLACE,
-            MAP_GROWSDOWN,
-            MAP_HUGETLB,
-            MAP_HUGE_2MB,
-            MAP_HUGE_1GB,
-            MAP_LOCKED,
-            MAP_NONBLOCK,
-            MAP_NORESERVE,
-            MAP_POPULATE,
-            MAP_STACK,
-            MAP_SYNC,
-            MAP_UNINITIALIZED,
+        public enum MMapFlags : ulong {
+            MAP_SHARED = 1 << 0,
+            MAP_SHARED_VALIDATE = 1 << 1,
+            MAP_PRIVATE = 1 << 2,
+            MAP_32BIT = 1 << 3,
+            MAP_ANON = 1 << 4,
+            MAP_ANONYMOUS = 1 << 5,
+            MAP_DENYWRITE = 1 << 6,
+            MAP_EXECUTABLE = 1 << 7,
+            MAP_FILE = 1 << 8,
+            MAP_FIXED = 1 << 9,
+            MAP_FIXED_NOREPLACE = 1 << 10,
+            MAP_GROWSDOWN = 1 << 11,
+            MAP_HUGETLB = 1 << 12,
+            MAP_HUGE_2MB = 1 << 13,
+            MAP_HUGE_1GB = 1 << 14,
+            MAP_LOCKED = 1 << 15,
+            MAP_NONBLOCK = 1 << 16,
+            MAP_NORESERVE = 1 << 17,
+            MAP_POPULATE = 1 << 18,
+            MAP_STACK = 1 << 19,
+            MAP_SYNC = 1 << 20,
+            MAP_UNINITIALIZED = 1 << 21,
         }
 
         public enum MMapErrors {

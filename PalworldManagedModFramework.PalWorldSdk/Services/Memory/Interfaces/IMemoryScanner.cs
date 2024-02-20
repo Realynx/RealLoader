@@ -1,6 +1,6 @@
 ﻿using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
-namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
+namespace PalworldManagedModFramework.Sdk.Services.Memory.Interfaces {
     public interface IMemoryScanner {
         nint[]? SequenceScan(ByteCodePattern byteCodePattern);
         nint[]? SequenceScan(ByteCodePattern byteCodePattern, nint startAddress, nint endAddress);
