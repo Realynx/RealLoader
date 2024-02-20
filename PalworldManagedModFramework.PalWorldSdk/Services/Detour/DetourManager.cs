@@ -51,7 +51,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
                 $"[0x{detourRecord.PTrampoline:X}]Trampoline: {managedDetourInfo.TrampolineDelegate.Name}");
 
             _managedDetours.Add(managedDetourInfo, detourRecord);
-            managedDetourInfo.TrampolineDelegate.SetValue(null, detourRecord.DetourAddress);
+            managedDetourInfo.TrampolineDelegate.SetValue(null, detourRecord.PTrampoline);
 
             return detourRecord;
         }

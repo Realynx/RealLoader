@@ -16,10 +16,10 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             var foundPatternsOrdred = new List<nint>[patterns.Length];
             InitLists(foundPatternsOrdred);
 
-            foreach (var scanRegion in memoryRegions) {
+            Parallel.ForEach(memoryRegions, (scanRegion) => {
                 var foundAddresses = ScanMemoryRegionImpl(patterns, scanRegion);
                 AppendFoundAddresses(foundPatternsOrdred, foundAddresses);
-            }
+            });
 
             return foundPatternsOrdred.Select(i => i.ToArray()).ToArray();
         }
@@ -51,10 +51,10 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
                     if (mask[patternPtr] == '?' || pattern[patternPtr] == scannedByte) {
                         patternPtr++;
                         if (patternPtr == pattern.Length) {
-                            var foundAddress = (nint)(scanPtr - pattern.Length + 1);
-                            _logger.Debug($"[0x{foundAddress:X}] Found: {string.Join(" ", patterns[x].Pattern.Select(i => i.ToString("X")))}");
+                            var foundAddress = (nint)(scanPtr - pattern.Length + 1) + patterns[x].OperandOffset;
 
-                            foundSequencesPerPattern[x].Add(foundAddress + patterns[x].OperandOffset);
+                            _logger.Debug($"[0x{foundAddress:X}] Found: {string.Join(" ", patterns[x].Pattern.Select(i => i.ToString("X")))}");
+                            foundSequencesPerPattern[x].Add(foundAddress);
                             patternPtr = 0;
                         }
                     }
