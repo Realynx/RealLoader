@@ -5,7 +5,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags;
+using PalworldManagedModFramework.Sdk.Models.CoreUObject.Flags;
 
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 

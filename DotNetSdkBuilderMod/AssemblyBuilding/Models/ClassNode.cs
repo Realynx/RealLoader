@@ -1,5 +1,5 @@
-﻿using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.GNameStructs;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
+﻿using PalworldManagedModFramework.Sdk.Models.CoreUObject.GNameStructs;
+using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     public unsafe class ClassNode {

@@ -1,8 +1,8 @@
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
-using PalworldManagedModFramework.UnrealSdk.Services;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FunctionServices;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
+using PalworldManagedModFramework.Sdk.Models.CoreUObject.FunctionServices;
+using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
+using PalworldManagedModFramework.Sdk.Services.Interfaces;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
     public class PackageNameGenerator : IPackageNameGenerator {

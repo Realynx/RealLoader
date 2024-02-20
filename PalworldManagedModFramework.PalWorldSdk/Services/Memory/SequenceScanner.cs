@@ -52,8 +52,6 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
                         patternPtr++;
                         if (patternPtr == pattern.Length) {
                             var foundAddress = (nint)(scanPtr - pattern.Length + 1) + patterns[x].OperandOffset;
-
-                            _logger.Debug($"[0x{foundAddress:X}] Found: {string.Join(" ", patterns[x].Pattern.Select(i => i.ToString("X")))}");
                             foundSequencesPerPattern[x].Add(foundAddress);
                             patternPtr = 0;
                         }

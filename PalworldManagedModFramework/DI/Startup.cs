@@ -5,12 +5,15 @@ using Microsoft.Extensions.Hosting;
 using PalworldManagedModFramework.Models.Config;
 
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Models.CoreUObject.FunctionServices;
+using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.Sdk.Services.Detour;
 using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices;
 using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Detour.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Detour.Linux;
 using PalworldManagedModFramework.Sdk.Services.Detour.Windows;
+using PalworldManagedModFramework.Sdk.Services.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
@@ -21,9 +24,6 @@ using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning;
 using PalworldManagedModFramework.Services.SandboxDI;
 using PalworldManagedModFramework.Services.SandboxDI.Interfaces;
-using PalworldManagedModFramework.UnrealSdk.Services;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.FunctionServices;
-using PalworldManagedModFramework.UnrealSdk.Services.Interfaces;
 
 namespace PalworldManagedModFramework.DI {
     internal static class Startup {

@@ -1,4 +1,4 @@
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
+using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces {
     public unsafe interface IPackageNameGenerator {

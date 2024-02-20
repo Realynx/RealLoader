@@ -1,6 +1,6 @@
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags;
+using PalworldManagedModFramework.Sdk.Models.CoreUObject.Flags;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces {
     public interface ICodeGenClassNodeFactory {

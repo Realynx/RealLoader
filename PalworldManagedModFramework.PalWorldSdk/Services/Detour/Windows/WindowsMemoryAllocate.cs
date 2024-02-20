@@ -21,7 +21,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.Windows {
                 _logger.Error($"Failed to allocate memory. Length: {length}, Protection: {winProtection}");
             }
             else {
-                _logger.Info($"Memory allocated. Address: 0x{allocatedMemory:X}, Length: {length}, Protection: {winProtection}");
+                _logger.Debug($"Memory allocated. Address: 0x{allocatedMemory:X}, Length: {length}, Protection: {winProtection}");
             }
 
             return allocatedMemory;
@@ -35,7 +35,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.Windows {
                 return false;
             }
 
-            _logger.Info($"Memory freed at address: 0x{address:X}");
+            _logger.Debug($"Memory freed at address: 0x{address:X}");
             return true;
         }
 
@@ -50,7 +50,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.Windows {
                 return false;
             }
 
-            _logger.Info($"Set memory protection to {protection} at address: 0x{address:X}");
+            _logger.Debug($"Set memory protection to {protection} at address: 0x{address:X}");
             previousProtection = ConvertToMemoryProtection((Protection)oldProtection);
             return true;
         }

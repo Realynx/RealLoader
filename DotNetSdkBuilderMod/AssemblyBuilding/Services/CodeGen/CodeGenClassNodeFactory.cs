@@ -3,9 +3,9 @@ using System.Text;
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
-using PalworldManagedModFramework.UnrealSdk.Services;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.Flags;
-using PalworldManagedModFramework.UnrealSdk.Services.Data.CoreUObject.UClassStructs;
+using PalworldManagedModFramework.Sdk.Models.CoreUObject.Flags;
+using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
+using PalworldManagedModFramework.Sdk.Services.Interfaces;
 
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 

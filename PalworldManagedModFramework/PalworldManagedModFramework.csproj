@@ -28,7 +28,6 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.Sdk.csproj" />
-	  <ProjectReference Include="..\PalworldManagedModFramework.UnrealSdk\PalworldManagedModFramework.UnrealSdk.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
