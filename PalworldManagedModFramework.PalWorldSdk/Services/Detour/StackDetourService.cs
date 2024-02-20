@@ -20,26 +20,28 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
             _shellCodeReader = shellCodeReader;
         }
 
-        public unsafe DetourRecord PrepareDetour(nint detourAddress, nint redirect) {
-            var detourCodes = _shellCodeFactory.BuildStackDetour64(redirect);
+        public unsafe DetourRecord PrepareDetour(nint detourAddress, nint redirectAddress) {
+            var detourCodes = _shellCodeFactory.BuildStackDetour64(redirectAddress);
 
             var minPatchSize = _shellCodeReader.FindMinPatchSize(detourAddress, detourCodes.Length, 64);
             var originalCodes = new ReadOnlySpan<byte>((byte*)detourAddress, minPatchSize).ToArray();
 
-            var reEntryAddress = detourAddress + detourCodes.Length;
-            var trampoline = AllocateTrampoline(originalCodes, reEntryAddress);
+            var trampoline = AllocateTrampoline(detourAddress, originalCodes);
 
-            return new DetourRecord(detourCodes, originalCodes, detourAddress, redirect, trampoline, DetourType.Stack);
+            return new DetourRecord(detourCodes, originalCodes, detourAddress, redirectAddress, trampoline, DetourType.Stack);
         }
 
-        private unsafe nint AllocateTrampoline(byte[] originalCodes, nint reEntryAddress) {
-            var trampolineCodes = _shellCodeFactory.BuildTrampoline64(originalCodes, reEntryAddress);
-            var trampoline = _memoryAllocate.Allocate(MemoryProtection.ReadWrite, (uint)trampolineCodes.Length);
+        private unsafe nint AllocateTrampoline(nint originalAddress, byte[] originalCodes) {
+            var reEntryAddress = originalAddress + originalCodes.Length;
+            var trampolineAddress = _memoryAllocate.Allocate(MemoryProtection.ReadWrite, (uint)originalCodes.Length + 0x10);
 
-            Marshal.Copy(trampolineCodes, 0, trampoline, trampolineCodes.Length);
+            var fixedcodes = _shellCodeReader.FixRelativeOffsets(originalAddress, trampolineAddress, originalCodes, 64);
+            var trampolineCodes = _shellCodeFactory.BuildTrampoline64(fixedcodes, reEntryAddress);
 
-            _memoryAllocate.SetProtection(trampoline, (uint)trampolineCodes.Length, MemoryProtection.Execute, out _);
-            return trampoline;
+            Marshal.Copy(trampolineCodes, 0, trampolineAddress, trampolineCodes.Length);
+
+            _memoryAllocate.SetProtection(trampolineAddress, (uint)trampolineCodes.Length, MemoryProtection.Execute, out _);
+            return trampolineAddress;
         }
     }
 }

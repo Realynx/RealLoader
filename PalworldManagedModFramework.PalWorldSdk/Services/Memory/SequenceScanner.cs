@@ -28,7 +28,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             return ScanMemoryRegionImpl(patterns, memoryRegion).Select(i => i.ToArray()).ToArray();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private unsafe List<nint>[] ScanMemoryRegionImpl(ByteCodePattern[] patterns, MemoryRegion memoryRegion) {
             var foundSequencesPerPattern = new List<nint>[patterns.Length];
             for (var x = 0; x < foundSequencesPerPattern.Length; x++) {
@@ -51,7 +51,10 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
                     if (mask[patternPtr] == '?' || pattern[patternPtr] == scannedByte) {
                         patternPtr++;
                         if (patternPtr == pattern.Length) {
-                            foundSequencesPerPattern[x].Add((nint)(scanPtr - pattern.Length + 1) + patterns[x].OperandOffset);
+                            var foundAddress = (nint)(scanPtr - pattern.Length + 1);
+                            _logger.Debug($"[0x{foundAddress:X}] Found: {string.Join(" ", patterns[x].Pattern.Select(i => i.ToString("X")))}");
+
+                            foundSequencesPerPattern[x].Add(foundAddress + patterns[x].OperandOffset);
                             patternPtr = 0;
                         }
                     }

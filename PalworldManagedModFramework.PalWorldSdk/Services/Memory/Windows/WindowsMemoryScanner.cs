@@ -52,7 +52,6 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
             _processSuspender.PauseSelf();
 
             var memoryRegions = _memoryMapper.FindMemoryRegions()
-                .Where(i => i.ReadFlag)
                 .Where(i => startAddress <= (nint)i.EndAddress && endAddress >= (nint)i.StartAddress);
 
             var foundSequences = _sequenceScanner.ScanMemoryRegions(byteCodePatterns, memoryRegions);

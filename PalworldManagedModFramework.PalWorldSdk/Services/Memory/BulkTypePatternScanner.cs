@@ -30,8 +30,12 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             return _registredPatterns[memberInfo];
         }
 
-        public nint GetMatchedAddress(ByteCodePattern byteCodePattern) {
-            return _matchedPatterns[byteCodePattern];
+        public nint? GetMatchedAddress(ByteCodePattern byteCodePattern) {
+            if (_matchedPatterns.ContainsKey(byteCodePattern)) {
+                return _matchedPatterns[byteCodePattern];
+            }
+
+            return null;
         }
 
         public object GetRegistredTypeInstance(MemberInfo memberInfo) {

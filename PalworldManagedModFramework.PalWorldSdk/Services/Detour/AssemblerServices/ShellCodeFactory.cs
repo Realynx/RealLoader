@@ -16,8 +16,6 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices {
         /// <param name="redirect"></param>
         /// <returns></returns>
         public byte[] BuildStackDetour64(nint redirect) {
-            DebugUtilities.WaitForDebuggerAttach();
-
             // Jmp [RIP + 0]
             // Address bytes
             var jmpBytes = new byte[] {
@@ -61,15 +59,15 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices {
         /// Orignial Instructions (Usually function prologue)
         /// Stack detour to original func + (Orignial Instructions Length).
         /// </summary>
-        /// <param name="overwrittenCodes"></param>
+        /// <param name="migratedCodes"></param>
         /// <param name="offsetStackAddr"></param>
         /// <returns></returns>
-        public byte[] BuildTrampoline64(byte[] overwrittenCodes, nint offsetStackAddr) {
+        public byte[] BuildTrampoline64(byte[] migratedCodes, nint offsetStackAddr) {
             var finalDetour = BuildStackDetour64(offsetStackAddr);
-            var trampolineCodes = new byte[overwrittenCodes.Length + finalDetour.Length];
+            var trampolineCodes = new byte[migratedCodes.Length + finalDetour.Length];
 
-            overwrittenCodes.CopyTo(trampolineCodes, 0);
-            finalDetour.CopyTo(trampolineCodes, overwrittenCodes.Length);
+            migratedCodes.CopyTo(trampolineCodes, 0);
+            finalDetour.CopyTo(trampolineCodes, migratedCodes.Length);
             return trampolineCodes;
         }
     }

@@ -48,6 +48,7 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
                 //.RegisterProperty(_uObjectFuncs.GetType().GetProperty(nameof(_uObjectFuncs.GetFullName)), _uObjectFuncs);
 
                 .RegisterDetour(GetType().GetMethod(nameof(UStructCtorDetour)))
+                .RegisterDetour(GetType().GetMethod(nameof(UObjectCtorDetour)))
 
                 .ScanAll()
                 .UpdatePropertyValues(_propertyManager)
@@ -58,12 +59,28 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
             _logger.Debug($"Scanning took {sw.ElapsedMilliseconds} ms.");
         }
 
-        public static unsafe delegate* unmanaged<UStruct*, int, int, int, EObjectFlags, void> UStructCtorDetour_Original;
-        [Detour("48 89 8E 80 00 ? ? 48 89 8E 88 00 ? ? 48 89 8E 90 00 ? ? 48 89 8E 98 00 ? ? 48 89 8E A0 00 ? ? 48 89 8E A8 00 ? ? 48 8B 74 ? ? 48 83 ? ? ? C3", DetourType.Stack), UnmanagedCallersOnly(CallConvs = [typeof(CallConvThiscall)])]
-        public static unsafe void UStructCtorDetour(UStruct* instance, int ctorFlags, int param2, int param3, EObjectFlags param4) {
+        public static unsafe delegate* unmanaged<UStruct*, int, int, int, EObjectFlags, UStruct*> UStructCtorDetour_Original;
+
+        [Detour("48 89 5C ? ? 48 89 74 ? ? ? 48 83 ? ? 41 ? ? ? ? 44 8B 44 ? ? 41 ? ? 48 ? ? E8 1C 39 09", DetourType.Stack), UnmanagedCallersOnly(CallConvs = [typeof(CallConvThiscall)])]
+        public static unsafe UStruct* UStructCtorDetour(UStruct* instance, int ctorFlags, int param2, int param3, EObjectFlags param4) {
             Console.WriteLine("CALLED WORKS");
-            UStructCtorDetour_Original(instance, ctorFlags, param2, param3, param4);
+
+            var constructedStruct = UStructCtorDetour_Original(instance, ctorFlags, param2, param3, param4);
             LoggerStatic.Info($"Constructed 0x{(nint)instance:X}");
+
+            return constructedStruct;
+        }
+
+        public static unsafe delegate* unmanaged<UObject*, UObject*> UObjectCtorDetour_Original;
+
+        [Detour("48 89 5C ? ? ? 48 83 ? ? 48 8D 05 CF 9A ? ? 48 ? ? 48 ? ? E8 14 BC FA ? 48 8D 44 ? ? C6 44 24 ? ?", DetourType.Stack), UnmanagedCallersOnly(CallConvs = [typeof(CallConvThiscall)])]
+        public static unsafe UObject* UObjectCtorDetour(UObject* instance) {
+            Console.WriteLine("CALLED WORKS");
+
+            var constructedObject = UObjectCtorDetour_Original(instance);
+            LoggerStatic.Info($"Constructed 0x{(nint)instance:X}");
+
+            return constructedObject;
         }
     }
 }

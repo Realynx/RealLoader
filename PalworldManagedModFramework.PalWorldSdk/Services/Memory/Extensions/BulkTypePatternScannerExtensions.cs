@@ -41,7 +41,11 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Extensions {
                 var matchedAddress = bulkTypePatternScanner.GetMatchedAddress(byteCodePattern);
                 var instance = bulkTypePatternScanner.GetRegistredTypeInstance(member);
 
-                propertyManager.UpdatePropertyValue(byteCodePattern, matchedAddress, propertyInfo, instance);
+                if (matchedAddress is null) {
+                    continue;
+                }
+
+                propertyManager.UpdatePropertyValue(byteCodePattern, matchedAddress.Value, propertyInfo, instance);
             }
 
             return bulkTypePatternScanner;

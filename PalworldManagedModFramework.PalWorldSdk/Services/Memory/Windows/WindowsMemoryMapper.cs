@@ -27,9 +27,11 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
 
                 while (true) {
                     bytesReturnedQuery = WindowsNativeMethods.VirtualQuery(hProcess, baseAddress, memoryInfoStructs, (uint)sizeOfStruct);
+
                     if (bytesReturnedQuery == 0) {
                         break;
                     }
+
 
                     var readFlag = memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READ) ||
                                     memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READWRITE) ||
@@ -46,6 +48,13 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
                                       memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READWRITE) ||
                                       memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_WRITECOPY);
 
+                    baseAddress += (nint)memoryInfoStructs->RegionSize;
+
+                    // We only want commited memory when scanning.
+                    if (memoryInfoStructs->State != WindowsStructs.PageState.MEM_COMMIT) {
+                        continue;
+                    }
+
                     mappedMemoryRegions.Add(new MemoryRegion {
                         StartAddress = memoryInfoStructs->BaseAddress,
                         EndAddress = memoryInfoStructs->BaseAddress + memoryInfoStructs->RegionSize,
@@ -54,8 +63,6 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
                         WriteFlag = writeFlag,
                         ExecuteFlag = executeFlag
                     });
-
-                    baseAddress = baseAddress + (nint)memoryInfoStructs->RegionSize;
                 }
 
                 return mappedMemoryRegions;

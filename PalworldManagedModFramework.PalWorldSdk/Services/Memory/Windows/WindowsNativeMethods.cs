@@ -51,10 +51,17 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
             public int AllocationProtect;
             public int __alignment1;
             public ulong RegionSize;
-            public int State;
+            public PageState State;
             public MemoryProtection Protect;
             public int Type;
             public int __alignment2;
+        }
+
+        [Flags]
+        public enum PageState {
+            MEM_COMMIT = 0x1000,
+            MEM_FREE = 0x10000,
+            MEM_RESERVE = 0x2000,
         }
 
         /// <summary>

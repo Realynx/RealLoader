@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-using Iced.Intel;
+﻿using Iced.Intel;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices.Interfaces;
@@ -18,12 +16,12 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices {
 
             var minPatchSize = patchLength;
             foreach (var instruction in instructions) {
-                if (instruction.IP < (ulong)(address + patchLength)) {
+                var instructionEnd = instruction.IP + (ulong)instruction.Length;
+                if (instructionEnd < (ulong)(address + patchLength)) {
                     continue;
                 }
 
-                var instructionEnd = instruction.IP + (ulong)instruction.Length;
-                if (instructionEnd > (ulong)(address + patchLength)) {
+                if (instructionEnd >= (ulong)(address + patchLength)) {
                     minPatchSize = (int)(instructionEnd - (ulong)address);
                     break;
                 }
@@ -34,25 +32,15 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices {
 
         public unsafe byte[] FixRelativeOffsets(nint originalAddress, nint newAddress, byte[] codes, int bitness) {
             var instructions = DisAssembleCodes(originalAddress, codes, bitness);
-            var offsetChange = newAddress - originalAddress;
 
-            for (var x = 0; x < instructions.Count; x++) {
-                var instruction = instructions[x];
-
-                instruction.IP += (ulong)offsetChange;
-                if (instruction.IsIPRelativeMemoryOperand) {
-                    var newOffset = instruction.MemoryDisplacement32 + offsetChange;
-
-                    if (newOffset is > int.MaxValue or < int.MinValue) {
-                        throw new InvalidOperationException("Offset change is too large for a 32-bit displacement.");
-                    }
-
-                    instruction.MemoryDisplacement32 = (uint)newOffset;
-                    instruction.NearBranch64 += (ulong)offsetChange;
-                }
+            var codeWriter = new CodeWriterImpl();
+            var block = new InstructionBlock(codeWriter, instructions, (ulong)newAddress);
+            var success = BlockEncoder.TryEncode(bitness, block, out var errorMessage, out _);
+            if (!success) {
+                throw new Exception($"Error Migrating Instructions: {errorMessage}");
             }
 
-            return AssembleInstructions(instructions, newAddress, bitness);
+            return codeWriter.ToArray();
         }
 
         private byte[] AssembleInstructions(List<Instruction> instructions, nint newAddress, int bitness) {
@@ -68,11 +56,10 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices {
         }
 
         private static unsafe List<Instruction> DisAssembleCodes(nint address, int patchLength, int bitness) {
-            var length = patchLength + 64;
+            var length = patchLength + 32;
 
             var codes = new ReadOnlySpan<byte>((byte*)address, length).ToArray();
             var instructions = DisAssembleCodes(address, codes, bitness);
-
             return instructions;
         }
 

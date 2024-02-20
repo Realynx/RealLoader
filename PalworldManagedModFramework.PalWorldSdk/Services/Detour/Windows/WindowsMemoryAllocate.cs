@@ -15,7 +15,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.Windows {
         public nint Allocate(MemoryProtection protection, uint length) {
             var winProtection = ConvertToProtection(protection);
 
-            var allocatedMemory = (nint)VirtualAlloc(nint.Zero, length, StateEnum.MEM_COMMIT | StateEnum.MEM_RESERVE, winProtection);
+            var allocatedMemory = VirtualAlloc(nint.Zero, length, StateEnum.MEM_COMMIT, winProtection);
 
             if (allocatedMemory == nint.Zero) {
                 _logger.Error($"Failed to allocate memory. Length: {length}, Protection: {winProtection}");

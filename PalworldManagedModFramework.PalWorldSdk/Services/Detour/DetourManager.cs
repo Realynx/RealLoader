@@ -25,7 +25,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
             DetourRecord? detourRecord;
             switch (managedDetourInfo.DetourType) {
                 case Memory.DetourType.Stack:
-                    detourRecord = _stackDetourService.PrepareDetour(pManagedFunction, pFunction);
+                    detourRecord = _stackDetourService.PrepareDetour(pFunction, pManagedFunction);
                     break;
 
                 case Memory.DetourType.Jmp_IP:
@@ -47,9 +47,10 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
                 throw new Exception($"Failed to prepare hooked function! '{managedDetourInfo.DetourMethod.Name}'");
             }
 
-            _logger.Debug($"Prepared Hook: {managedDetourInfo.DetourMethod.Name}, Trampoline: {managedDetourInfo.TrampolineDelegate.Name}");
-            _managedDetours.Add(managedDetourInfo, detourRecord);
+            _logger.Debug($"[0x{detourRecord.PFunction:X}]Prepared Hook: {managedDetourInfo.DetourMethod.Name}, " +
+                $"[0x{detourRecord.PTrampoline:X}]Trampoline: {managedDetourInfo.TrampolineDelegate.Name}");
 
+            _managedDetours.Add(managedDetourInfo, detourRecord);
             managedDetourInfo.TrampolineDelegate.SetValue(null, detourRecord.DetourAddress);
 
             return detourRecord;
@@ -60,7 +61,6 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
                 _logger.Error($"Tried to add duplicate detour at: 0x{detourRecord.PFunction:X}, Skipping duplicate detour.");
                 return false;
             }
-            DebugUtilities.WaitForDebuggerAttach();
 
             var overWrittenCodes = _instructionPatcher.PatchInstructions(detourRecord.PFunction, detourRecord.DetourCodes);
             var correctPatch = AreEqual(detourRecord.OriginalCodes, overWrittenCodes);

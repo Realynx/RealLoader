@@ -3,7 +3,7 @@
 namespace PalworldManagedModFramework.Sdk.Services.Detour.Windows {
     public static class NativeFunctions {
         [DllImport("kernel32.dll")]
-        public static extern uint VirtualAlloc(nint lpStartAddr, uint size, StateEnum flAllocationType, Protection flProtect);
+        public static extern nint VirtualAlloc(nint lpStartAddr, uint size, StateEnum flAllocationType, Protection flProtect);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool VirtualFree(nint lpAddress, uint dwSize, StateEnum dwFreeType);
