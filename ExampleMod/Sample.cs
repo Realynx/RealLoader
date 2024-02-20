@@ -27,9 +27,9 @@ namespace ExampleMod {
 
         }
 
-        [HookEngineEvent("PalHate::DamageEvent")]
-        public unsafe void CombatEvent(UObject* instance, UFunction* uFunction, void* voidPtr) {
+        //[HookEngineEvent("PalHate::DamageEvent")]
+        //public unsafe void CombatEvent(UObject* instance, UFunction* uFunction, void* voidPtr) {
 
-        }
+        //}
     }
 }
