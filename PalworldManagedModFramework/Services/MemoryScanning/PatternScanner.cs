@@ -11,6 +11,7 @@ using PalworldManagedModFramework.Sdk.Services.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory;
 using PalworldManagedModFramework.Sdk.Services.Memory.Extensions;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.UnrealHook;
 
 namespace PalworldManagedModFramework.Services.MemoryScanning {
     internal class PatternScanner {
@@ -55,7 +56,7 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
                 .RegisterDetour(GetType().GetMethod(nameof(UObjectBeginDestroy)))
                 .RegisterDetour(GetType().GetMethod(nameof(UObjectFinishDestroy)))
                 //.RegisterDetour(GetType().GetMethod(nameof(UObjectCtorDetour)))
-                .RegisterDetour(GetType().GetMethod(nameof(ProcessEvent)))
+                .RegisterDetour(typeof(UnrealHookManager).GetMethod(nameof(UnrealHookManager.ProcessEvent)))
                 //.RegisterDetour(GetType().GetMethod(nameof(UObjectCtor)))
                 .RegisterDetour(GetType().GetMethod(nameof(UObjectPostInitProperties)))
 
@@ -70,7 +71,6 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
         }
 
         private static HashSet<nint> LoadedObjects = new();
-        private static HashSet<string> FuncNames = new();
 
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, void> UObjectPostInitProperties_Original;
 
@@ -107,28 +107,6 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
             UObjectFinishDestroy_Original(instance);
         }
 
-        public static unsafe delegate* unmanaged[Thiscall]<UObject*, UFunction*, void*, void> ProcessEvent_Original;
 
-        [Detour("40 ? ? ? 41 ? 41 ? 41 ? 41 ? 48 81 EC 10 01 ? ? 48 8D 6C ? ? 48 89 9D 38 01", DetourType.Stack)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-        public static unsafe void ProcessEvent(UObject* instance, UFunction* uFunction, void* voidPtr) {
-            if (uFunction is not null && instance is not null) {
-                var className = _namePoolServiceStatic.GetNameString(instance->baseObjectBaseUtility.baseUObjectBase.classPrivate->ObjectName);
-                var functionName = _namePoolServiceStatic.GetNameString(uFunction->baseUstruct.ObjectName);
-                var implulseName = $"{className}::{functionName}";
-
-                if (FuncNames.Add(functionName)) {
-                    _loggerStatic.Info($"VM: {implulseName}");
-                }
-
-                if (!implulseName.Equals("PalHate::DamageEvent")) {
-                    ProcessEvent_Original(instance, uFunction, voidPtr);
-                }
-
-                return;
-            }
-
-            ProcessEvent_Original(instance, uFunction, voidPtr);
-        }
     }
 }

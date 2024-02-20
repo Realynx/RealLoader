@@ -22,7 +22,7 @@ namespace ExampleMod {
             _logger.Info("Unloading...");
         }
 
-        [UnrealEvent("$BP_AIAction_CombatPal_C.*")]
+        [EngineEvent("$BP_AIAction_CombatPal_C.*")]
         public unsafe void CombatEvent(UObject* instance, UFunction* uFunction, void* voidPtr) {
 
         }
