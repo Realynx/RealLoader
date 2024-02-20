@@ -1,8 +1,10 @@
 ﻿using System.Reflection;
 
+using PalworldManagedModFramework.Sdk.Services.Memory.Models;
+
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Interfaces {
     public interface IPatternResolver {
-        nint? ResolvePattern(PropertyInfo member, object? instance = null);
-        nint?[] ResolvePatterns(PropertyInfo[] members, object?[] instances);
+        nint? ResolvePattern(ByteCodePattern pattern);
+        nint?[] ResolvePatterns(ByteCodePattern[] patterns);
     }
 }

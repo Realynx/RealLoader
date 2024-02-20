@@ -1,9 +1,11 @@
-﻿namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
+﻿using PalworldManagedModFramework.Sdk.Services.Memory.Models;
+
+namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
     public interface IMemoryScanner {
-        nint[]? SequenceScan(string signature);
-        nint[]? SequenceScan(string signature, nint startAddress, nint endAddress);
-        nint[][] SequenceScan(nint startAddress, nint endAddress, params string[] signature);
-        nint[][]? SequenceScan(params string[] signature);
-        nint? SingleSequenceScan(string signature);
+        nint[]? SequenceScan(ByteCodePattern byteCodePattern);
+        nint[]? SequenceScan(ByteCodePattern byteCodePattern, nint startAddress, nint endAddress);
+        nint[][] SequenceScan(nint startAddress, nint endAddress, params ByteCodePattern[] byteCodePatterns);
+        nint[][]? SequenceScan(params ByteCodePattern[] byteCodePatterns);
+        nint? SingleSequenceScan(ByteCodePattern byteCodePattern);
     }
 }

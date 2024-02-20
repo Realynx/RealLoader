@@ -1,7 +1,7 @@
-﻿using PalworldManagedModFramework.Sdk.Attributes;
+﻿using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Interfaces {
     public interface IOperandResolver {
-        nint ResolveInstructionAddress(nint matchedAddress, nint operandOffset, MachineCodePatternAttribute patternAttribute);
+        nint ResolveInstructionAddress(nint matchedAddress, ByteCodePattern byteCodePattern);
     }
 }

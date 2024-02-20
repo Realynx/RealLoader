@@ -1,5 +1,6 @@
 ﻿using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
     public class LinuxMemoryScanner : IMemoryScanner {
@@ -14,44 +15,44 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
             _memoryMapper = memoryMapper;
         }
 
-        public nint? SingleSequenceScan(string signature) {
-            return SequenceScan(signature).FirstOrDefault();
+        public nint? SingleSequenceScan(ByteCodePattern byteCodePattern) {
+            return SequenceScan(byteCodePattern).FirstOrDefault();
         }
 
-        public nint[]? SequenceScan(string signature) {
+        public nint[]? SequenceScan(ByteCodePattern byteCodePattern) {
             var memoryRegions = _memoryMapper.FindMemoryRegions();
 
             _logger.Debug($"Scanning {memoryRegions.Length} memory regions");
             var foundSequences = _sequenceScanner
-                .ScanMemoryRegions(new string[] { signature }, memoryRegions).ToArray();
+                .ScanMemoryRegions(new ByteCodePattern[] { byteCodePattern }, memoryRegions).ToArray();
             _logger.Debug($"Finished scan, found {foundSequences.Length} matches.");
 
             return foundSequences.FirstOrDefault()?.ToArray();
         }
 
-        public nint[][]? SequenceScan(string[] signature) {
+        public nint[][]? SequenceScan(ByteCodePattern[] byteCodePatterns) {
             var memoryRegions = _memoryMapper.FindMemoryRegions();
 
             _logger.Debug($"Scanning {memoryRegions.Length} memory regions");
             var foundSequences = _sequenceScanner
-                .ScanMemoryRegions(signature, memoryRegions);
+                .ScanMemoryRegions(byteCodePatterns, memoryRegions);
             _logger.Debug($"Finished scan, found {foundSequences.Length} matches.");
 
             return foundSequences;
         }
 
-        public nint[]? SequenceScan(string signature, nint startAddress, nint endAddress) {
-            return SequenceScan(startAddress, endAddress, signature).FirstOrDefault();
+        public nint[]? SequenceScan(ByteCodePattern byteCodePattern, nint startAddress, nint endAddress) {
+            return SequenceScan(startAddress, endAddress, byteCodePattern).FirstOrDefault();
         }
 
-        public nint[][] SequenceScan(nint startAddress, nint endAddress, params string[] signatures) {
+        public nint[][] SequenceScan(nint startAddress, nint endAddress, params ByteCodePattern[] byteCodePatterns) {
             var memoryRegions = _memoryMapper.FindMemoryRegions()
                 .Where(i => i.ReadFlag)
                 .Where(i => startAddress <= (nint)i.EndAddress && endAddress >= (nint)i.StartAddress);
 
             _logger.Debug($"Scanning {memoryRegions.Count()} memory regions");
             var foundSequences = _sequenceScanner
-                .ScanMemoryRegions(signatures, memoryRegions);
+                .ScanMemoryRegions(byteCodePatterns, memoryRegions);
             _logger.Debug($"Finished scan, found {foundSequences.Length} matches.");
 
             return foundSequences;

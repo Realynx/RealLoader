@@ -3,6 +3,7 @@
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
+using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
     public class WindowsMemoryScanner : IMemoryScanner {
@@ -26,35 +27,36 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
             _logger.Debug($"Windows Main Module Base Address: 0x{_baseAddress:X}");
         }
 
-        public nint? SingleSequenceScan(string signature) {
-            return SequenceScan(signature).FirstOrDefault();
+        public nint? SingleSequenceScan(ByteCodePattern byteCodePattern) {
+            return SequenceScan(byteCodePattern).FirstOrDefault();
         }
 
-        public nint[][]? SequenceScan(params string[] signatures) {
+        public nint[][]? SequenceScan(params ByteCodePattern[] byteCodePatterns) {
             var processModule = Process.GetCurrentProcess().MainModule!;
 
             var endAddress = processModule.BaseAddress + processModule.ModuleMemorySize;
-            return SequenceScan(_baseAddress, endAddress, signatures);
+            return SequenceScan(_baseAddress, endAddress, byteCodePatterns);
         }
 
-        public nint[]? SequenceScan(string signature) {
+        public nint[]? SequenceScan(ByteCodePattern byteCodePattern) {
             var processModule = Process.GetCurrentProcess().MainModule!;
 
             var endAddress = processModule.BaseAddress + processModule.ModuleMemorySize;
-            return SequenceScan(signature, _baseAddress, endAddress);
+            return SequenceScan(byteCodePattern, _baseAddress, endAddress);
         }
 
-        public nint[]? SequenceScan(string signature, nint startAddress, nint endAddress) {
-            return SequenceScan(startAddress, endAddress, signature).FirstOrDefault();
+        public nint[]? SequenceScan(ByteCodePattern byteCodePattern, nint startAddress, nint endAddress) {
+            return SequenceScan(startAddress, endAddress, byteCodePattern).FirstOrDefault();
         }
 
-        public nint[][] SequenceScan(nint startAddress, nint endAddress, params string[] signature) {
+        public nint[][] SequenceScan(nint startAddress, nint endAddress, params ByteCodePattern[] byteCodePatterns) {
             _processSuspender.PauseSelf();
 
             var memoryRegions = _memoryMapper.FindMemoryRegions()
                 .Where(i => i.ReadFlag)
                 .Where(i => startAddress <= (nint)i.EndAddress && endAddress >= (nint)i.StartAddress);
-            var foundSequences = _sequenceScanner.ScanMemoryRegions(signature, memoryRegions);
+
+            var foundSequences = _sequenceScanner.ScanMemoryRegions(byteCodePatterns, memoryRegions);
 
             _processSuspender.ResumeSelf();
 

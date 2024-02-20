@@ -2,7 +2,7 @@
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Interfaces {
     public interface ISequenceScanner {
-        nint[][] ScanMemoryRegion(string[] signatures, MemoryRegion memoryRegion);
-        nint[][] ScanMemoryRegions(string[] signatures, IEnumerable<MemoryRegion> memoryRegions);
+        nint[][] ScanMemoryRegion(ByteCodePattern[] patterns, MemoryRegion memoryRegion);
+        nint[][] ScanMemoryRegions(ByteCodePattern[] patterns, IEnumerable<MemoryRegion> memoryRegions);
     }
 }
