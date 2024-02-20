@@ -10,20 +10,18 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.Models {
             DetourMethod = detourMethod;
             TrampolineDelegate = trampolineDelegate;
             DetourType = detourType;
+
+            GetDetourDelegate = DetourMethod.CreateDelegate(Expression.GetDelegateType(
+                (from parameter in DetourMethod.GetParameters() select parameter.ParameterType)
+                .Concat([DetourMethod.ReturnType])
+                .ToArray()));
         }
 
         public MethodInfo DetourMethod { get; }
         public FieldInfo TrampolineDelegate { get; }
         public DetourType DetourType { get; }
 
-        public Delegate GetDetourDelegate {
-            get {
-                return DetourMethod.CreateDelegate(Expression.GetDelegateType(
-                    (from parameter in DetourMethod.GetParameters() select parameter.ParameterType)
-                    .Concat([DetourMethod.ReturnType])
-                    .ToArray()));
-            }
-        }
+        public Delegate GetDetourDelegate { get; }
 
         public DetourAttribute DetourAttribute {
             get {

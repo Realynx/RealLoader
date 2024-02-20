@@ -20,6 +20,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
         }
 
         public DetourRecord PrepareDetour(ManagedDetourInfo managedDetourInfo, nint pFunction) {
+
             var pManagedFunction = Marshal.GetFunctionPointerForDelegate(managedDetourInfo.GetDetourDelegate);
 
             DetourRecord? detourRecord;

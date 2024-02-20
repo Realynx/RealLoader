@@ -54,9 +54,11 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
                 .RegisterProperty(_uObjectFuncs.GetType().GetProperty(nameof(_uObjectFuncs.GetParentPackage)), _uObjectFuncs)
                 //.RegisterProperty(_uObjectFuncs.GetType().GetProperty(nameof(_uObjectFuncs.GetFullName)), _uObjectFuncs);
 
-                // .RegisterDetour(GetType().GetMethod(nameof(UStructCtorDetour)))
-                .RegisterDetour(GetType().GetMethod(nameof(UObjectCtorDetour)))
+                .RegisterDetour(GetType().GetMethod(nameof(UObjectBeginDestroy)))
+                //.RegisterDetour(GetType().GetMethod(nameof(UObjectCtorDetour)))
                 .RegisterDetour(GetType().GetMethod(nameof(ProcessEvent)))
+                //.RegisterDetour(GetType().GetMethod(nameof(UObjectCtor)))
+                .RegisterDetour(GetType().GetMethod(nameof(UObjectPostLoad)))
 
 
                 .ScanAll()
@@ -68,31 +70,57 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
             _logger.Debug($"Scanning took {sw.ElapsedMilliseconds} ms.");
         }
 
-        public static unsafe delegate* unmanaged[Thiscall]<UStruct*, int, int, int, EObjectFlags, UStruct*> UStructCtorDetour_Original;
+        private static HashSet<nint> LoadedObjects = new();
 
-        [Detour("48 89 5C ? ? 48 89 74 ? ? ? 48 83 ? ? 41 ? ? ? ? 44 8B 44 ? ? 41 ? ? 48 ? ? E8 1C 39 09", DetourType.Stack)]
+        public static unsafe delegate* unmanaged[Thiscall]<UObject*, void> UObjectPostLoad_Original;
+
+        [Detour("48 83 ? ? 48 ? ? 48 C7 44 24 20 00 00 ? ? 48 8B ? ? 45 ? ? 41 ? ?", DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-        public static unsafe UStruct* UStructCtorDetour(UStruct* instance, int ctorFlags, int param2, int param3, EObjectFlags param4) {
-            Console.WriteLine("CALLED WORKS");
+        public static unsafe void UObjectPostLoad(UObject* instance) {
+            UObjectPostLoad_Original(instance);
 
-            var constructedStruct = UStructCtorDetour_Original(instance, ctorFlags, param2, param3, param4);
-            LoggerStatic.Info($"Constructed 0x{(nint)instance:X}");
-
-            return constructedStruct;
+            lock (LoadedObjects) {
+                LoadedObjects.Add((nint)instance);
+                Console.Title = $"Objects: {LoadedObjects.Count}";
+            }
         }
 
-        public static unsafe delegate* unmanaged[Thiscall]<UObject*, UObject*> UObjectCtorDetour_Original;
 
-        [Detour("48 89 5C ? ? ? 48 83 ? ? 48 8D 05 CF 9A ? ? 48 ? ? 48 ? ? E8 14 BC FA ? 48 8D 44", DetourType.Stack)]
+        //public static unsafe delegate* unmanaged[Thiscall]<UObject*, object*, UObject*> UObjectCtor_Original;
+
+        //[Detour("48 89 5C ? ? ? 48 83 ? ? 48 8D 05 2F 9B ? ? 48 ? ? 48 ? ? 48 ? ? E8 71 BC FA ?", DetourType.Stack)]
+        //[UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+        //public static unsafe UObject* UObjectCtor(UObject* instance, object* initalizer) {
+        //    var constructedObject = UObjectCtor_Original(instance, initalizer);
+
+        //    LoggerStatic.Info($"Constructed 0x{(nint)instance:X}");
+
+        //    return constructedObject;
+        //}
+
+        public static unsafe delegate* unmanaged[Thiscall]<UObject*, void> UObjectBeginDestroy_Original;
+
+        [Detour("40 ? 48 83 ? ? 8B ? ? 48 ? ? C1 ? ? ? ? 75 ? 48 8B ? ? 48 8D 54", DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
-        public static unsafe UObject* UObjectCtorDetour(UObject* instance) {
-            Console.WriteLine("CALLED WORKS");
+        public static unsafe void UObjectBeginDestroy(UObject* instance) {
+            UObjectBeginDestroy_Original(instance);
 
-            var constructedObject = UObjectCtorDetour_Original(instance);
-            LoggerStatic.Info($"Constructed 0x{(nint)instance:X}");
-
-            return constructedObject;
+            lock (LoadedObjects) {
+                LoadedObjects.Remove((nint)instance);
+                Console.Title = $"Objects: {LoadedObjects.Count}";
+            }
         }
+
+        //public static unsafe delegate* unmanaged[Thiscall]<UObject*, UObject*> UObjectCtorDetour_Original;
+
+        //[Detour("48 89 5C ? ? ? 48 83 ? ? 48 8D 05 CF 9A ? ? 48 ? ? 48 ? ? E8 14 BC FA ? 48 8D 44", DetourType.Stack)]
+        //[UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
+        //public static unsafe UObject* UObjectCtorDetour(UObject* instance) {
+        //    var constructedObject = UObjectCtorDetour_Original(instance);
+        //    LoggerStatic.Info($"Constructed 0x{(nint)instance:X}");
+
+        //    return constructedObject;
+        //}
 
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, UFunction*, void*, void> ProcessEvent_Original;
 
@@ -102,10 +130,15 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
             ProcessEvent_Original(instance, uFunction, voidPtr);
 
             //var functionName = "Null Func";
-            //if (uFunction is not null) {
-            //    functionName = NamePoolService.GetNameString(uFunction->baseUstruct.ObjectName);
-            //}
-            //LoggerStatic.Info($"VM Executed: {functionName}");
+            if (uFunction is not null) {
+                var functionName = NamePoolService.GetNameString(uFunction->baseUstruct.ObjectName);
+                if (FuncNames.Add(functionName)) {
+                    LoggerStatic.Info($"VM: {functionName}");
+                }
+            }
+
         }
+
+        private static HashSet<string> FuncNames = new();
     }
 }
