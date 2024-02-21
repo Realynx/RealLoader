@@ -50,10 +50,12 @@
         internal const string CODE_NAMESPACE = "DotNetSdkBuilderMod.Generated";
         internal const string CODE_GEN_INTEROP_NAMESPACE = "CodeGenInterop";
         internal const string CODE_GEN_INTEROP_RETURN_VALUE_NAME = "__returnValue";
+        internal const string CODE_GEN_INTEROP_INVOKE_METHOD_NAME = "Invoke";
         internal const string U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE = $"{CODE_GEN_INTEROP_NAMESPACE}.Extensions";
         internal const string U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME = "UObjectInteropExtensions";
         internal const string ADDRESS_FIELD_NAME = "Address";
         internal const string CONSTRUCTOR_ADDRESS_NAME = "address";
+        internal const string CONSTRUCTOR_UNREAL_REFLECTION_NAME = "unrealReflection";
         internal const string OPERATOR_THIS_CLASS_NAME = "self"; // I don't like this but I can't think of anything better
         internal const string FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE = "FullTypePath";
         internal const string COMPATIBLE_GAME_VERSION_ATTRIBUTE = "CompatibleGameVersion";

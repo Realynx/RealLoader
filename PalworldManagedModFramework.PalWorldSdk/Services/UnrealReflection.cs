@@ -38,6 +38,19 @@ namespace PalworldManagedModFramework.Sdk.Services {
             return pFields;
         }
 
+        public unsafe UFunction* GetFunctionAtIndex(UClass* uClass, Index index) {
+            var i = 0;
+            for (var field = uClass->baseUStruct.children; field is not null; field = field->next) {
+                if (i == index.Value) {
+                    return (UFunction*)field;
+                }
+
+                i++;
+            }
+
+            throw new Exception($"Could not find function {index} for {uClass->ObjectName}. Found {i} functions.");
+        }
+
         public unsafe FField*[] GetFunctionSignature(UFunction* uFunction, out FField* returnValue, out Index returnValueIndex) {
             var hasReturnProperty = uFunction->returnValueOffset != 0xffff;
             var returnValueAddress = uFunction->baseUstruct.childProperties + uFunction->returnValueOffset;

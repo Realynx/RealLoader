@@ -2,6 +2,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.Interfaces;
 
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 
@@ -20,13 +21,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 new CodeGenArgumentNode {
                     type = INT_PTR,
                     name = CONSTRUCTOR_ADDRESS_NAME,
-                    attributes = null,
+                },
+                new CodeGenArgumentNode {
+                    type = nameof(IUnrealReflection),
+                    name = CONSTRUCTOR_UNREAL_REFLECTION_NAME,
                 }
             };
 
-            var baseConstructor = $"{BASE}{OPEN_ROUND_BRACKET}{CONSTRUCTOR_ADDRESS_NAME}{CLOSED_ROUND_BRACKET}";
-
-            string[]? body = null;
+            var baseConstructor = $"{BASE}{OPEN_ROUND_BRACKET}{CONSTRUCTOR_ADDRESS_NAME}{COMMA}{WHITE_SPACE}{CONSTRUCTOR_UNREAL_REFLECTION_NAME}{CLOSED_ROUND_BRACKET}";
 
             return new CodeGenConstructorNode {
                 modifier = PUBLIC,
@@ -34,7 +36,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 attributes = attributes,
                 arguments = arguments,
                 baseConstructor = baseConstructor,
-                body = body,
             };
         }
 
