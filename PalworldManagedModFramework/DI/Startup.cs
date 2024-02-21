@@ -35,8 +35,6 @@ namespace PalworldManagedModFramework.DI {
             services
                 .AddSingleton<IShellCodeFactory, ShellCodeFactory>();
 
-            // TODO: Create extention classes with batches of these add singletons in logical groupings.
-
             services
                 .AddSingleton<ILogger, Logger>()
                 .AddSingleton<PatternScanner>()
