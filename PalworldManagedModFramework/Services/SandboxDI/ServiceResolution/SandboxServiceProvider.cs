@@ -40,7 +40,6 @@ namespace PalworldManagedModFramework.Services.SandboxDI.ServiceResolution {
                 }
 
                 var arguments = GetConstructorArguments(DICtor);
-
                 _serviceSingletons[serviceType] = DICtor.Invoke(arguments);
             }
 
