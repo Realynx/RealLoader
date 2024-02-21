@@ -28,28 +28,28 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
             }
         }
 
-        public nint RegisterInUnreal() {
-            Address = Service.RegisterInUnreal(this);
-            return _addressUnsafe;
-        }
+        //public nint RegisterInUnreal() {
+        //    Address = Service.RegisterInUnreal(this);
+        //    return _addressUnsafe;
+        //}
 
-        public void OnObjectRemovedFromGlobalObjectPool(object sender, ObjectRemovedEventArgs e) {
-            if (e.address == _addressUnsafe) {
-                Address = IntPtr.Zero;
-            }
-        }
+        //public void OnObjectRemovedFromGlobalObjectPool(object sender, ObjectRemovedEventArgs e) {
+        //    if (e.address == _addressUnsafe) {
+        //        Address = IntPtr.Zero;
+        //    }
+        //}
 
-        public unsafe void ProcessEvent(int functionAddress, void* arguments) {
-            Service.ProcessEvent(Address, functionAddress, arguments);
-        }
+        //public unsafe void ProcessEvent(int functionAddress, void* arguments) {
+        //    Service.ProcessEvent(Address, functionAddress, arguments);
+        //}
 
-        private bool _disposing;
+        //private bool _disposing;
 
-        public void Dispose() {
-            if (!_disposing) {
-                _disposing = true;
-                Service.DeleteInUnreal(this);
-            }
-        }
+        //public void Dispose() {
+        //    if (!_disposing) {
+        //        _disposing = true;
+        //        Service.DeleteInUnreal(this);
+        //    }
+        //}
     }
 }
