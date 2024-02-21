@@ -5,11 +5,9 @@ using PalworldManagedModFramework.Sdk.Services.Interfaces;
 namespace PalworldManagedModFramework.Sdk.Services {
     public class UnrealReflection : IUnrealReflection {
         private readonly ILogger _logger;
-        private readonly IGlobalObjects _globalObjects;
 
-        public UnrealReflection(ILogger logger, IGlobalObjects globalObjects) {
+        public UnrealReflection(ILogger logger) {
             _logger = logger;
-            _globalObjects = globalObjects;
         }
 
         public unsafe FProperty*[] GetTypeFields(UClass* uClass) {
@@ -40,20 +38,25 @@ namespace PalworldManagedModFramework.Sdk.Services {
             return pFields;
         }
 
-        public unsafe FField*[] GetFunctionSignature(UFunction* uFunction, out FField* returnValue) {
+        public unsafe FField*[] GetFunctionSignature(UFunction* uFunction, out FField* returnValue, out Index returnValueIndex) {
             var hasReturnProperty = uFunction->returnValueOffset != 0xffff;
             var returnValueAddress = uFunction->baseUstruct.childProperties + uFunction->returnValueOffset;
 
             returnValue = (FField*)nint.Zero;
+            returnValueIndex = 0;
 
+            var i = 0;
             var childProps = new List<nint>();
             for (var currentProp = uFunction->baseUstruct.childProperties; currentProp is not null; currentProp = currentProp->next) {
                 if (hasReturnProperty && currentProp == returnValueAddress) {
                     returnValue = currentProp;
+                    returnValueIndex = i;
                 }
                 else {
                     childProps.Add((nint)currentProp);
                 }
+
+                i++;
             }
 
             var parameters = new FField*[childProps.Count];

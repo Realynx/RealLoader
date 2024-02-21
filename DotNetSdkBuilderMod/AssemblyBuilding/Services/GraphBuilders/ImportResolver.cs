@@ -27,7 +27,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 if (imports.Count > 0) {
                     var namespaceImports = new string[imports.Count];
                     var i = 0;
-                    foreach (var package in imports) {
+                    foreach (var package in imports.Order()) {
                         var import = new StringBuilder(package)
                             .TrimStart('/')
                             .Replace('/', '.')
@@ -117,6 +117,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             if (methodNode.arguments is not null) {
                 foreach (var argumentNode in methodNode.arguments) {
                     ResolveImportsForArgument(argumentNode, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
+                }
+            }
+
+            if (methodNode.bodyTypes is not null) {
+                foreach (var type in methodNode.bodyTypes) {
+                    TryAddClassAsImport(type, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
                 }
             }
         }

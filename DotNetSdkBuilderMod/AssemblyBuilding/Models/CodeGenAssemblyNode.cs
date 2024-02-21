@@ -18,7 +18,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public string[]? imports;
     }
 
-    [DebuggerDisplay("{baseType} {name}: {constructorNodes?.Length ?? 0} ctors, {propertyNodes?.Length ?? 0} props, {methodNodes?.Length ?? 0} methods, {operatorNodes?.Length ?? 0} operators")]
+    [DebuggerDisplay("{baseType} {name}: {constructorNodes?.Length ?? 0} constructors, {propertyNodes?.Length ?? 0} properties, {methodNodes?.Length ?? 0} methods, {operatorNodes?.Length ?? 0} operators")]
     public class CodeGenClassNode : CodeGenCodeObjectNode {
         public CodeGenConstructorNode[]? constructorNodes;
         public CodeGenPropertyNode[]? propertyNodes;
@@ -42,10 +42,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public string? set;
     }
 
-    [DebuggerDisplay("{returnType} {name}: {arguments?.Length ?? 0} arguments")]
+    [DebuggerDisplay("{returnType} {name}: {arguments?.Length ?? 0} arguments, {genericTypes?.Length ?? 0} generic types {bodyTypes?.Length ?? 0} body types")]
     public class CodeGenMethodNode : CodeGenCodeObjectNode {
         public string returnType;
+        public string[]? genericTypes;
         public CodeGenArgumentNode[]? arguments;
+        public string[]? body;
+        public string[]? bodyTypes;
     }
 
     [DebuggerDisplay("{modifier} {returnType}({name}) => {result}")]
@@ -60,9 +63,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public string? value;
     }
 
-    [DebuggerDisplay("{type} {name}, {attributes?.Length ?? 0} attributes")]
+    [DebuggerDisplay("{modifier} {type} {name}, {attributes?.Length ?? 0} attributes")]
     public class CodeGenArgumentNode {
         public CodeGenAttributeNode[]? attributes;
+        public string? modifier;
         public string type;
         public string name;
     }

@@ -40,11 +40,18 @@
         internal const string BASE = "base";
         internal const string VOID = "void";
         internal const string INT_PTR = "nint";
+        internal const string INT = "int";
         internal const string GET = "get";
         internal const string SET = "set";
         internal const string NEW = "new";
+        internal const string THIS = "this";
+        internal const string RETURN = "return";
         internal const string DELEGATE = "delegate";
         internal const string CODE_NAMESPACE = "DotNetSdkBuilderMod.Generated";
+        internal const string CODE_GEN_INTEROP_NAMESPACE = "CodeGenInterop";
+        internal const string CODE_GEN_INTEROP_RETURN_VALUE_NAME = "__returnValue";
+        internal const string U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE = $"{CODE_GEN_INTEROP_NAMESPACE}.Extensions";
+        internal const string U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME = "UObjectInteropExtensions";
         internal const string ADDRESS_FIELD_NAME = "Address";
         internal const string CONSTRUCTOR_ADDRESS_NAME = "address";
         internal const string OPERATOR_THIS_CLASS_NAME = "self"; // I don't like this but I can't think of anything better
@@ -53,59 +60,5 @@
         internal const string DEPRECATED_ATTRIBUTE = "Obsolete";
         internal const char INDENT = ' ';
         internal const int INDENT_SIZE = 4;
-        internal const string CORE_U_OBJECT_EXTRA_MEMBERS = """
-// Framework members
-
-public Object(nint address) {
-    Address = address;
-}
-
-public bool Disposed { get; private set; } = true;
-
-private nint _addressUnsafe;
-public nint Address {
-    get {
-        if (Disposed) {
-            throw new ObjectDisposedException();
-        }
-
-        return _addressUnsafe;
-    }
-    private set {
-        _addressUnsafe = value;
-
-        if (_addressUnsafe == IntPtr.Zero) {
-            Disposed = true;
-        }
-        else {
-            Disposed = false;
-        }
-    }
-}
-
-public nint RegisterInUnreal() {
-    Address = Service.RegisterInUnreal(this);
-    return _addressUnsafe;
-}
-
-public void OnObjectRemovedFromGlobalObjectPool(object sender, ObjectRemovedEventArgs e) {
-    if (e.address == _addressUnsafe) {
-        Address = IntPtr.Zero;
-    }
-}
-
-public void ProcessEvent(nint function, void* arguments) {
-    // TODO
-}
-
-private bool _disposing;
-
-public void Dispose() {
-    if (!disposing) {
-        _disposing = true;
-        Service.DeleteInUnreal(this);
-    }
-}
-"""; // TODO: Compile as a regular class and use it to replace Script/CoreUObject/Object
     }
 }

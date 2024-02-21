@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Buffers;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
@@ -6,6 +7,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.Flags;
+using PalworldManagedModFramework.Sdk.Services.Interfaces;
 
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 
@@ -17,15 +19,20 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         private readonly IFunctionTimingService _functionTimingService;
         private readonly ICodeGenAttributeNodeFactory _attributeNodeFactory;
         private readonly ICodeGenClassNodeFactory _classNodeFactory;
+        private readonly IUnrealReflection _unrealReflection;
+        private readonly IUObjectInteropExtensionsBuilder _uObjectInteropExtensionsBuilder;
 
         public CodeGenGraphBuilder(ILogger logger, INameSpaceService nameSpaceService, IImportResolver importResolver,
-            IFunctionTimingService functionTimingService, ICodeGenAttributeNodeFactory attributeNodeFactory, ICodeGenClassNodeFactory classNodeFactory) {
+            IFunctionTimingService functionTimingService, ICodeGenAttributeNodeFactory attributeNodeFactory, ICodeGenClassNodeFactory classNodeFactory,
+            IUnrealReflection unrealReflection, IUObjectInteropExtensionsBuilder uObjectInteropExtensionsBuilder) {
             _logger = logger;
             _nameSpaceService = nameSpaceService;
             _importResolver = importResolver;
             _functionTimingService = functionTimingService;
             _attributeNodeFactory = attributeNodeFactory;
             _classNodeFactory = classNodeFactory;
+            _unrealReflection = unrealReflection;
+            _uObjectInteropExtensionsBuilder = uObjectInteropExtensionsBuilder;
         }
 
         public CodeGenAssemblyNode[] BuildAssemblyGraphs(ClassNode rootNode) {
@@ -52,6 +59,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
             _logger.Debug("Building dotnet class-namespace dictionary...");
             var dotnetClassNamespaces = TimedMemoizeDotnetTypeNamespaces();
+
+            _logger.Debug("Counting function arguments...");
+            var functionArgCounts = TimedCountFunctionArguments(rootNode);
+
+            _logger.Debug("Building interop extensions...");
+            TimedBuildInteropExtensions(namespaceTree, functionArgCounts);
 
             _logger.Debug("Applying imports...");
             TimedApplyImports(namespaceTree, customClassNamespaces, dotnetClassNamespaces);
@@ -80,7 +93,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
         private CodeGenNamespaceNode[] TimedBuildNamespaceTree(string[] namespaces) {
             var namespaceTree = new CodeGenNamespaceNode();
-            var time = _functionTimingService.Execute(() => _nameSpaceService.BuildNamespaceTree(namespaces, string.Empty, namespaceTree));
+
+            var time = _functionTimingService.Execute(() => {
+                _nameSpaceService.BuildNamespaceTree(namespaces, string.Empty, namespaceTree);
+
+                Array.Resize(ref namespaceTree.namespaces, namespaceTree.namespaces!.Length + 1);
+                namespaceTree.namespaces[^1] = _uObjectInteropExtensionsBuilder.GetScaffoldNamespaceNode();
+            });
 
             _logger.Debug($"Built namespace tree; {time.TotalMilliseconds:F1} ms to build.");
             return namespaceTree.namespaces!;
@@ -94,23 +113,34 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 }
             });
 
-            _logger.Debug($"Built namespace tree; {time.TotalMilliseconds:F1} ms to build.");
+            _logger.Debug($"Memoized namespace tree; {time.TotalMilliseconds:F1} ms to build.");
             return namespacesMemo;
         }
 
         private Dictionary<string, string> TimedMemoizeTypeNamespaces(ClassNode rootNode) {
             var memoizedClassesAndNamespaces = new Dictionary<string, string>();
-            var time = _functionTimingService.Execute(() => _nameSpaceService.MemoizeTypeNamespaces(rootNode, memoizedClassesAndNamespaces));
+
+            var time = _functionTimingService.Execute(() => {
+                _nameSpaceService.MemoizeTypeNamespaces(rootNode, memoizedClassesAndNamespaces);
+
+                memoizedClassesAndNamespaces.Add(nameof(UObjectInterop), typeof(UObjectInterop).Namespace!);
+                memoizedClassesAndNamespaces.Add(U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME, U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE);
+            });
 
             _logger.Debug($"Memoized classes and namespaces; {time.TotalMilliseconds:F1} ms to build.");
             return memoizedClassesAndNamespaces;
         }
 
         private Dictionary<string, string> TimedMemoizeDotnetTypeNamespaces() {
-            var assembly = Assembly.GetAssembly(typeof(string))!;
-            var time = _functionTimingService.Execute(() => _nameSpaceService.MemoizeAssemblyTypeNamespaces(assembly), out var memoizedClassesAndNamespaces);
+            var memoizedClassesAndNamespaces = new Dictionary<string, string>();
 
-            _logger.Debug($"Memoized dotnet classes and namespaces; {time.TotalMilliseconds:F1} ms to build.");
+            var systemAssembly = Assembly.GetAssembly(typeof(string))!;
+            var time1 = _functionTimingService.Execute(() => _nameSpaceService.MemoizeAssemblyTypeNamespaces(systemAssembly, memoizedClassesAndNamespaces));
+
+            var systemBuffersAssembly = Assembly.GetAssembly(typeof(MemoryPool<byte>))!;
+            var time2 = _functionTimingService.Execute(() => _nameSpaceService.MemoizeAssemblyTypeNamespaces(systemBuffersAssembly, memoizedClassesAndNamespaces));
+
+            _logger.Debug($"Memoized dotnet classes and namespaces; {(time1 + time2).TotalMilliseconds:F1} ms to build.");
             return memoizedClassesAndNamespaces;
         }
 
@@ -171,6 +201,34 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
                 namespaceNode.classes = codeGenClassNodes;
             }
+        }
+
+        private IReadOnlyList<int> TimedCountFunctionArguments(ClassNode rootNode) {
+            var argCounts = new HashSet<int>();
+            var time = _functionTimingService.Execute(() => CountFunctionArguments(rootNode, argCounts));
+
+            _logger.Debug($"Applied imports to namespace tree; {time.TotalMilliseconds:F1} ms to build.");
+            return argCounts.Order().ToArray();
+        }
+
+        private unsafe void CountFunctionArguments(ClassNode currentNode, HashSet<int> argCounts) {
+            foreach (var function in currentNode.functions) {
+                var functionSignature = _unrealReflection.GetFunctionSignature(function, out var returnValue, out _);
+                var argumentsCount = functionSignature.Length + (returnValue is not null ? 1 : 0);
+                argCounts.Add(argumentsCount);
+            }
+
+            foreach (var child in currentNode.children) {
+                CountFunctionArguments(child, argCounts);
+            }
+        }
+
+        private void TimedBuildInteropExtensions(CodeGenNamespaceNode[] namespaceTree, IReadOnlyList<int> functionArgCounts) {
+            var interopNamespace = namespaceTree.First(x => x.packageName.Equals(CODE_GEN_INTEROP_NAMESPACE));
+            var extensionsNamespace = interopNamespace.namespaces!.First(x => x.packageName.Equals(U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE));
+            var time = _functionTimingService.Execute(() => _uObjectInteropExtensionsBuilder.PopulateNamespaceNode(extensionsNamespace, functionArgCounts));
+
+            _logger.Debug($"Built interop extension methods; {time.TotalMilliseconds:F1} ms to build.");
         }
 
         private void TimedApplyImports(CodeGenNamespaceNode[] namespaceTree, Dictionary<string, string> customClassNamespaces, Dictionary<string, string> dotnetClassNamespaces) {

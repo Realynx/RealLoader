@@ -34,6 +34,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                     }
                 }
 
+                if (argumentNode.modifier is not null) {
+                    codeBuilder.Append(argumentNode.modifier);
+                    codeBuilder.Append(WHITE_SPACE);
+                }
+
                 codeBuilder.Append(argumentNode.type);
                 codeBuilder.Append(WHITE_SPACE);
                 codeBuilder.Append(argumentNode.name);

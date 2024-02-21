@@ -24,16 +24,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             };
 
-            string? baseConstructor = null;
+            var baseConstructor = $"{BASE}{OPEN_ROUND_BRACKET}{CONSTRUCTOR_ADDRESS_NAME}{CLOSED_ROUND_BRACKET}";
+
             string[]? body = null;
-            if (classNode.nodeClass->baseUStruct.superStruct is not null) {
-                baseConstructor = $"{BASE}{OPEN_ROUND_BRACKET}{CONSTRUCTOR_ADDRESS_NAME}{CLOSED_ROUND_BRACKET}";
-            }
-            else {
-                body = new[] {
-                    $"{ADDRESS_FIELD_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{CONSTRUCTOR_ADDRESS_NAME}{SEMICOLON}"
-                };
-            }
 
             return new CodeGenConstructorNode {
                 modifier = PUBLIC,

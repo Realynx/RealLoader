@@ -8,6 +8,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces {
         CodeGenNamespaceNode BuildNamespaceTree(string[] namespaceNames, string previousNamespace, CodeGenNamespaceNode currentNode);
         void MemoizeNamespaceTree(CodeGenNamespaceNode currentNode, Dictionary<string, CodeGenNamespaceNode> namespacesMemo);
         void MemoizeTypeNamespaces(ClassNode currentNode, Dictionary<string, string> memo);
-        Dictionary<string, string> MemoizeAssemblyTypeNamespaces(Assembly assembly);
+        void MemoizeAssemblyTypeNamespaces(Assembly assembly, Dictionary<string, string> memo);
     }
 }

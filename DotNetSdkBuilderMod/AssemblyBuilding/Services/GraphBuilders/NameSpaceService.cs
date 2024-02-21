@@ -81,13 +81,16 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             }
         }
 
-        public Dictionary<string, string> MemoizeAssemblyTypeNamespaces(Assembly assembly) {
-            var memo = new Dictionary<string, string>();
+        public void MemoizeAssemblyTypeNamespaces(Assembly assembly, Dictionary<string, string> memo) {
             foreach (var type in assembly.GetTypes()) {
-                memo[type.Name] = type.Namespace!;
+                if (type.ContainsGenericParameters && type.Name.IndexOf('`') is > 0 and var index) {
+                    var typeName = type.Name[..index];
+                    memo[typeName] = type.Namespace!;
+                }
+                else {
+                    memo[type.Name] = type.Namespace!;
+                }
             }
-
-            return memo;
         }
     }
 }
