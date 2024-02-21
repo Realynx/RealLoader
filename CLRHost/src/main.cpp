@@ -34,7 +34,11 @@ void RUNCLR()
 	host.StartAssembly(fullAppPath.GetWideCharArray());
 }
 
+std::atomic<bool> clrInitialized{ false };
 void SpawnClrThread() {
+	if (clrInitialized.exchange(true)) {
+		return;
+	}
 
 	//inits console if running on windows.
 #if defined(_WIN32)
