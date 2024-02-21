@@ -50,8 +50,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
-            var classMethods = classNode.functions;
             CodeGenMethodNode[]? methods = null;
+            var classMethods = classNode.functions;
             if (classMethods.Length > 0) {
                 methods = new CodeGenMethodNode[classMethods.Length];
                 for (var i = 0; i < classMethods.Length; i++) {
@@ -75,9 +75,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
 
             var baseClass = classNode.nodeClass->baseUStruct.superStruct;
-            string? baseClassName = null;
+            string? baseClassName;
             if (baseClass is not null) {
                 baseClassName = _namePoolService.GetNameString(baseClass->ObjectName);
+            }
+            else {
+                baseClassName = nameof(UObjectInterop);
             }
 
             CodeGenOperatorNode[]? operators = null;
