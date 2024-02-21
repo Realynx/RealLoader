@@ -1,10 +1,12 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.DI;
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 
 namespace PalworldManagedModFramework {
@@ -13,6 +15,8 @@ namespace PalworldManagedModFramework {
         internal delegate void VoidDelegateSignature();
         public static void EntryPoint() {
             try {
+                DebugUtilities.WaitForDebuggerAttach();
+                Debugger.Break();
                 Console.OutputEncoding = Encoding.UTF8;
 
                 AppDomainMonitor.MonitorDomain();
