@@ -12,6 +12,7 @@ using PalworldManagedModFramework.Sdk.Services.Memory;
 using PalworldManagedModFramework.Sdk.Services.Memory.Extensions;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.UnrealHook;
+using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
 
 namespace PalworldManagedModFramework.Services.MemoryScanning {
     internal class PatternScanner {
@@ -26,10 +27,11 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
         private readonly IDetourManager _detourManager;
         private readonly IDetourAttributeScanner _detourAttributeScanner;
         private readonly INamePoolService _namePoolService;
+        private readonly IUnrealHookManager _unrealHookManager;
 
         public PatternScanner(ILogger logger, IEnginePattern enginePattern, IUObjectFuncs uObjectFuncs,
             IBulkTypePatternScanner bulkTypePatternScanner, IPropertyManager propertyManager,
-            IDetourManager detourManager, IDetourAttributeScanner detourAttributeScanner, INamePoolService namePoolService) {
+            IDetourManager detourManager, IDetourAttributeScanner detourAttributeScanner, INamePoolService namePoolService, IUnrealHookManager unrealHookManager) {
             _logger = logger;
             _loggerStatic = logger;
             _enginePattern = enginePattern;
@@ -39,6 +41,7 @@ namespace PalworldManagedModFramework.Services.MemoryScanning {
             _detourManager = detourManager;
             _detourAttributeScanner = detourAttributeScanner;
             _namePoolService = namePoolService;
+            _unrealHookManager = unrealHookManager;
             _namePoolServiceStatic = namePoolService;
         }
 

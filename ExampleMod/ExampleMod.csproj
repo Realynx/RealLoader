@@ -13,4 +13,9 @@
     <ProjectReference Include="..\PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.Sdk.csproj" />
   </ItemGroup>
 
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(ModsBuildFolder)' != ''">
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsBuildFolder)\ExampleMod" OverwriteReadOnlyFiles="true" />
+		<Exec Command="echo Copied SdkBuilder successfully" />
+	</Target>
+
 </Project>

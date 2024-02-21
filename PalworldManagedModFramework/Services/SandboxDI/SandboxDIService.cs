@@ -59,6 +59,9 @@ namespace PalworldManagedModFramework.Services.SandboxDI {
             if (sbStartupMod is not null && _modContainers.ContainsKey(sbStartupMod)) {
                 resolvedService = _modContainers[sbStartupMod].Services.GetService(serviceType);
             }
+            else {
+                resolvedService = _rootServiceProvider.GetService(serviceType);
+            }
 
             return resolvedService;
         }

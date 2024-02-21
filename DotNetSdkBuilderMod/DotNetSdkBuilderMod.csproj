@@ -1,39 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <PlatformTarget>x64</PlatformTarget>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <DebugType>Embedded</DebugType>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<PlatformTarget>x64</PlatformTarget>
+		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+		<DebugType>Embedded</DebugType>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.Sdk.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.Sdk.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="AssemblyBuilding\Interfaces\" />
-    <Folder Include="AssemblyBuilding\Services\ArtifactService\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="AssemblyBuilding\Interfaces\" />
+		<Folder Include="AssemblyBuilding\Services\ArtifactService\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="SdkBuilderConfig.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="SdkBuilderConfig.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SdkBuilderDir)' != ''">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SdkBuilderDir)" OverwriteReadOnlyFiles="true" />
-    <Copy SourceFiles="$(TargetDir)\SdkBuilderConfig.json" DestinationFolder="$(SdkBuilderDir)" OverwriteReadOnlyFiles="true" />
-    <Exec Command="echo Copied SdkBuilder successfully" />
-  </Target>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(ModsBuildFolder)' != ''">
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsBuildFolder)\SdkBuilder" OverwriteReadOnlyFiles="true" />
+		<Copy SourceFiles="$(TargetDir)\SdkBuilderConfig.json" DestinationFolder="$(ModsBuildFolder)\SdkBuilder" OverwriteReadOnlyFiles="true" />
+		<Exec Command="echo Copied SdkBuilder successfully" />
+	</Target>
 
 </Project>

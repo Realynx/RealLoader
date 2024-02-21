@@ -18,7 +18,8 @@ using PalworldManagedModFramework.Sdk.Services.Memory;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
 using PalworldManagedModFramework.Sdk.Services.Memory.Windows;
-
+using PalworldManagedModFramework.Sdk.Services.UnrealHook;
+using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
 using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 using PalworldManagedModFramework.Services.MemoryScanning;
@@ -86,6 +87,10 @@ namespace PalworldManagedModFramework.DI {
                 .AddSingleton<IUnrealReflection, UnrealReflection>()
                 .AddSingleton<IGlobalObjects, GlobalObjects>()
                 .AddSingleton<INamePoolService, NamePoolService>();
+
+            // TODO: Immediate Loading.
+            services
+                .AddSingleton<IUnrealHookManager, UnrealHookManager>();
         }
     }
 }
