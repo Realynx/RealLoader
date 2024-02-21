@@ -36,7 +36,7 @@ namespace ExampleMod {
         [EngineEvent("^.*")]
         public unsafe void AllEvents(UnrealEvent unrealEvent) {
             if (_functions.Add(unrealEvent.EventName)) {
-                // _logger.Debug($"Event: {unrealEvent.EventName}");
+                _logger.Debug($"Event: {unrealEvent.EventName}");
             }
         }
 
