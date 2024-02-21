@@ -29,18 +29,18 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         }
 
         public nint RegisterInUnreal() {
-            Address = Service.RegisterInUnreal(this);
+            // Address = Service.RegisterInUnreal(this);
             return _addressUnsafe;
         }
 
-        public void OnObjectRemovedFromGlobalObjectPool(object sender, ObjectRemovedEventArgs e) {
-            if (e.address == _addressUnsafe) {
-                Address = IntPtr.Zero;
-            }
-        }
+        // public void OnObjectRemovedFromGlobalObjectPool(object sender, ObjectRemovedEventArgs e) {
+        //     if (e.address == _addressUnsafe) {
+        //         Address = IntPtr.Zero;
+        //     }
+        // }
 
         public unsafe void ProcessEvent(int functionAddress, void* arguments) {
-            Service.ProcessEvent(Address, functionAddress, arguments);
+            // Service.ProcessEvent(Address, functionAddress, arguments);
         }
 
         private bool _disposing;
@@ -48,7 +48,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public void Dispose() {
             if (!_disposing) {
                 _disposing = true;
-                Service.DeleteInUnreal(this);
+                // Service.DeleteInUnreal(this);
             }
         }
     }

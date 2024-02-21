@@ -60,8 +60,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
 
             var modifiers = new StringBuilder(PUBLIC);
-            if (properties is not null || methods is not null) {
-                modifiers.Append($"{WHITE_SPACE}{UNSAFE}");
+            if (properties is not null) {
+                modifiers.Append($"{WHITE_SPACE}");
             }
             if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Abstract)) {
                 modifiers.Append($"{WHITE_SPACE}{ABSTRACT}");
