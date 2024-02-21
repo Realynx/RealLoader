@@ -43,7 +43,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
             // Service.ProcessEvent(Address, functionAddress, arguments);
         }
 
-        //private bool _disposing;
+        private bool _disposing;
 
         public void Dispose() {
             if (!_disposing) {
