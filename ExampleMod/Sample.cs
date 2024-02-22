@@ -1,4 +1,6 @@
-﻿using PalworldManagedModFramework.Sdk.Attributes;
+﻿using System.Runtime.CompilerServices;
+
+using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.UnrealHook;
@@ -34,6 +36,7 @@ namespace ExampleMod {
         }
 
         [EngineEvent("^.*")]
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public unsafe void AllEvents(UnrealEvent unrealEvent) {
             if (_functions.Add(unrealEvent.EventName)) {
                 _logger.Debug($"Event: {unrealEvent.EventName}");
@@ -48,9 +51,9 @@ namespace ExampleMod {
 
         [HookEngineEvent("BP_Player_Female_C::CanJumpInternal")]
         public unsafe void JumpEvent(UnrealEvent unrealEvent, ExecuteOriginalCallback executeOriginalCallback) {
-            _logger.Debug("Jumping Enabled!");
+            _logger.Debug("Jumping Disabled!");
 
-            executeOriginalCallback(unrealEvent.Instance, unrealEvent.UFunction, unrealEvent.Params);
+            // executeOriginalCallback(unrealEvent.Instance, unrealEvent.UFunction, unrealEvent.Params);
 
             unrealEvent.ContinueExecute = false;
         }

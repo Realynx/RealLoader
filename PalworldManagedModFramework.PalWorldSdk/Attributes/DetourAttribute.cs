@@ -1,4 +1,4 @@
-﻿using PalworldManagedModFramework.Sdk.Services.Memory;
+﻿using PalworldManagedModFramework.Sdk.Services.Detour;
 
 namespace PalworldManagedModFramework.Sdk.Attributes {
     public class DetourAttribute : Attribute {

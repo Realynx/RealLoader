@@ -1,6 +1,4 @@
-﻿using PalworldManagedModFramework.Sdk.Services.Memory;
-
-namespace PalworldManagedModFramework.Sdk.Services.Detour.Models {
+﻿namespace PalworldManagedModFramework.Sdk.Services.Detour.Models {
 
     public record DetourRecord {
         public DetourRecord(byte[] detourCodes, byte[] originalCodes, nint pHook, nint redirect, nint pTrampoline, DetourType detourType) {

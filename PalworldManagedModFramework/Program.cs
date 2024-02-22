@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
+﻿using System.Text;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,8 +14,6 @@ namespace PalworldManagedModFramework {
         internal delegate void VoidDelegateSignature();
         public static void EntryPoint() {
             try {
-                DebugUtilities.WaitForDebuggerAttach();
-                Debugger.Break();
                 Console.OutputEncoding = Encoding.UTF8;
 
                 AppDomainMonitor.MonitorDomain();
@@ -42,6 +39,7 @@ namespace PalworldManagedModFramework {
                 ConsoleExtensions.SetWindowAlwaysOnTop(loggerInstance);
 
                 var modLoader = host.Services.GetRequiredService<IModLoader>();
+
                 modLoader.LoadMods();
 
                 for (; ; )

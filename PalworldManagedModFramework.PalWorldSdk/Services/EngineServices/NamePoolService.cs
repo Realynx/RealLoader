@@ -2,10 +2,10 @@
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.GNameStructs;
-using PalworldManagedModFramework.Sdk.Services.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 
-namespace PalworldManagedModFramework.Sdk.Services {
+namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
     public class NamePoolService : INamePoolService {
         private readonly ILogger _logger;
         private readonly IEnginePattern _enginePattern;

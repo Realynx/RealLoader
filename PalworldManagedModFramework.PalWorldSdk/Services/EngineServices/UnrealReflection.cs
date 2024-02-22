@@ -1,8 +1,8 @@
 ﻿using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
-using PalworldManagedModFramework.Sdk.Services.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
-namespace PalworldManagedModFramework.Sdk.Services {
+namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
     public class UnrealReflection : IUnrealReflection {
         private readonly ILogger _logger;
 

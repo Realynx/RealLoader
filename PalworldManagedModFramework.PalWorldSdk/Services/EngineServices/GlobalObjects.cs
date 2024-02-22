@@ -1,10 +1,10 @@
 ﻿using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.GObjectsStructs;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
-using PalworldManagedModFramework.Sdk.Services.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 
-namespace PalworldManagedModFramework.Sdk.Services {
+namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
     public class GlobalObjects : IGlobalObjects {
         private readonly ILogger _logger;
         private readonly IEnginePattern _enginePattern;

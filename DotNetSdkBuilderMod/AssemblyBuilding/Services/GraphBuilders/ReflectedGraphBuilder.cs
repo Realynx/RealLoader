@@ -5,7 +5,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
-using PalworldManagedModFramework.Sdk.Services.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
     public unsafe class ReflectedGraphBuilder : IReflectedGraphBuilder {

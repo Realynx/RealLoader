@@ -2,7 +2,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.FunctionServices;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
-using PalworldManagedModFramework.Sdk.Services.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
     public class PackageNameGenerator : IPackageNameGenerator {

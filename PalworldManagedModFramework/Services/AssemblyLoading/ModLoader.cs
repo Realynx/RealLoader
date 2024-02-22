@@ -4,7 +4,7 @@ using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
-using PalworldManagedModFramework.Services.MemoryScanning;
+using PalworldManagedModFramework.Services.Interfaces;
 using PalworldManagedModFramework.Services.SandboxDI.Interfaces;
 
 namespace PalworldManagedModFramework.Services.AssemblyLoading {
@@ -12,16 +12,17 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
         private readonly ILogger _logger;
         private readonly IAssemblyDiscovery _assemblyDiscovery;
         private readonly ModLoaderConfig _modLoaderConfig;
-        private readonly PatternScanner _uReflectionPointerScanner;
+        private readonly IRuntimeInstaller _runtimeInstaller;
         private readonly ISandboxDIService _sandboxDIService;
         private readonly HashSet<LoadedMod> _loadedMods = [];
 
         public ModLoader(ILogger logger, IAssemblyDiscovery assemblyDiscovery, ModLoaderConfig modLoaderConfig,
-            PatternScanner uReflectionPointerScanner, ISandboxDIService sandboxDIService) {
+            IRuntimeInstaller runtimeInstaller, ISandboxDIService sandboxDIService) {
+
             _logger = logger;
             _assemblyDiscovery = assemblyDiscovery;
             _modLoaderConfig = modLoaderConfig;
-            _uReflectionPointerScanner = uReflectionPointerScanner;
+            _runtimeInstaller = runtimeInstaller;
             _sandboxDIService = sandboxDIService;
         }
 
@@ -34,7 +35,7 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
             }
 
             _logger.Debug("Scanning for reflected functions.");
-            _uReflectionPointerScanner.ScanMemoryForUnrealReflectionPointers();
+            _runtimeInstaller.ScanAndInstallRuntime();
 
             _logger.Info("Loading mods");
             var validMods = _assemblyDiscovery.DiscoverValidModAsselblies();

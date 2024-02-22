@@ -4,7 +4,6 @@ using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Detour.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Detour.Models;
-using PalworldManagedModFramework.Sdk.Services.Memory;
 
 namespace PalworldManagedModFramework.Sdk.Services.Detour {
     public class StackDetourService : IStackDetourService {

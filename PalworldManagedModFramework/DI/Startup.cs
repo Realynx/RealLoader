@@ -5,15 +5,16 @@ using Microsoft.Extensions.Hosting;
 using PalworldManagedModFramework.Models.Config;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.Sdk.Services.Detour;
 using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices;
 using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices;
 using PalworldManagedModFramework.Sdk.Services.Memory;
 using PalworldManagedModFramework.Sdk.Services.UnrealHook;
 using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
+using PalworldManagedModFramework.Services;
 using PalworldManagedModFramework.Services.AssemblyLoading;
-using PalworldManagedModFramework.Services.MemoryScanning;
+using PalworldManagedModFramework.Services.Interfaces;
 using PalworldManagedModFramework.Services.SandboxDI;
 
 namespace PalworldManagedModFramework.DI {
@@ -37,7 +38,7 @@ namespace PalworldManagedModFramework.DI {
 
             services
                 .AddSingleton<ILogger, Logger>()
-                .AddSingleton<PatternScanner>()
+                .AddSingleton<IRuntimeInstaller, RuntimeInstaller>()
 
                 .SetupMemoryScanningServices()
                 .SetupBasicUnrealEngineServices()

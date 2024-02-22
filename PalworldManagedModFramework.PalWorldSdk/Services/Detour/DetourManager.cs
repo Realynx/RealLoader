@@ -25,16 +25,16 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
 
             DetourRecord? detourRecord;
             switch (managedDetourInfo.DetourType) {
-                case Memory.DetourType.Stack:
+                case DetourType.Stack:
                     detourRecord = _stackDetourService.PrepareDetour(pFunction, pManagedFunction);
                     break;
 
-                case Memory.DetourType.Jmp_IP:
+                case DetourType.Jmp_IP:
                     // TODO:
                     detourRecord = null;
                     break;
 
-                case Memory.DetourType.VTable:
+                case DetourType.VTable:
                     // TODO:
                     detourRecord = null;
                     break;

@@ -2,7 +2,6 @@
 using System.Reflection;
 
 using PalworldManagedModFramework.Sdk.Attributes;
-using PalworldManagedModFramework.Sdk.Services.Memory;
 
 namespace PalworldManagedModFramework.Sdk.Services.Detour.Models {
     public record ManagedDetourInfo {

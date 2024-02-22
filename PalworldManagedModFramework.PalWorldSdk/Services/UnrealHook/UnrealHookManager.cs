@@ -6,8 +6,8 @@ using System.Text.RegularExpressions;
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
-using PalworldManagedModFramework.Sdk.Services.Interfaces;
-using PalworldManagedModFramework.Sdk.Services.Memory;
+using PalworldManagedModFramework.Sdk.Services.Detour;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
 
 using static PalworldManagedModFramework.Sdk.Services.UnrealHook.UnrealEvent;
