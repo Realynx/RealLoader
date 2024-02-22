@@ -1,14 +1,18 @@
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
+using PalworldManagedModFramework.Sdk.Services.EngineServices;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     public abstract class UObjectInterop {
         private readonly IUnrealReflection _unrealReflection;
+        private readonly IGlobalObjectsTracker _globalObjectsTracker;
 
         // TODO: Expose UObject creation to the user via a factory service
-        public UObjectInterop(nint address, IUnrealReflection unrealReflection) {
-            _unrealReflection = unrealReflection;
+        public UObjectInterop(nint address, IUnrealReflection unrealReflection, IGlobalObjectsTracker globalObjectsTracker) {
             Address = address;
+            _unrealReflection = unrealReflection;
+            _globalObjectsTracker = globalObjectsTracker;
+            _globalObjectsTracker.OnObjectDestroyed += OnObjectDestroyed;
         }
 
         public bool Disposed { get; private set; } = true;
@@ -40,11 +44,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
             return _addressUnsafe;
         }
 
-        // TODO: public void OnObjectRemovedFromGlobalObjectPool(object sender, ObjectRemovedEventArgs e) {
-        //     if (e.address == _addressUnsafe) {
-        //         Address = IntPtr.Zero;
-        //     }
-        // }
+        public void OnObjectDestroyed(object? sender, ObjectDestroyedEventArgs e) {
+            if (!Disposed && e.Address == _addressUnsafe) {
+                Address = nint.Zero;
+            }
+        }
 
         public unsafe void ProcessEvent(nint functionStruct, void* arguments) {
             // TODO: Service.ProcessEvent(Address, functionStruct, arguments);
@@ -79,6 +83,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
                 _disposing = true;
                 // TODO: Service.DeleteInUnreal(this);
             }
+        }
+
+        ~UObjectInterop() {
+            _globalObjectsTracker.OnObjectDestroyed -= OnObjectDestroyed;
         }
     }
 }

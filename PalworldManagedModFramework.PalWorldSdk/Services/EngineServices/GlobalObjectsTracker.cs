@@ -16,6 +16,9 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         private readonly IUnrealHookManager _unrealHookManager;
 
         private static GlobalObjectsTracker? _thisInstance;
+        public event EventHandler<ObjectDestroyedEventArgs>? OnObjectDestroyed;
+
+
         private readonly HashSet<nint> _loadedObjects = new();
         private readonly HashSet<nint> _markedObjects = new();
 
@@ -28,6 +31,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             _unrealHookManager
                 .RegisterUnrealEvent(GetType().GetMethod(nameof(ObjectsReady))!, this);
         }
+
+
 
         [EngineEvent("^WBP_TItle_C::OnInitialized")]
         public unsafe void ObjectsReady(UnrealEvent unrealEvent) {
@@ -67,7 +72,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         private void ObjectLoaded(nint pObject) {
             _loadedObjects.Add(pObject);
 
-            SetConsoleTitileObjCount();
+            SetConsoleTitleObjCount();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -76,22 +81,22 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
                 _markedObjects.Add(pObject);
             }
 
-            SetConsoleTitileObjCount();
+            SetConsoleTitleObjCount();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void ObjectDestroyed(nint pObject) {
-
             // Consider the Object as already freed from memory at this point the nint pointer is ID only.
             var removed = _markedObjects.Remove(pObject) || _loadedObjects.Remove(pObject);
             if (!removed) {
                 _logger.Debug($"Could not remove untracked object: 0x{pObject:X}");
             }
 
-            SetConsoleTitileObjCount();
+            SetConsoleTitleObjCount();
+            OnObjectDestroyed?.Invoke(this, new ObjectDestroyedEventArgs(pObject));
         }
 
-        private void SetConsoleTitileObjCount() {
+        private void SetConsoleTitleObjCount() {
             Console.Title = $"Active Objects: {_loadedObjects.Count}, GC Marked Objects: {_markedObjects.Count}";
         }
 
@@ -121,7 +126,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         [Detour("40 ? 48 83 ? ? F6 41 ? ? 48 ? ? 75 ? 48 8B ? ? 48 8D 54 ? ? 48 8D 4C", DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void UObjectFinishDestroy(UObject* instance) {
-            _thisInstance?.ObjectDestroyed((nint)instance);
+            Task.Factory.StartNew(() => _thisInstance?.ObjectDestroyed((nint)instance));
 
             UObjectFinishDestroy_Original(instance);
         }
