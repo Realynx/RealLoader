@@ -1,5 +1,5 @@
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
-using PalworldManagedModFramework.Sdk.Services.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     public abstract class UObjectInterop {

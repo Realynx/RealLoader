@@ -2,7 +2,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 
@@ -51,8 +51,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             string[]? body = null;
 
-            return new CodeGenConstructorNode
-            {
+            return new CodeGenConstructorNode {
                 modifier = PUBLIC,
                 name = name,
                 attributes = attributes,

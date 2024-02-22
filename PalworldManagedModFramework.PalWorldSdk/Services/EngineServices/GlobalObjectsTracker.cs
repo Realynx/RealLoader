@@ -55,7 +55,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         private void ObjectDestroyed(nint pObject) {
 
             // Consider the Object as already freed from memory at this point the nint pointer is ID only.
-            var removed = _markedObjects.Remove(pObject);
+            var removed = _markedObjects.Remove(pObject) || _loadedObjects.Remove(pObject);
             if (!removed) {
                 _logger.Error($"Could not remove untracked object: 0x{pObject:X}");
             }
