@@ -23,6 +23,9 @@ namespace PalworldManagedModFramework.Services.SandboxDI.Hosting {
                 throw new InvalidOperationException("Service provider factory is not configured.");
             }
 
+            var configuration = _configurationBuilder.Build();
+            _services.AddSingleton(configuration);
+
             var serviceProvider = _serviceProviderFactory.CreateServiceProvider(_services);
             return new SandboxHost(serviceProvider);
         }

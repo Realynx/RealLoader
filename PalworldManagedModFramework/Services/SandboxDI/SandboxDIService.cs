@@ -32,13 +32,12 @@ namespace PalworldManagedModFramework.Services.SandboxDI {
             var assemblyDir = Path.GetDirectoryName(assembly.Location);
 
             var configuration = _rootServiceProvider.GetRequiredService<IConfiguration>();
-
             hostBuilder.ConfigureAppConfiguration(i => i.AddConfiguration(configuration));
+
             hostBuilder.ConfigureAppConfiguration(i => serviceContainerMod.Configure(assemblyDir, i));
 
             // This must be set before services get configured, in-case dev needs their config early.
             hostBuilder.ConfigureAppConfiguration((_, config) => serviceContainerMod.Configuration = config.Build());
-
             hostBuilder.ConfigureServices(serviceContainerMod.ConfigureServices);
 
             var host = hostBuilder.Build();
