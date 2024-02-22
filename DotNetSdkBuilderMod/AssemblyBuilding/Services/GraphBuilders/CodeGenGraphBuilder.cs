@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
+using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.Flags;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
@@ -123,8 +124,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var time = _functionTimingService.Execute(() => {
                 _nameSpaceService.MemoizeTypeNamespaces(rootNode, memoizedClassesAndNamespaces);
 
-                memoizedClassesAndNamespaces.Add(nameof(IUnrealReflection), typeof(IUnrealReflection).Namespace!);
-                memoizedClassesAndNamespaces.Add(nameof(UObjectInterop), typeof(UObjectInterop).Namespace!);
+                var sdkBuilderAssembly = typeof(SdkBuilder).Assembly;
+                _nameSpaceService.MemoizeAssemblyTypeNamespaces(sdkBuilderAssembly, memoizedClassesAndNamespaces);
+
+                var frameworkSdkAssembly = typeof(DetourAttribute).Assembly;
+                _nameSpaceService.MemoizeAssemblyTypeNamespaces(frameworkSdkAssembly, memoizedClassesAndNamespaces);
+
                 memoizedClassesAndNamespaces.Add(U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME, U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE);
             });
 

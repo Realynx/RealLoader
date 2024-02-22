@@ -56,6 +56,7 @@
         internal const string ADDRESS_FIELD_NAME = "Address";
         internal const string CONSTRUCTOR_ADDRESS_NAME = "address";
         internal const string CONSTRUCTOR_UNREAL_REFLECTION_NAME = "unrealReflection";
+        internal const string CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME = "globalObjectsTracker";
         internal const string OPERATOR_THIS_CLASS_NAME = "self"; // I don't like this but I can't think of anything better
         internal const string FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE = "FullTypePath";
         internal const string COMPATIBLE_GAME_VERSION_ATTRIBUTE = "CompatibleGameVersion";

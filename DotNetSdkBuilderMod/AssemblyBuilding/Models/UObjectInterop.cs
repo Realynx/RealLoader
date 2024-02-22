@@ -1,5 +1,4 @@
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
-using PalworldManagedModFramework.Sdk.Services.EngineServices;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
@@ -12,42 +11,32 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
             Address = address;
             _unrealReflection = unrealReflection;
             _globalObjectsTracker = globalObjectsTracker;
-            _globalObjectsTracker.OnObjectDestroyed += OnObjectDestroyed;
         }
 
-        public bool Disposed { get; private set; } = true;
+        public bool Disposed {
+            get {
+                return _globalObjectsTracker.IsObjectDestroyed(_addressUnsafe);
+            }
+        }
 
         private nint _addressUnsafe;
 
         public nint Address {
             get {
                 if (Disposed) {
-                    throw new ObjectDisposedException($"{Address}", $"The object at {Address} does not exist.");
+                    throw new ObjectDisposedException($"{_addressUnsafe}", $"The object at 0x{_addressUnsafe:X} does not exist.");
                 }
 
                 return _addressUnsafe;
             }
             private set {
                 _addressUnsafe = value;
-
-                if (_addressUnsafe == nint.Zero) {
-                    Disposed = true;
-                }
-                else {
-                    Disposed = false;
-                }
             }
         }
 
         public nint RegisterInUnreal() {
             // TODO: Address = Service.RegisterInUnreal(this);
             return _addressUnsafe;
-        }
-
-        public void OnObjectDestroyed(object? sender, ObjectDestroyedEventArgs e) {
-            if (!Disposed && e.Address == _addressUnsafe) {
-                Address = nint.Zero;
-            }
         }
 
         public unsafe void ProcessEvent(nint functionStruct, void* arguments) {
@@ -76,17 +65,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
             throw new Exception($"An object not of type {nameof(UObjectInterop)} was passed. Type: {typeof(T).FullName ?? typeof(T).Name}.");
         }
 
-        private bool _disposing;
-
         public void Dispose() {
-            if (!_disposing) {
-                _disposing = true;
+            if (!Disposed) {
                 // TODO: Service.DeleteInUnreal(this);
             }
-        }
-
-        ~UObjectInterop() {
-            _globalObjectsTracker.OnObjectDestroyed -= OnObjectDestroyed;
         }
     }
 }

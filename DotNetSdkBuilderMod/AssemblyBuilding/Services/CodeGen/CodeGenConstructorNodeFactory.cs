@@ -25,10 +25,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 new CodeGenArgumentNode {
                     type = nameof(IUnrealReflection),
                     name = CONSTRUCTOR_UNREAL_REFLECTION_NAME,
+                },
+                new CodeGenArgumentNode {
+                    type = nameof(IGlobalObjectsTracker),
+                    name = CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME,
                 }
             };
 
-            var baseConstructor = $"{BASE}{OPEN_ROUND_BRACKET}{CONSTRUCTOR_ADDRESS_NAME}{COMMA}{WHITE_SPACE}{CONSTRUCTOR_UNREAL_REFLECTION_NAME}{CLOSED_ROUND_BRACKET}";
+            var baseConstructor = $"{BASE}{OPEN_ROUND_BRACKET}{CONSTRUCTOR_ADDRESS_NAME}{COMMA}{WHITE_SPACE}{CONSTRUCTOR_UNREAL_REFLECTION_NAME}{COMMA}{WHITE_SPACE}{CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME}{CLOSED_ROUND_BRACKET}";
 
             return new CodeGenConstructorNode {
                 modifier = PUBLIC,
