@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using PalworldManagedModFramework.Sdk.Models.CoreUObject.FunctionServices;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Linux;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Windows;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
 using PalworldManagedModFramework.Sdk.Services.Memory.Windows;
@@ -18,8 +19,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
 
             if (Environment.OSVersion.Platform == PlatformID.Unix) {
                 serviceDescriptors
-                    .AddSingleton<IEnginePattern, LinuxServerPattern>();
-                //.AddSingleton<IUObjectFuncs, LinuxUObjectFuncs>()
+                    .AddSingleton<IEnginePattern, LinuxServerPattern>()
+                    .AddSingleton<IUObjectFuncs, LinuxUObjectFuncs>();
             }
             else if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
                 serviceDescriptors

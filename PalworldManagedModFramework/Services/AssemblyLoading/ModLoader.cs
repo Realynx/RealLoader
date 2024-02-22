@@ -18,7 +18,6 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
 
         public ModLoader(ILogger logger, IAssemblyDiscovery assemblyDiscovery, ModLoaderConfig modLoaderConfig,
             IRuntimeInstaller runtimeInstaller, ISandboxDIService sandboxDIService) {
-
             _logger = logger;
             _assemblyDiscovery = assemblyDiscovery;
             _modLoaderConfig = modLoaderConfig;

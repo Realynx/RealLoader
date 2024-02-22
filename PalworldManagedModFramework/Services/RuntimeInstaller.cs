@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Models.CoreUObject.FunctionServices;
 using PalworldManagedModFramework.Sdk.Services.Detour.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.EngineServices;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
@@ -27,7 +26,6 @@ namespace PalworldManagedModFramework.Services {
         public RuntimeInstaller(ILogger logger, IEnginePattern enginePattern, IUObjectFuncs uObjectFuncs, IBulkTypePatternScanner bulkTypePatternScanner,
             IPropertyManager propertyManager, IDetourManager detourManager, IDetourAttributeScanner detourAttributeScanner, IGlobalObjectsTracker globalObjectsTracker,
             IUnrealHookManager unrealHookManager) {
-
             _logger = logger;
             _enginePattern = enginePattern;
             _uObjectFuncs = uObjectFuncs;
@@ -49,9 +47,7 @@ namespace PalworldManagedModFramework.Services {
             _bulkTypePatternScanner
                 .RegisterProperty(_enginePattern.GetType().GetProperty(nameof(_enginePattern.PGUObjectArray)), _enginePattern)
                 .RegisterProperty(_enginePattern.GetType().GetProperty(nameof(_enginePattern.PNamePoolData)), _enginePattern)
-                .RegisterProperty(_uObjectFuncs.GetType().GetProperty(nameof(_uObjectFuncs.GetExternalPackage)), _uObjectFuncs)
                 .RegisterProperty(_uObjectFuncs.GetType().GetProperty(nameof(_uObjectFuncs.GetParentPackage)), _uObjectFuncs)
-                //.RegisterProperty(_uObjectFuncs.GetType().GetProperty(nameof(_uObjectFuncs.GetFullName)), _uObjectFuncs);
 
                 .RegisterDetour(_globalObjectsTracker.GetType().GetMethod(nameof(GlobalObjectsTracker.UObjectBeginDestroy)), _detourAttributeScanner)
                 .RegisterDetour(_globalObjectsTracker.GetType().GetMethod(nameof(GlobalObjectsTracker.UObjectFinishDestroy)), _detourAttributeScanner)

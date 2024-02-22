@@ -5,7 +5,6 @@ using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.DI;
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 
 namespace PalworldManagedModFramework {
@@ -13,41 +12,34 @@ namespace PalworldManagedModFramework {
 
         internal delegate void VoidDelegateSignature();
         public static void EntryPoint() {
-            try {
-                Console.OutputEncoding = Encoding.UTF8;
+            Console.OutputEncoding = Encoding.UTF8;
 
-                AppDomainMonitor.MonitorDomain();
+            AppDomainMonitor.MonitorDomain();
 
-                Console.WriteLine($"Loading .NET DI Service Container...");
+            Console.WriteLine($"Loading .NET DI Service Container...");
 
-                var hostBuilder = new HostBuilder()
-                    .UseConsoleLifetime();
+            var hostBuilder = new HostBuilder()
+                .UseConsoleLifetime();
 
-                // Call startup functions to configure DI Container.
-                hostBuilder.ConfigureAppConfiguration(Startup.Configure);
-                hostBuilder.ConfigureAppConfiguration((_, config) => Startup.Configuration = config.Build());
-                hostBuilder.ConfigureServices(Startup.ConfigureServices);
+            // Call startup functions to configure DI Container.
+            hostBuilder.ConfigureAppConfiguration(Startup.Configure);
+            hostBuilder.ConfigureAppConfiguration((_, config) => Startup.Configuration = config.Build());
+            hostBuilder.ConfigureServices(Startup.ConfigureServices);
 
-                var host = hostBuilder
-                    .Build();
+            var host = hostBuilder
+                .Build();
 
-                var loggerInstance = host.
-                    Services.GetRequiredService<ILogger>();
+            var loggerInstance = host.
+                Services.GetRequiredService<ILogger>();
+            loggerInstance.Debug("DI Container Setup!");
 
-                loggerInstance.Info("DI Container Setup!");
+            ConsoleExtensions.SetWindowAlwaysOnTop(loggerInstance);
 
-                ConsoleExtensions.SetWindowAlwaysOnTop(loggerInstance);
+            var modLoader = host.Services.GetRequiredService<IModLoader>();
+            modLoader.LoadMods();
 
-                var modLoader = host.Services.GetRequiredService<IModLoader>();
-
-                modLoader.LoadMods();
-
-                for (; ; )
-                    Console.ReadLine();
-            }
-            catch (Exception e) {
-                Console.WriteLine(e);
-            }
+            for (; ; )
+                Console.ReadLine();
         }
     }
 }

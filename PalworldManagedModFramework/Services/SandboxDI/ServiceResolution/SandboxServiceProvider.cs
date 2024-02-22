@@ -18,7 +18,6 @@ namespace PalworldManagedModFramework.Services.SandboxDI.ServiceResolution {
             var service = GetOrActivateService(serviceType);
             service ??= _rootServiceProvider.GetService(serviceType);
 
-
             return service;
         }
 
