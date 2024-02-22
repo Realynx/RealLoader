@@ -27,6 +27,11 @@ namespace PalworldManagedModFramework.Sdk.Logging {
 
             Level = LogLevel.Info | LogLevel.Warnings | LogLevel.Errors;
 
+            if (loggerConfig.WriteFile) {
+                // TODO: Keep backup of last 5-10 log files instead of erasing the current file
+                File.WriteAllText(_logLocation, null);
+            }
+
             if (loggerConfig.DebugLogs) {
                 Level |= LogLevel.Debugging;
                 Debug("Enabled debug logs...");
