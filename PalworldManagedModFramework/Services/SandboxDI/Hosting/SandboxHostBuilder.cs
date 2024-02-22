@@ -24,7 +24,7 @@ namespace PalworldManagedModFramework.Services.SandboxDI.Hosting {
             }
 
             var configuration = _configurationBuilder.Build();
-            _services.AddSingleton(configuration);
+            _services.AddSingleton<IConfiguration>(configuration);
 
             var serviceProvider = _serviceProviderFactory.CreateServiceProvider(_services);
             return new SandboxHost(serviceProvider);
