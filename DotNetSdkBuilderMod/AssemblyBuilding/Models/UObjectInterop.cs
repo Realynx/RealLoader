@@ -1,5 +1,6 @@
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.UnrealHook;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     public abstract class UObjectInterop {
@@ -34,13 +35,19 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
             }
         }
 
-        public nint RegisterInUnreal() {
+        public bool TryRegisterInUnreal(out nint address) {
+            if (Disposed) {
+                address = nint.Zero;
+                return false;
+            }
+
             // TODO: Address = Service.RegisterInUnreal(this);
-            return _addressUnsafe;
+            address = _addressUnsafe;
+            return true;
         }
 
-        public unsafe void ProcessEvent(nint functionStruct, void* arguments) {
-            // TODO: Service.ProcessEvent(Address, functionStruct, arguments);
+        public unsafe void Invoke(nint functionStruct, void* arguments) {
+            UnrealHookManager.ProcessEvent((UObject*)Address, (UFunction*)functionStruct, arguments);
         }
 
         public unsafe nint GetFunctionStructPointer(Index functionIndex) {
