@@ -22,6 +22,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             _thisInstance = this;
         }
 
+        public event EventHandler<ObjectDestroyedEventArgs>? OnObjectDestroyed;
+
         public void SynchroniseObjectPool() {
 
         }
@@ -46,7 +48,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         private void ObjectLoaded(nint pObject) {
             _loadedObjects.Add(pObject);
 
-            SetConsoleTitileObjCount();
+            SetConsoleTitleObjCount();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -55,7 +57,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
                 _markedObjects.Add(pObject);
             }
 
-            SetConsoleTitileObjCount();
+            SetConsoleTitleObjCount();
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -67,10 +69,14 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
                 _logger.Debug($"Could not remove untracked object: 0x{pObject:X}");
             }
 
-            SetConsoleTitileObjCount();
+            SetConsoleTitleObjCount();
+
+            if (OnObjectDestroyed is not null) {
+                Task.Factory.StartNew(() => OnObjectDestroyed.Invoke(this, new ObjectDestroyedEventArgs(pObject)));
+            }
         }
 
-        private void SetConsoleTitileObjCount() {
+        private void SetConsoleTitleObjCount() {
             Console.Title = $"Active Objects: {_loadedObjects.Count}, GC Marked Objects: {_markedObjects.Count}";
         }
 
