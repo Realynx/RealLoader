@@ -33,11 +33,16 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         }
 
 
-
+        private bool _synchronized = false;
         [EngineEvent("^WBP_TItle_C::OnInitialized")]
         public unsafe void ObjectsReady(UnrealEvent unrealEvent) {
+            _synchronized = true;
+            if (_synchronized) {
+                return;
+
+            }
             SynchroniseObjectPool();
-            _logger.Debug("Synchronised Object Pool");
+            _logger.Debug("Synchronized Object Pool");
         }
 
         public unsafe void SynchroniseObjectPool() {
@@ -68,14 +73,14 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             return _markedObjects.Contains(uObjectAddress);
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
+        [MethodImpl(MethodImplOptions.Synchronized | MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         private void ObjectLoaded(nint pObject) {
             _loadedObjects.Add(pObject);
 
             SetConsoleTitleObjCount();
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
+        [MethodImpl(MethodImplOptions.Synchronized | MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         private void ObjectDestroying(nint pObject) {
             if (_loadedObjects.Remove(pObject)) {
                 _markedObjects.Add(pObject);
@@ -84,7 +89,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             SetConsoleTitleObjCount();
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
+        [MethodImpl(MethodImplOptions.Synchronized | MethodImplOptions.AggressiveOptimization | MethodImplOptions.AggressiveInlining)]
         private void ObjectDestroyed(nint pObject) {
             // Consider the Object as already freed from memory at this point the nint pointer is ID only.
             var removed = _markedObjects.Remove(pObject) || _loadedObjects.Remove(pObject);
