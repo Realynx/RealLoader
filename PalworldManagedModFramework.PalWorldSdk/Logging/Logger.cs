@@ -123,7 +123,7 @@ namespace PalworldManagedModFramework.Sdk.Logging {
 
             var timeStamp = $"[{TimeStamp}]";
 
-            var logPreamble = $"[{timeStamp}][{className}::{callerName};{lineNumber}]: ";
+            var logPreamble = $"{timeStamp}[{className}::{callerName};{lineNumber}]: ";
 
             Console.ForegroundColor = color;
             Console.Write(logPreamble);
