@@ -123,6 +123,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var time = _functionTimingService.Execute(() => {
                 _nameSpaceService.MemoizeTypeNamespaces(rootNode, memoizedClassesAndNamespaces);
 
+                memoizedClassesAndNamespaces.Add(nameof(IUnrealReflection), typeof(IUnrealReflection).Namespace!);
                 memoizedClassesAndNamespaces.Add(nameof(UObjectInterop), typeof(UObjectInterop).Namespace!);
                 memoizedClassesAndNamespaces.Add(U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME, U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE);
             });

@@ -49,7 +49,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private CodeGenMethodNode GetDefaultExtensionMethod() {
             var modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}{WHITE_SPACE}{UNSAFE}";
 
-            var methodName = nameof(UObjectInterop.ProcessEvent);
+            var methodName = CODE_GEN_INTEROP_INVOKE_METHOD_NAME;
 
             var returnType = VOID;
 
@@ -84,7 +84,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private CodeGenMethodNode GetGenericExtensionMethod(int genericArgCount) {
             var modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}{WHITE_SPACE}{UNSAFE}";
 
-            var methodName = nameof(UObjectInterop.ProcessEvent);
+            var methodName = CODE_GEN_INTEROP_INVOKE_METHOD_NAME;
 
             var returnType = VOID;
 
@@ -111,8 +111,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             body.AddRange(GetArgMemoryAllocationSegment());
             body.Add(string.Empty);
             for (var i = 0; i < genericArgCount; i++) {
-                // TODO: don't use Unsafe.AsPointer
-                body.Add($"span[{i}] = (nint)Unsafe.AsPointer(ref arg{i + 1}); // TODO: don't use Unsafe.AsPointer");
+                body.Add($"span[{i}] = objectInterop.{nameof(UObjectInterop.GetObjectAddress)}(ref arg{i + 1});");
             }
             body.Add(string.Empty);
             body.AddRange(GetProcessEventCallSegment());
@@ -146,7 +145,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             return new CodeGenArgumentNode
             {
                 type = INT,
-                name = "functionAddress",
+                name = "functionStruct",
             };
         }
 
@@ -158,7 +157,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
         private static IEnumerable<string> GetProcessEventCallSegment() {
             yield return "fixed (void* argsPtr = &span.GetPinnableReference()) {";
-            yield return "    objectInterop.ProcessEvent(functionAddress, argsPtr);";
+            yield return $"    objectInterop.{nameof(UObjectInterop.ProcessEvent)}(functionStruct, argsPtr);";
             yield return "}";
         }
 

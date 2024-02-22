@@ -55,7 +55,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             if (classMethods.Length > 0) {
                 methods = new CodeGenMethodNode[classMethods.Length];
                 for (var i = 0; i < classMethods.Length; i++) {
-                    methods[i] = _methodNodeFactory.GenerateCodeGenMethodNode(classMethods[i]);
+                    methods[i] = _methodNodeFactory.GenerateCodeGenMethodNode(classMethods[i], i);
                 }
             }
 
