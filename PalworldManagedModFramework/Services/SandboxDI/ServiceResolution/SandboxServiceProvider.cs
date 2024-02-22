@@ -18,6 +18,10 @@ namespace PalworldManagedModFramework.Services.SandboxDI.ServiceResolution {
             var service = GetOrActivateService(serviceType);
             service ??= _rootServiceProvider.GetService(serviceType);
 
+            if (service is null) {
+                throw new Exception($"Could not resolve dependency {serviceType.Name}.");
+            }
+
             return service;
         }
 
@@ -28,9 +32,14 @@ namespace PalworldManagedModFramework.Services.SandboxDI.ServiceResolution {
                     return null;
                 }
 
+                if (existingType.ImplementationType is null) {
+                    _serviceSingletons[serviceType] = existingType.ImplementationInstance;
+                    return existingType.ImplementationInstance;
+                }
+
                 var implementationType = existingType.ImplementationType;
                 var constructors = implementationType.GetConstructors();
-                var DICtor = constructors.OrderByDescending(i => i.GetParameters().Length).FirstOrDefault();
+                var DICtor = constructors.MaxBy(i => i.GetParameters().Length);
 
                 if (DICtor is null) {
                     var service = Activator.CreateInstance(implementationType);

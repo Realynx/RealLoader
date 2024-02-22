@@ -1,7 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 
-using Microsoft.Extensions.Configuration;
-
 namespace PalworldManagedModFramework.Sdk.Logging {
     public interface ILogger {
         LogLevel Level { get; set; }
