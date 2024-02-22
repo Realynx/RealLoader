@@ -16,8 +16,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
         public void Configure(string assemblyFolder, IConfigurationBuilder configurationBuilder) {
             configurationBuilder
                 .AddJsonFile(Path.Combine(assemblyFolder, "SdkBuilderConfig.json"));
-
-            Configuration = configurationBuilder.Build();
         }
 
         public void ConfigureServices(IServiceCollection services) {

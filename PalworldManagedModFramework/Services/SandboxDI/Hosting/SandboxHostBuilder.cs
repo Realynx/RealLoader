@@ -7,6 +7,7 @@ using PalworldManagedModFramework.Services.SandboxDI.ServiceResolution;
 namespace PalworldManagedModFramework.Services.SandboxDI.Hosting {
     public class SandboxHostBuilder : IHostBuilder {
         private IServiceProviderFactory<IServiceCollection> _serviceProviderFactory;
+        private readonly ConfigurationBuilder _configurationBuilder = new();
         private readonly HostBuilderContext _hostBuilderContext;
         private readonly IServiceCollection _services;
 
@@ -27,7 +28,7 @@ namespace PalworldManagedModFramework.Services.SandboxDI.Hosting {
         }
 
         public IHostBuilder ConfigureAppConfiguration(Action<HostBuilderContext, IConfigurationBuilder> configureDelegate) {
-            configureDelegate?.Invoke(_hostBuilderContext, new ConfigurationBuilder());
+            configureDelegate?.Invoke(_hostBuilderContext, _configurationBuilder);
             return this;
         }
 
