@@ -75,7 +75,8 @@ namespace PalworldManagedModFramework.Sdk.Services.UnrealHook {
         }
 
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, UFunction*, void*, void> ProcessEvent_Original;
-        [Detour("40 ? ? ? 41 ? 41 ? 41 ? 41 ? 48 81 EC 10 01 ? ? 48 8D 6C ? ? 48 89 9D 38 01", DetourType.Stack)]
+        [LinuxDetour("55 48 ? ? 41 ? 41 ? 41 ? 41 ? ? 48 81 EC B8 00 ? ? F6 47 ? ? 74 ? 48 8D ? ? ? 41 ? 41 ? 41 ? 41 ? ? C3", DetourType.Stack)]
+        [WindowsDetour("40 ? ? ? 41 ? 41 ? 41 ? 41 ? 48 81 EC 10 01 ? ? 48 8D 6C ? ? 48 89 9D 38 01", DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void ProcessEvent(UObject* instance, UFunction* uFunction, void* parameters) {
             if (SingleInstance is not null && uFunction is not null && instance is not null) {

@@ -10,4 +10,14 @@ namespace PalworldManagedModFramework.Sdk.Attributes {
         public string Pattern { get; }
         public DetourType DetourType { get; }
     }
+
+    public class LinuxDetourAttribute : DetourAttribute {
+        public LinuxDetourAttribute(string pattern, DetourType detourType) : base(pattern, detourType) {
+        }
+    }
+
+    public class WindowsDetourAttribute : DetourAttribute {
+        public WindowsDetourAttribute(string pattern, DetourType detourType) : base(pattern, detourType) {
+        }
+    }
 }

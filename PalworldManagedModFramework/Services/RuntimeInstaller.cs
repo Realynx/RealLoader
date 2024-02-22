@@ -53,10 +53,10 @@ namespace PalworldManagedModFramework.Services {
                 .RegisterProperty(_uObjectFuncs.GetType().GetProperty(nameof(_uObjectFuncs.GetParentPackage)), _uObjectFuncs)
                 //.RegisterProperty(_uObjectFuncs.GetType().GetProperty(nameof(_uObjectFuncs.GetFullName)), _uObjectFuncs);
 
-                .RegisterDetour(_globalObjectsTracker.GetType().GetMethod(nameof(GlobalObjectsTracker.UObjectBeginDestroy)))
-                .RegisterDetour(_globalObjectsTracker.GetType().GetMethod(nameof(GlobalObjectsTracker.UObjectFinishDestroy)))
-                .RegisterDetour(_unrealHookManager.GetType().GetMethod(nameof(UnrealHookManager.ProcessEvent)))
-                .RegisterDetour(_globalObjectsTracker.GetType().GetMethod(nameof(GlobalObjectsTracker.UObjectPostInitProperties)))
+                .RegisterDetour(_globalObjectsTracker.GetType().GetMethod(nameof(GlobalObjectsTracker.UObjectBeginDestroy)), _detourAttributeScanner)
+                .RegisterDetour(_globalObjectsTracker.GetType().GetMethod(nameof(GlobalObjectsTracker.UObjectFinishDestroy)), _detourAttributeScanner)
+                .RegisterDetour(_unrealHookManager.GetType().GetMethod(nameof(UnrealHookManager.ProcessEvent)), _detourAttributeScanner)
+                .RegisterDetour(_globalObjectsTracker.GetType().GetMethod(nameof(GlobalObjectsTracker.UObjectPostInitProperties)), _detourAttributeScanner)
 
                 .ScanAll()
                 .UpdatePropertyValues(_propertyManager)

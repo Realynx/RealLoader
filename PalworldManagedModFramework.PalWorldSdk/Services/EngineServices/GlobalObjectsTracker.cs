@@ -107,7 +107,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         //TODO: These patterns need to be swapped in the case of linus OS
 
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, void> UObjectPostInitProperties_Original;
-        [Detour("48 83 ? ? 48 ? ? 48 C7 44 24 20 00 00 ? ? 48 8B ? ? 45 ? ? 41 ? ?", DetourType.Stack)]
+        [LinuxDetour("", DetourType.Stack)]
+        [WindowsDetour("48 83 ? ? 48 ? ? 48 C7 44 24 20 00 00 ? ? 48 8B ? ? 45 ? ? 41 ? ?", DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void UObjectPostInitProperties(UObject* instance) {
             UObjectPostInitProperties_Original(instance);
@@ -116,7 +117,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         }
 
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, void> UObjectBeginDestroy_Original;
-        [Detour("40 ? 48 83 ? ? 8B ? ? 48 ? ? C1 ? ? ? ? 75 ? 48 8B ? ? 48 8D 54", DetourType.Stack)]
+        [LinuxDetour("", DetourType.Stack)]
+        [WindowsDetour("40 ? 48 83 ? ? 8B ? ? 48 ? ? C1 ? ? ? ? 75 ? 48 8B ? ? 48 8D 54", DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void UObjectBeginDestroy(UObject* instance) {
             UObjectBeginDestroy_Original(instance);
@@ -125,7 +127,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         }
 
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, void> UObjectFinishDestroy_Original;
-        [Detour("40 ? 48 83 ? ? F6 41 ? ? 48 ? ? 75 ? 48 8B ? ? 48 8D 54 ? ? 48 8D 4C", DetourType.Stack)]
+        [LinuxDetour("", DetourType.Stack)]
+        [WindowsDetour("40 ? 48 83 ? ? F6 41 ? ? 48 ? ? 75 ? 48 8B ? ? 48 8D 54 ? ? 48 8D 4C", DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void UObjectFinishDestroy(UObject* instance) {
             _thisInstance?.ObjectDestroyed((nint)instance);

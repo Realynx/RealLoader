@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 
 using PalworldManagedModFramework.Sdk.Attributes;
+using PalworldManagedModFramework.Sdk.Services.Detour.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
@@ -15,11 +16,9 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Extensions {
             return bulkTypePatternScanner;
         }
 
-        public static IBulkTypePatternScanner RegisterDetour(this IBulkTypePatternScanner bulkTypePatternScanner, MethodInfo methodInfo) {
-            var patternAttribute = methodInfo.GetCustomAttribute<DetourAttribute>()
-                ?? throw new Exception($"Method: {methodInfo.Name} does not have a {nameof(DetourAttribute)} attribute.");
-
-            bulkTypePatternScanner.BuildPatternAndAdd(methodInfo, patternAttribute.Pattern, PatternType.Hook);
+        public static IBulkTypePatternScanner RegisterDetour(this IBulkTypePatternScanner bulkTypePatternScanner, MethodInfo methodInfo, IDetourAttributeScanner detourAttributeScanner) {
+            var selectedDetourAttribute = detourAttributeScanner.FindDetourAttribute(methodInfo);
+            bulkTypePatternScanner.BuildPatternAndAdd(methodInfo, selectedDetourAttribute.Pattern, PatternType.Hook);
 
             return bulkTypePatternScanner;
         }
