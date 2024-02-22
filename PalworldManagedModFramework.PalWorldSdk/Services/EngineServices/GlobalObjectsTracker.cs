@@ -16,8 +16,6 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         private readonly IUnrealHookManager _unrealHookManager;
 
         private static GlobalObjectsTracker? _thisInstance;
-        public event EventHandler<ObjectDestroyedEventArgs>? OnObjectDestroyed;
-
 
         private readonly HashSet<nint> _loadedObjects = new();
         private readonly HashSet<nint> _markedObjects = new();
@@ -98,7 +96,6 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             }
 
             SetConsoleTitleObjCount();
-            OnObjectDestroyed?.Invoke(this, new ObjectDestroyedEventArgs(pObject));
         }
 
         private void SetConsoleTitleObjCount() {
@@ -131,7 +128,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         [Detour("40 ? 48 83 ? ? F6 41 ? ? 48 ? ? 75 ? 48 8B ? ? 48 8D 54 ? ? 48 8D 4C", DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void UObjectFinishDestroy(UObject* instance) {
-            Task.Factory.StartNew(() => _thisInstance?.ObjectDestroyed((nint)instance));
+            _thisInstance?.ObjectDestroyed((nint)instance);
 
             UObjectFinishDestroy_Original(instance);
         }
