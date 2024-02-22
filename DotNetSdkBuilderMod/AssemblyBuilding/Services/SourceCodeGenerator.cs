@@ -37,6 +37,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
                 foreach (var nameSpace in assemblyGraph.namespaces) {
                     TraverseNodes(nameSpace, compiler);
                 }
+
+                compiler.Compile(assemblyGraph.name);
             }
         }
 

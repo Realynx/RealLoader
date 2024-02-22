@@ -62,7 +62,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 "const int ARGS_SIZE = 0x1000; // Magic number for some reason",
                 string.Empty
             };
-            body.AddRange(GetArgMemoryAllocationSegment());
+            body.AddRange(GetArgMemoryAllocationSegment(true));
             body.Add(string.Empty);
             body.AddRange(GetProcessEventCallSegment());
 
@@ -108,7 +108,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 $"const int ARGS_SIZE = {genericArgCount};",
                 string.Empty
             };
-            body.AddRange(GetArgMemoryAllocationSegment());
+            body.AddRange(GetArgMemoryAllocationSegment(false));
             body.Add(string.Empty);
             for (var i = 0; i < genericArgCount; i++) {
                 body.Add($"span[{i}] = objectInterop.{nameof(UObjectInterop.GetObjectAddress)}(ref arg{i + 1});");
@@ -149,10 +149,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             };
         }
 
-        private static IEnumerable<string> GetArgMemoryAllocationSegment() {
+        private static IEnumerable<string> GetArgMemoryAllocationSegment(bool fillAll) {
             yield return "using var arguments = MemoryPool<nint>.Shared.Rent(ARGS_SIZE);";
             yield return "var span = arguments.Memory.Span;";
-            yield return "span[ARGS_SIZE..].Fill(0);";
+            if (fillAll) {
+                yield return "span.Fill(0);";
+            }
+            else {
+                yield return "span[ARGS_SIZE..].Fill(0);";
+            }
         }
 
         private static IEnumerable<string> GetProcessEventCallSegment() {
