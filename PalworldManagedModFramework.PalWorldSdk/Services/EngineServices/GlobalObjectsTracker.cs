@@ -5,18 +5,25 @@ using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.Sdk.Services.Detour;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
 namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
     public class GlobalObjectsTracker : IGlobalObjectsTracker {
         private readonly ILogger _logger;
+        private readonly IGlobalObjects _globalObjects;
 
         private static GlobalObjectsTracker? _thisInstance;
         private readonly HashSet<nint> _loadedObjects = new();
         private readonly HashSet<nint> _markedObjects = new();
 
-        public GlobalObjectsTracker(ILogger logger) {
+        public GlobalObjectsTracker(ILogger logger, IGlobalObjects globalObjects) {
             _logger = logger;
+            _globalObjects = globalObjects;
             _thisInstance = this;
+        }
+
+        public void SynchroniseObjectPool() {
+
         }
 
         public nint[] GetLoadedObjects() {
@@ -57,7 +64,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             // Consider the Object as already freed from memory at this point the nint pointer is ID only.
             var removed = _markedObjects.Remove(pObject) || _loadedObjects.Remove(pObject);
             if (!removed) {
-                _logger.Error($"Could not remove untracked object: 0x{pObject:X}");
+                _logger.Debug($"Could not remove untracked object: 0x{pObject:X}");
             }
 
             SetConsoleTitileObjCount();

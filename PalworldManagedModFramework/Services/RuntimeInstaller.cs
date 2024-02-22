@@ -24,7 +24,8 @@ namespace PalworldManagedModFramework.Services {
         private readonly IUnrealHookManager _unrealHookManager;
 
         public RuntimeInstaller(ILogger logger, IEnginePattern enginePattern, IUObjectFuncs uObjectFuncs, IBulkTypePatternScanner bulkTypePatternScanner,
-            IPropertyManager propertyManager, IDetourManager detourManager, IDetourAttributeScanner detourAttributeScanner, IGlobalObjectsTracker globalObjectsTracker, IUnrealHookManager unrealHookManager) {
+            IPropertyManager propertyManager, IDetourManager detourManager, IDetourAttributeScanner detourAttributeScanner, IGlobalObjectsTracker globalObjectsTracker,
+            IUnrealHookManager unrealHookManager) {
 
             _logger = logger;
             _enginePattern = enginePattern;
@@ -60,9 +61,10 @@ namespace PalworldManagedModFramework.Services {
                 .UpdatePropertyValues(_propertyManager)
                 .PrepareDetours(_detourAttributeScanner, _detourManager)
                 .InstallDetours(_detourManager);
-
             sw.Stop();
             _logger.Debug($"Scanning took {sw.ElapsedMilliseconds} ms.");
+
+            _globalObjectsTracker.SynchroniseObjectPool();
         }
     }
 }

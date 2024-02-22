@@ -4,5 +4,6 @@
         nint[] GetMarkedObjects();
         bool IsObjectDestroyed(nint uObjectAddress);
         bool IsObjectMarkedForCollection(nint uObjectAddress);
+        void SynchroniseObjectPool();
     }
 }
