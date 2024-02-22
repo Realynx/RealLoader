@@ -1,6 +1,7 @@
 ﻿using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen;
+using DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
@@ -40,6 +41,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
                 .AddSingleton<ICodeGenClassNodeFactory, CodeGenClassNodeFactory>()
                 .AddSingleton<ICodeGenGraphBuilder, CodeGenGraphBuilder>()
                 .AddSingleton<IUObjectInteropExtensionsBuilder, UObjectInteropExtensionsBuilder>()
+                .AddSingleton<ICodeCompilerFactory, CodeCompilerFactory>()
                 .AddSingleton<ISourceCodeGenerator, SourceCodeGenerator>()
 
                 .AddSingleton<IArgumentGenerator, ArgumentGenerator>()

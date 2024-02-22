@@ -12,14 +12,16 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
         private readonly IReflectedGraphBuilder _reflectedGraphBuilder;
         private readonly ICodeGenGraphBuilder _codeGenGraphBuilder;
         private readonly IFunctionTimingService _functionTimingService;
+        private readonly ICodeCompilerFactory _codeCompilerFactory;
 
         public SourceCodeGenerator(ILogger logger, IFileGenerator fileGenerator, IReflectedGraphBuilder reflectedGraphBuilder,
-            ICodeGenGraphBuilder codeGenGraphBuilder, IFunctionTimingService functionTimingService) {
+            ICodeGenGraphBuilder codeGenGraphBuilder, IFunctionTimingService functionTimingService, ICodeCompilerFactory codeCompilerFactory) {
             _logger = logger;
             _fileGenerator = fileGenerator;
             _reflectedGraphBuilder = reflectedGraphBuilder;
             _codeGenGraphBuilder = codeGenGraphBuilder;
             _functionTimingService = functionTimingService;
+            _codeCompilerFactory = codeCompilerFactory;
         }
 
         public unsafe void BuildSourceCode() {
@@ -29,34 +31,26 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             _logger.Debug("Building assembly graphs...");
             var assemblyGraphs = TimeAssemblyGraphBuilder(rootNode);
 
-            var path = Path.GetFullPath("GeneratedCode.cs");
-            using var sw = File.CreateText(path);
+            var compiler = _codeCompilerFactory.CreateCompiler();
 
-            try {
-                foreach (var assemblyGraph in assemblyGraphs) {
-                    foreach (var nameSpace in assemblyGraph.namespaces) {
-                        TraverseNodes(nameSpace, sw);
-                    }
+            foreach (var assemblyGraph in assemblyGraphs) {
+                foreach (var nameSpace in assemblyGraph.namespaces) {
+                    TraverseNodes(nameSpace, compiler);
                 }
-            }
-            finally {
-                _logger.Debug($"Generated code written to {path}");
             }
         }
 
-        private void TraverseNodes(CodeGenNamespaceNode namespaceNode, StreamWriter sw) {
+        private void TraverseNodes(CodeGenNamespaceNode namespaceNode, ICodeCompiler codeCompiler) {
             var classFile = new StringBuilder();
 
             _fileGenerator.GenerateFile(classFile, namespaceNode);
             if (classFile.Length > 0) {
-                // _logger.Debug(classFile.ToString());
-                sw.WriteLine(classFile.ToString());
-                sw.WriteLine();
+                codeCompiler.AppendFile(classFile, namespaceNode.packageName.TrimStart('/').Replace('/', '.'));
             }
 
             if (namespaceNode.namespaces is not null) {
                 foreach (var node in namespaceNode.namespaces) {
-                    TraverseNodes(node, sw);
+                    TraverseNodes(node, codeCompiler);
                 }
             }
         }
