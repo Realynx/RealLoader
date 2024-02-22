@@ -3,8 +3,6 @@ using System.Runtime.Versioning;
 
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
-using static PalworldManagedModFramework.Sdk.Services.Memory.Windows.NativeFunctions;
-
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
     /// <summary>
     /// Native methods for working in Windows process memory.

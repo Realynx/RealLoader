@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Runtime.InteropServices;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using PalworldModInstaller.Commands;
 using PalworldModInstaller.DI;
@@ -27,9 +29,14 @@ namespace PalworldModInstaller {
         }
 
         private static void ConfigureServices(IServiceCollection serviceDescriptors) {
-            serviceDescriptors
-                .AddSingleton<LinuxInstaller>()
-                .AddSingleton<WindowsInstaller>();
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+                serviceDescriptors
+                    .AddSingleton<LinuxInstaller>();
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                serviceDescriptors
+                    .AddSingleton<WindowsInstaller>();
+            }
         }
 
         public static async Task<byte[]> DownloadGithubRelease(string githubFileName) {

@@ -1,4 +1,6 @@
-﻿using PalworldManagedModFramework.Sdk.Services.Detour;
+﻿using System.Runtime.Versioning;
+
+using PalworldManagedModFramework.Sdk.Services.Detour;
 
 namespace PalworldManagedModFramework.Sdk.Attributes {
     public class DetourAttribute : Attribute {

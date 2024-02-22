@@ -1,10 +1,13 @@
-﻿using PalworldManagedModFramework.Sdk.Logging;
+﻿using System.Runtime.Versioning;
+
+using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 using static PalworldManagedModFramework.Sdk.Services.Memory.Windows.NativeFunctions;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
+    [SupportedOSPlatform("windows")]
     public class WindowsMemoryAllocate : IMemoryAllocate {
         private readonly ILogger _logger;
 

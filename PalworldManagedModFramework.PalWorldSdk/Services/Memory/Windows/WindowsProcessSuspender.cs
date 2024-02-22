@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
+using System.Runtime.Versioning;
 
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
+    [SupportedOSPlatform("windows")]
     public class WindowsProcessSuspender : IProcessSuspender {
         public void PauseSelf() {
             var currentProcess = Process.GetCurrentProcess();

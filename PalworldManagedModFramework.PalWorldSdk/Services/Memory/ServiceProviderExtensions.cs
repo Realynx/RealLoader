@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Runtime.InteropServices;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
@@ -14,13 +16,13 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
                 .AddSingleton<ISequenceScanner, SequenceScanner>()
                 .AddSingleton<IBulkTypePatternScanner, BulkTypePatternScanner>();
 
-            if (Environment.OSVersion.Platform == PlatformID.Unix) {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 serviceDescriptors
                     .AddSingleton<IProcessSuspender, LinuxProcessSuspender>()
                     .AddSingleton<IMemoryMapper, LinuxMemoryMapper>()
                     .AddSingleton<IMemoryScanner, LinuxMemoryScanner>();
             }
-            else if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 serviceDescriptors
                     .AddSingleton<IProcessSuspender, WindowsProcessSuspender>()
                     .AddSingleton<IMemoryMapper, WindowsMemoryMapper>()

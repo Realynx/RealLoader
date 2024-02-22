@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.InteropServices;
 
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Logging;
@@ -18,35 +19,30 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
             var parentFields = detourMethod.DeclaringType!.GetFields(BindingFlags.Public | BindingFlags.Static);
             var delegateField = parentFields.FirstOrDefault(i => i.Name.Equals($"{detourMethod.Name}_Original", StringComparison.OrdinalIgnoreCase));
 
-            if (detourAttribute is not null && delegateField is { FieldType.IsFunctionPointer: true }) {
+            if (delegateField is { FieldType.IsFunctionPointer: true }) {
                 return new ManagedDetourInfo(detourMethod, delegateField, detourAttribute.DetourType);
             }
 
-            _logger.Error($"Detour: '{detourMethod.Name}' Could not find a valid deleagte pointer to assign to detour trampoline!");
+            _logger.Error($"Detour: '{detourMethod.Name}' Could not find a valid delegate pointer to assign to detour trampoline!");
             return null;
         }
 
         public DetourAttribute FindDetourAttribute(MethodInfo detourMethod) {
-            var detourAttributes = detourMethod.GetCustomAttributes<DetourAttribute>();
-            var patternAttributes = detourMethod.GetCustomAttributes<DetourAttribute>()
+            var detourAttributes = detourMethod.GetCustomAttributes<DetourAttribute>()
                 ?? throw new Exception($"Method: {detourMethod.Name} does not have a {nameof(DetourAttribute)} attribute.");
 
             return FindDetourAttribute(detourAttributes);
         }
 
         public DetourAttribute FindDetourAttribute(IEnumerable<DetourAttribute> patternAttributes) {
-            var windowsDetour = patternAttributes.SingleOrDefault(i => i is WindowsDetourAttribute);
-            var linuxDetour = patternAttributes.SingleOrDefault(i => i is LinuxDetourAttribute);
-            var detour = patternAttributes.SingleOrDefault(i => i is DetourAttribute and not WindowsDetourAttribute and not LinuxDetourAttribute);
-
             DetourAttribute? selectedDetourAttribute = null;
-            if (linuxDetour is not null && Environment.OSVersion.Platform == PlatformID.Unix) {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && patternAttributes.SingleOrDefault(i => i is LinuxDetourAttribute) is { } linuxDetour) {
                 selectedDetourAttribute = linuxDetour;
             }
-            else if (windowsDetour is not null && Environment.OSVersion.Platform == PlatformID.Win32NT) {
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && patternAttributes.SingleOrDefault(i => i is WindowsDetourAttribute) is { } windowsDetour) {
                 selectedDetourAttribute = windowsDetour;
             }
-            else if (detour is not null) {
+            else if (patternAttributes.SingleOrDefault(i => i is not null and not WindowsDetourAttribute and not LinuxDetourAttribute) is { } detour) {
                 selectedDetourAttribute = detour;
             }
 
@@ -70,7 +66,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
 
                 foreach (var methodInfo in allAttributedMethods) {
                     var detourInfo = FindDetourInformation(methodInfo);
-                    if (detourInfo is not { }) {
+                    if (detourInfo is null) {
                         continue;
                     }
 

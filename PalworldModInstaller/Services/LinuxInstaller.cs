@@ -1,12 +1,15 @@
-﻿using PalworldModInstaller.Models;
+﻿using System.Runtime.Versioning;
+
+using PalworldModInstaller.Models;
 
 using Spectre.Console;
 
 namespace PalworldModInstaller.Services {
+    [SupportedOSPlatform("linux")]
     public class LinuxInstaller : IInstaller {
         public void UninstallFiles(InstallerOptions installerOptions) {
             var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
-            var dotnetDependanciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "ManagedModFramework");
+            var dotnetDependenciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "ManagedModFramework");
 
             var launchScript = Path.Combine(installerOptions.InstallLocation, "PalServer.sh");
 
@@ -33,14 +36,14 @@ namespace PalworldModInstaller.Services {
 
             Directory.Delete(modsFolder, true);
             RestoreLaunchScript(launchScript);
-            Directory.Delete(dotnetDependanciesFolder, true);
+            Directory.Delete(dotnetDependenciesFolder, true);
 
             AnsiConsole.WriteLine($"Modloader uninstalled!");
         }
 
         public void InstallFiles(InstallerOptions installerOptions) {
             var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
-            var dotnetDependanciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "ManagedModFramework");
+            var dotnetDependenciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "ManagedModFramework");
 
             var launchScript = Path.Combine(installerOptions.InstallLocation, "PalServer.sh");
 
@@ -50,15 +53,15 @@ namespace PalworldModInstaller.Services {
                 Directory.CreateDirectory(modsFolder);
             }
 
-            if (!installerOptions.CheckUpdates && Directory.Exists(dotnetDependanciesFolder) && Directory.GetFiles(dotnetDependanciesFolder).Length > 0) {
+            if (!installerOptions.CheckUpdates && Directory.Exists(dotnetDependenciesFolder) && Directory.GetFiles(dotnetDependenciesFolder).Length > 0) {
                 AnsiConsole.WriteLine("Framework was found during install process! If you would like to update run with the -u flag.");
                 AnsiConsole.WriteLine("Aborting...");
                 return;
             }
 
-            if (!Directory.Exists(dotnetDependanciesFolder)) {
+            if (!Directory.Exists(dotnetDependenciesFolder)) {
                 AnsiConsole.WriteLine("Framework install folder did not exist, creating it now.");
-                Directory.CreateDirectory(dotnetDependanciesFolder);
+                Directory.CreateDirectory(dotnetDependenciesFolder);
             }
 
             if (installerOptions.CheckUpdates) {

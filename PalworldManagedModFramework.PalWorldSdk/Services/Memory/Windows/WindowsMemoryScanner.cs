@@ -27,7 +27,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
         }
 
         public nint? SingleSequenceScan(ByteCodePattern byteCodePattern) {
-            return SequenceScan(byteCodePattern).FirstOrDefault();
+            return SequenceScan(byteCodePattern)?.FirstOrDefault();
         }
 
         public nint[][]? SequenceScan(params ByteCodePattern[] byteCodePatterns) {

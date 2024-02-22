@@ -1,4 +1,6 @@
-﻿using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices.Interfaces;
+﻿using System.Runtime.InteropServices;
+
+using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices;
 using PalworldManagedModFramework.Sdk.Services.Detour.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,11 +18,11 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
                 .AddSingleton<IDetourAttributeScanner, DetourAttributeScanner>()
                 .AddSingleton<IShellCodeReader, ShellCodeReader>();
 
-            if (Environment.OSVersion.Platform == PlatformID.Unix) {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 serviceDescriptors
                     .AddSingleton<IMemoryAllocate, LinuxMemoryAllocate>();
             }
-            else if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 serviceDescriptors
                     .AddSingleton<IMemoryAllocate, WindowsMemoryAllocate>();
             }

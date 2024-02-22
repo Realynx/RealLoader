@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
@@ -18,35 +17,35 @@ namespace PalworldManagedModFramework.Sdk.Tests.ServicesTests.MemoryMapperTests 
 
         [SkippableFact]
         public void Was_Not_Empty() {
-            Skip.IfNot(Environment.OSVersion.Platform == PlatformID.Win32NT);
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
 
             Assert.NotEmpty(_memoryRegions);
         }
 
         [SkippableFact]
         public void Found_Readable_Regions() {
-            Skip.IfNot(Environment.OSVersion.Platform == PlatformID.Win32NT);
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
 
             Assert.Contains(_memoryRegions, i => i.ReadFlag);
         }
 
         [SkippableFact]
         public void Found_Writeable_Regions() {
-            Skip.IfNot(Environment.OSVersion.Platform == PlatformID.Win32NT);
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
 
             Assert.Contains(_memoryRegions, i => i.WriteFlag);
         }
 
         [SkippableFact]
-        public void Found_Executeable_Regions() {
-            Skip.IfNot(Environment.OSVersion.Platform == PlatformID.Win32NT);
+        public void Found_Executable_Regions() {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
 
             Assert.Contains(_memoryRegions, i => i.ExecuteFlag);
         }
 
         [SkippableFact]
         public unsafe void Found_Manually_Created_Memory() {
-            Skip.IfNot(Environment.OSVersion.Platform == PlatformID.Win32NT);
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
 
             var allocatedBytes = (int*)Marshal.AllocHGlobal(20);
             var address = (nint)allocatedBytes;
@@ -57,7 +56,7 @@ namespace PalworldManagedModFramework.Sdk.Tests.ServicesTests.MemoryMapperTests 
 
         [SkippableFact]
         public unsafe void Found_Manually_Created_Memory_At_Non_Zero_Address() {
-            Skip.IfNot(Environment.OSVersion.Platform == PlatformID.Win32NT);
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
 
             var allocatedBytes = (int*)Marshal.AllocHGlobal(20);
             var address = (nint)allocatedBytes;
@@ -67,6 +66,5 @@ namespace PalworldManagedModFramework.Sdk.Tests.ServicesTests.MemoryMapperTests 
             Assert.True(memoryRegion.StartAddress != 0);
             Marshal.FreeHGlobal((nint)allocatedBytes);
         }
-
     }
 }

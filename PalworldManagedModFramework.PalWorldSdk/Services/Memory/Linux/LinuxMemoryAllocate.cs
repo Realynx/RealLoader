@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
@@ -9,6 +10,7 @@ using static PalworldManagedModFramework.Sdk.Services.Memory.Linux.NativeFunctio
 
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
+    [SupportedOSPlatform("linux")]
     public class LinuxMemoryAllocate : IMemoryAllocate {
         private readonly ILogger _logger;
         private readonly IMemoryMapper _memoryMapper;

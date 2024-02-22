@@ -1,17 +1,19 @@
 ﻿using System.IO.Compression;
+using System.Runtime.Versioning;
 
 using PalworldModInstaller.Models;
 
 using Spectre.Console;
 
 namespace PalworldModInstaller.Services {
+    [SupportedOSPlatform("windows")]
     public class WindowsInstaller : IInstaller {
 
         public void UninstallFiles(InstallerOptions installerOptions) {
             var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
             var win64Folder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Win64");
 
-            var dotnetDependanciesFolder = Path.Combine(win64Folder, "ManagedModFramework");
+            var dotnetDependenciesFolder = Path.Combine(win64Folder, "ManagedModFramework");
             var clrHostLocation = Path.Combine(win64Folder, "CLRHost.dll");
             var entryPELocation = Path.Combine(win64Folder, "Palworld-Win64-Shipping.exe");
             var renamePELocation = Path.Combine(win64Folder, "Game-Palworld-Win64-Shipping.exe");
@@ -40,7 +42,7 @@ namespace PalworldModInstaller.Services {
             AnsiConsole.WriteLine($"Uninstalling modloader...");
 
             Directory.Delete(modsFolder, true);
-            Directory.Delete(dotnetDependanciesFolder, true);
+            Directory.Delete(dotnetDependenciesFolder, true);
 
             File.Delete(netHostLib);
             File.Delete(entryPELocation);
@@ -53,7 +55,7 @@ namespace PalworldModInstaller.Services {
             var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
             var win64Folder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Win64");
 
-            var dotnetDependanciesFolder = Path.Combine(win64Folder, "ManagedModFramework");
+            var dotnetDependenciesFolder = Path.Combine(win64Folder, "ManagedModFramework");
             var clrHostLocation = Path.Combine(win64Folder, "CLRHost.dll");
             var netHostLib = Path.Combine(win64Folder, "nethost.dll");
             var entryPELocation = Path.Combine(win64Folder, "Palworld-Win64-Shipping.exe");
@@ -64,9 +66,9 @@ namespace PalworldModInstaller.Services {
                 Directory.CreateDirectory(modsFolder);
             }
 
-            if (!Directory.Exists(dotnetDependanciesFolder)) {
+            if (!Directory.Exists(dotnetDependenciesFolder)) {
                 AnsiConsole.WriteLine("Framework install folder did not exist, creating it now.");
-                Directory.CreateDirectory(dotnetDependanciesFolder);
+                Directory.CreateDirectory(dotnetDependenciesFolder);
             }
 
             if (!installerOptions.CheckUpdates && File.Exists(renamePELocation)) {
@@ -86,14 +88,14 @@ namespace PalworldModInstaller.Services {
 
             AnsiConsole.WriteLine("Installing mod loader...");
             File.Move(entryPELocation, renamePELocation);
-            InstallNewFiles(dotnetDependanciesFolder, entryPELocation, clrHostLocation);
+            InstallNewFiles(dotnetDependenciesFolder, entryPELocation, clrHostLocation);
         }
 
-        private void InstallNewFiles(string dotnetDependanciesFolder, string bootStrapper, string clrHost) {
-            Task.Factory.StartNew(async () => await UnzipFrameworkPackage(dotnetDependanciesFolder));
+        private void InstallNewFiles(string dotnetDependenciesFolder, string bootstrapper, string clrHost) {
+            Task.Factory.StartNew(async () => await UnzipFrameworkPackage(dotnetDependenciesFolder));
 
             Task.Factory.StartNew(async () => await WriteGithubFile(clrHost, "CLRHost.dll"));
-            Task.Factory.StartNew(async () => await WriteGithubFile(bootStrapper, "Bootstrapper.exe"));
+            Task.Factory.StartNew(async () => await WriteGithubFile(bootstrapper, "Bootstrapper.exe"));
         }
 
         private bool IsOutOfDate() {
@@ -102,13 +104,13 @@ namespace PalworldModInstaller.Services {
 
         private async Task WriteGithubFile(string localLocation, string githubFilename) {
             var fileBytes = await Program.DownloadGithubRelease(githubFilename);
-            File.WriteAllBytes(localLocation, fileBytes);
+            await File.WriteAllBytesAsync(localLocation, fileBytes);
         }
 
         private async Task UnzipFrameworkPackage(string extractPath) {
             var githubFileName = "ManagedModFramework.zip";
             var zipFileBytes = await Program.DownloadGithubRelease(githubFileName);
-            File.WriteAllBytes(githubFileName, zipFileBytes);
+            await File.WriteAllBytesAsync(githubFileName, zipFileBytes);
 
             using var archive = ZipFile.OpenRead(githubFileName);
             foreach (var entry in archive.Entries) {

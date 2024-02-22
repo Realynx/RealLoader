@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Runtime.InteropServices;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Linux;
@@ -17,12 +19,12 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
                 .AddSingleton<IGlobalObjects, GlobalObjects>()
                 .AddSingleton<INamePoolService, NamePoolService>();
 
-            if (Environment.OSVersion.Platform == PlatformID.Unix) {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 serviceDescriptors
                     .AddSingleton<IEnginePattern, LinuxServerPattern>()
                     .AddSingleton<IUObjectFuncs, LinuxUObjectFuncs>();
             }
-            else if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 serviceDescriptors
                     .AddSingleton<IEnginePattern, WindowsClientPattern>()
                     .AddSingleton<IUObjectFuncs, WindowsUObjectFuncs>();

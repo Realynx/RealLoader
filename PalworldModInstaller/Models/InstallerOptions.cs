@@ -9,7 +9,7 @@ namespace PalworldModInstaller.Models {
         [CommandOption("-l|--location")]
         [DefaultValue("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Palworld")]
         [Description("This is the directory that your game is installed.")]
-        public string? InstallLocation { get; set; }
+        public string InstallLocation { get; set; }
 
         [CommandOption("-u|--update")]
         [DefaultValue(true)]
@@ -23,7 +23,7 @@ namespace PalworldModInstaller.Models {
 
         [CommandOption("-b|--backup")]
         [Description("This will backup all of your mods to the specified directory.")]
-        public string? Backup { get; set; }
+        public string Backup { get; set; }
 
         [CommandOption("-m|--mods")]
         [DefaultValue(true)]

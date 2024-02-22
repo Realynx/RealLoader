@@ -1,8 +1,10 @@
 ﻿using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
+    [SupportedOSPlatform("linux")]
     public static class NativeFunctions {
         [DllImport("libc.so.6", SetLastError = true, EntryPoint = "mmap")]
         public static extern nint MemoryMap(nint addr, nuint length, MProtectProtect protect, MMapFlags flags, int fileDescriptor, int offset);

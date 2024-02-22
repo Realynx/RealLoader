@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
+
 using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
 using PalworldManagedModFramework.Sdk.Services.Memory.Windows;
 using PalworldManagedModFramework.Sdk.Services.Memory;
@@ -18,17 +20,17 @@ namespace PalworldManagedModFramework.Sdk.Tests.ServicesTests.SequenceScannerTes
         }
 
         protected unsafe void SetupMemoryMapperService() {
-            IMemoryMapper memoryMapper = null;
+            IMemoryMapper memoryMapper = null!;
 
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
                 memoryMapper = new WindowsMemoryMapper();
             }
-            else if (Environment.OSVersion.Platform == PlatformID.Unix) {
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 var mockedLogger = Mocker.CreateInstance<ILogger>();
                 memoryMapper = new LinuxMemoryMapper(mockedLogger);
             }
 
-            Mocker.Use(memoryMapper!);
+            Mocker.Use(memoryMapper);
         }
     }
 }

@@ -1,8 +1,11 @@
-﻿using PalworldManagedModFramework.Sdk.Logging;
+﻿using System.Runtime.Versioning;
+
+using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
+    [SupportedOSPlatform("linux")]
     public class LinuxMemoryScanner : IMemoryScanner {
         private readonly ILogger _logger;
         private readonly ISequenceScanner _sequenceScanner;
@@ -16,7 +19,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
         }
 
         public nint? SingleSequenceScan(ByteCodePattern byteCodePattern) {
-            return SequenceScan(byteCodePattern).FirstOrDefault();
+            return SequenceScan(byteCodePattern)?.FirstOrDefault();
         }
 
         public nint[]? SequenceScan(ByteCodePattern byteCodePattern) {

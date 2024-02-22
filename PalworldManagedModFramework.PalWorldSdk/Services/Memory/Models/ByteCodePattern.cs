@@ -66,12 +66,12 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Models {
         }
 
         public virtual bool Equals(ByteCodePattern? other) {
-            if ((object)this == (object)other) {
-                return true;
-            }
-
             if (other is null) {
                 return false;
+            }
+
+            if ((object)this == (object)other) {
+                return true;
             }
 
             return Mask.AsSpan().SequenceEqual(other.Mask) && Pattern.AsSpan().SequenceEqual(other.Pattern)
