@@ -8,6 +8,7 @@ namespace PalworldManagedModFramework.Sdk.Logging {
         Warnings = 4,
         Info = 8
     }
+
     public class Logger : ILogger {
         public LogLevel Level { get; set; }
 
@@ -44,10 +45,8 @@ namespace PalworldManagedModFramework.Sdk.Logging {
         public void Info(DefaultInterpolatedStringHandler info,
             [CallerFilePath] string classFile = "",
             [CallerLineNumber] int lineNumber = 0,
-            [CallerMemberName] string callerName = "")
-        {
-            if (Level.HasFlag(LogLevel.Info))
-            {
+            [CallerMemberName] string callerName = "") {
+            if (Level.HasFlag(LogLevel.Info)) {
                 var infoString = info.ToStringAndClear();
                 LogOutput(ConsoleColor.Green, infoString, classFile, lineNumber, callerName);
             }
@@ -65,10 +64,8 @@ namespace PalworldManagedModFramework.Sdk.Logging {
         public void Error(DefaultInterpolatedStringHandler error,
             [CallerFilePath] string classFile = "",
             [CallerLineNumber] int lineNumber = 0,
-            [CallerMemberName] string callerName = "")
-        {
-            if (Level.HasFlag(LogLevel.Errors))
-            {
+            [CallerMemberName] string callerName = "") {
+            if (Level.HasFlag(LogLevel.Errors)) {
                 var errorString = error.ToStringAndClear();
                 LogOutput(ConsoleColor.Red, errorString, classFile, lineNumber, callerName);
             }
@@ -86,10 +83,8 @@ namespace PalworldManagedModFramework.Sdk.Logging {
         public void Warning(DefaultInterpolatedStringHandler warning,
             [CallerFilePath] string classFile = "",
             [CallerLineNumber] int lineNumber = 0,
-            [CallerMemberName] string callerName = "")
-        {
-            if (Level.HasFlag(LogLevel.Warnings))
-            {
+            [CallerMemberName] string callerName = "") {
+            if (Level.HasFlag(LogLevel.Warnings)) {
                 var warningString = warning.ToStringAndClear();
                 LogOutput(ConsoleColor.Yellow, warningString, classFile, lineNumber, callerName);
             }
@@ -107,10 +102,8 @@ namespace PalworldManagedModFramework.Sdk.Logging {
         public void Debug(DefaultInterpolatedStringHandler debug,
             [CallerFilePath] string classFile = "",
             [CallerLineNumber] int lineNumber = 0,
-            [CallerMemberName] string callerName = "")
-        {
-            if (Level.HasFlag(LogLevel.Debugging))
-            {
+            [CallerMemberName] string callerName = "") {
+            if (Level.HasFlag(LogLevel.Debugging)) {
                 var debugString = debug.ToStringAndClear();
                 LogOutput(ConsoleColor.Magenta, debugString, classFile, lineNumber, callerName);
             }
@@ -128,7 +121,9 @@ namespace PalworldManagedModFramework.Sdk.Logging {
             }
             className = Path.GetFileNameWithoutExtension(className);
 
-            var logPreamble = $"[{TimeStamp}][{className}::{callerName};{lineNumber}]: ";
+            var timeStamp = $"[{TimeStamp}]";
+
+            var logPreamble = $"[{timeStamp}][{className}::{callerName};{lineNumber}]: ";
 
             Console.ForegroundColor = color;
             Console.Write(logPreamble);
@@ -137,7 +132,10 @@ namespace PalworldManagedModFramework.Sdk.Logging {
             Console.WriteLine(log);
 
             if (_loggerConfig.WriteFile) {
-                File.WriteAllText(_logLocation, log);
+                using var sw = File.AppendText(_logLocation);
+                sw.Write(timeStamp);
+                sw.Write(' ');
+                sw.WriteLine(log);
             }
         }
     }

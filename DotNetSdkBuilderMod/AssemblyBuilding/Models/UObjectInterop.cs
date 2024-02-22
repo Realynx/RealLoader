@@ -42,7 +42,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
 
         // TODO: public void OnObjectRemovedFromGlobalObjectPool(object sender, ObjectRemovedEventArgs e) {
         //     if (e.address == _addressUnsafe) {
-        //         Address = IntPtr.Zero;
+        //         Address = nint.Zero;
         //     }
         // }
 
