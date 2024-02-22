@@ -36,6 +36,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
                 .AddSingleton<ICodeGenMethodNodeFactory, CodeGenMethodNodeFactory>()
                 .AddSingleton<ICodeGenPropertyNodeFactory, CodeGenPropertyNodeFactory>()
                 .AddSingleton<ICodeGenConstructorNodeFactory, CodeGenConstructorNodeFactory>()
+                .AddSingleton<ICodeGenOperatorNodeFactory, CodeGenOperatorNodeFactory>()
                 .AddSingleton<ICodeGenClassNodeFactory, CodeGenClassNodeFactory>()
                 .AddSingleton<ICodeGenGraphBuilder, CodeGenGraphBuilder>()
                 .AddSingleton<IUObjectInteropExtensionsBuilder, UObjectInteropExtensionsBuilder>()
