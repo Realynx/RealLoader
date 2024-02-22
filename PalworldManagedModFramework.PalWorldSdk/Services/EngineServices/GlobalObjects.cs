@@ -9,16 +9,16 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         private readonly ILogger _logger;
         private readonly IEnginePattern _enginePattern;
         private readonly INamePoolService _namePoolService;
-        private readonly unsafe FUObjectArray* _objectPoolAddress;
+        private unsafe FUObjectArray* _objectPoolAddress;
 
         public unsafe GlobalObjects(ILogger logger, IEnginePattern enginePattern, INamePoolService namePoolService) {
             _logger = logger;
             _enginePattern = enginePattern;
             _namePoolService = namePoolService;
-            _objectPoolAddress = (FUObjectArray*)_enginePattern.PGUObjectArray;
         }
 
         public unsafe UObjectBase*[] EnumerateObjects() {
+            _objectPoolAddress = (FUObjectArray*)_enginePattern.PGUObjectArray;
             var fixedChunkedArray = _objectPoolAddress->ObjObjects;
             var objects = *fixedChunkedArray.objects;
 
@@ -38,6 +38,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         }
 
         public unsafe UObjectBase* FindObjects(string name, StringComparison stringComparison = StringComparison.Ordinal) {
+            _objectPoolAddress = (FUObjectArray*)_enginePattern.PGUObjectArray;
             var fixedChunkedArray = _objectPoolAddress->ObjObjects;
             var objects = *fixedChunkedArray.objects;
 

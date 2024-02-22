@@ -63,8 +63,6 @@ namespace PalworldManagedModFramework.Services {
                 .InstallDetours(_detourManager);
             sw.Stop();
             _logger.Debug($"Scanning took {sw.ElapsedMilliseconds} ms.");
-
-            _globalObjectsTracker.SynchroniseObjectPool();
         }
     }
 }

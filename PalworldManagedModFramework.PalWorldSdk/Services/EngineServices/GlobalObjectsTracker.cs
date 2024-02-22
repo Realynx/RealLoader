@@ -6,24 +6,45 @@ using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.Sdk.Services.Detour;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.UnrealHook;
+using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
 
 namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
     public class GlobalObjectsTracker : IGlobalObjectsTracker {
         private readonly ILogger _logger;
         private readonly IGlobalObjects _globalObjects;
+        private readonly IUnrealHookManager _unrealHookManager;
 
         private static GlobalObjectsTracker? _thisInstance;
         private readonly HashSet<nint> _loadedObjects = new();
         private readonly HashSet<nint> _markedObjects = new();
 
-        public GlobalObjectsTracker(ILogger logger, IGlobalObjects globalObjects) {
+        public GlobalObjectsTracker(ILogger logger, IGlobalObjects globalObjects, IUnrealHookManager unrealHookManager) {
             _logger = logger;
             _globalObjects = globalObjects;
+            _unrealHookManager = unrealHookManager;
             _thisInstance = this;
+
+            _unrealHookManager
+                .RegisterUnrealEvent(GetType().GetMethod(nameof(ObjectsReady))!, this);
         }
 
-        public void SynchroniseObjectPool() {
+        [EngineEvent("^WBP_TItle_C::OnInitialized")]
+        public unsafe void ObjectsReady(UnrealEvent unrealEvent) {
+            SynchroniseObjectPool();
+            _logger.Debug("Synchronised Object Pool");
+        }
 
+        public unsafe void SynchroniseObjectPool() {
+            var currentObjects = _globalObjects.EnumerateObjects();
+
+            foreach (var pObject in currentObjects) {
+                if (pObject is null) {
+                    continue;
+                }
+
+                _loadedObjects.Add((nint)pObject);
+            }
         }
 
         public nint[] GetLoadedObjects() {
@@ -73,6 +94,10 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         private void SetConsoleTitileObjCount() {
             Console.Title = $"Active Objects: {_loadedObjects.Count}, GC Marked Objects: {_markedObjects.Count}";
         }
+
+
+
+        //TODO: These patterns need to be swapped in the case of linus OS
 
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, void> UObjectPostInitProperties_Original;
         [Detour("48 83 ? ? 48 ? ? 48 C7 44 24 20 00 00 ? ? 48 8B ? ? 45 ? ? 41 ? ?", DetourType.Stack)]
