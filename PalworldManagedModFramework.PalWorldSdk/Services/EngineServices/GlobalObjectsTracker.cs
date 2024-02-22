@@ -37,8 +37,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             _synchronized = true;
             if (_synchronized) {
                 return;
-
             }
+
             SynchroniseObjectPool();
             _logger.Debug("Synchronized Object Pool");
         }
@@ -101,8 +101,6 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         private void SetConsoleTitleObjCount() {
             Console.Title = $"Active Objects: {_loadedObjects.Count}, GC Marked Objects: {_markedObjects.Count}";
         }
-
-
 
         //TODO: These patterns need to be swapped in the case of linus OS
 

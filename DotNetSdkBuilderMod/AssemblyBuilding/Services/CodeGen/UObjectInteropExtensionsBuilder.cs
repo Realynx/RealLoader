@@ -157,7 +157,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
         private static IEnumerable<string> GetProcessEventCallSegment() {
             yield return "fixed (void* argsPtr = &span.GetPinnableReference()) {";
-            yield return $"    objectInterop.{nameof(UObjectInterop.ProcessEvent)}(functionStruct, argsPtr);";
+            yield return $"    objectInterop.{nameof(UObjectInterop.Invoke)}(functionStruct, argsPtr);";
             yield return "}";
         }
 
