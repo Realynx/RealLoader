@@ -2,8 +2,9 @@
 using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices;
 using PalworldManagedModFramework.Sdk.Services.Detour.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using PalworldManagedModFramework.Sdk.Services.Detour.Linux;
-using PalworldManagedModFramework.Sdk.Services.Detour.Windows;
+using PalworldManagedModFramework.Sdk.Services.Memory.Linux;
+using PalworldManagedModFramework.Sdk.Services.Memory.Windows;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 
 namespace PalworldManagedModFramework.Sdk.Services.Detour {
     public static class ServiceProviderExtensions {

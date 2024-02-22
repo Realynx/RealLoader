@@ -9,7 +9,7 @@ using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
 using static PalworldManagedModFramework.Sdk.Services.UnrealHook.UnrealEvent;
 
 namespace ExampleMod {
-    [PalworldMod("Sample", "poofyfox", ".poofyfox", "1.0.0", PalworldModType.Client)]
+    [PalworldMod("Sample", "poofyfox", ".poofyfox", "1.0.0", PalworldModType.Universal)]
     public class Sample : IPalworldMod {
         private readonly CancellationToken _cancellationToken;
         private readonly ILogger _logger;

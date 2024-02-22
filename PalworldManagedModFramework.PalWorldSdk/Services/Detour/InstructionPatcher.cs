@@ -2,6 +2,8 @@
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Detour.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Detour {
     public class InstructionPatcher : IInstructionPatcher {
@@ -19,7 +21,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
             var destinationInstructions = new Span<byte>((byte*)address, length);
             var overwrittenInstructions = new byte[length];
 
-            _memoryAllocate.SetProtection(address, (uint)instructionBytes.Length, Models.MemoryProtection.ReadWrite, out var previousProtection);
+            _memoryAllocate.SetProtection(address, (uint)instructionBytes.Length, SimpleMemoryProtection.Read | SimpleMemoryProtection.Write | SimpleMemoryProtection.Execute, out var previousProtection);
 
             var i = 0;
 

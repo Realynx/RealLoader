@@ -9,7 +9,7 @@ using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
     public partial class LinuxMemoryMapper : IMemoryMapper {
         private const string LINUX_MAPS_PATH = "/proc/self/maps";
-        
+
         [GeneratedRegex(@"([0-9a-fA-F]+)-([0-9a-fA-F]+) ([r-])([w-])([x-])([p-]) ([0-9a-fA-F]+) .+")]
         private static partial Regex LinuxMapRegex();
 
@@ -30,8 +30,6 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
         }
 
         private IEnumerable<MemoryRegion> EnumerateMemoryRegions() {
-            _logger.Debug("Enumerating memory regions");
-
             var linuxMapsFile = File.ReadAllText(LINUX_MAPS_PATH);
             var memoryRegions = LinuxMapRegex().Matches(linuxMapsFile);
 

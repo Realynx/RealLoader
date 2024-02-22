@@ -1,8 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace PalworldManagedModFramework.Sdk.Services.Detour.Linux {
-    public static class NativeFunctions {
+using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
+namespace PalworldManagedModFramework.Sdk.Services.Memory.Linux {
+    public static class NativeFunctions {
         [DllImport("libc.so.6", SetLastError = true, EntryPoint = "mmap")]
         public static extern nint MemoryMap(nint addr, nuint length, MProtectProtect protect, MMapFlags flags, int fileDescriptor, int offset);
 
@@ -12,8 +13,48 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.Linux {
         [DllImport("libc.so.6", SetLastError = true, EntryPoint = "mprotect")]
         public static extern int MemoryProtect(nint addr, nuint length, MProtectProtect protect);
 
-        [DllImport("libc.so.6", SetLastError = true, EntryPoint = "read_mprotection")]
-        public static extern int GetMemoryProtect(nint addr);
+        public static MProtectProtect ConvertToMProtection(SimpleMemoryProtection memoryProtection) {
+            var hasRead = memoryProtection.HasFlag(SimpleMemoryProtection.Read);
+            var hasWrite = memoryProtection.HasFlag(SimpleMemoryProtection.Write);
+            var hasExecute = memoryProtection.HasFlag(SimpleMemoryProtection.Execute);
+
+            var linuxMProtectFlags = MProtectProtect.PROT_NONE;
+
+            if (hasRead) {
+                linuxMProtectFlags |= MProtectProtect.PROT_READ;
+            }
+
+            if (hasWrite) {
+                linuxMProtectFlags |= MProtectProtect.PROT_WRITE;
+            }
+
+            if (hasExecute) {
+                linuxMProtectFlags |= MProtectProtect.PROT_EXEC;
+            }
+
+            return linuxMProtectFlags;
+        }
+
+        public static SimpleMemoryProtection ConvertToMemoryProtection(MProtectProtect protection) {
+            var hasRead = protection.HasFlag(MProtectProtect.PROT_READ);
+            var hasWrite = protection.HasFlag(MProtectProtect.PROT_WRITE);
+            var hasExecute = protection.HasFlag(MProtectProtect.PROT_EXEC);
+
+            var genericMemoryProtection = SimpleMemoryProtection.None;
+            if (hasRead) {
+                genericMemoryProtection |= SimpleMemoryProtection.Read;
+            }
+
+            if (hasWrite) {
+                genericMemoryProtection |= SimpleMemoryProtection.Write;
+            }
+
+            if (hasExecute) {
+                genericMemoryProtection |= SimpleMemoryProtection.Execute;
+            }
+
+            return genericMemoryProtection;
+        }
 
         [Flags]
         public enum MProtectProtect {

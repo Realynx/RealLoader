@@ -124,6 +124,7 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
 
             var dependencies = ResolveDependencies(ctor);
             if (dependencies.Any(i => i is null)) {
+                _logger.Error($"Could not resolve dependencies for {ctor.GetType().Name}");
                 return false;
             }
 
@@ -137,6 +138,7 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
 
             for (var x = 0; x < parameters.Length; x++) {
                 var parameterType = parameters[x].ParameterType;
+
                 if (parameterType == typeof(CancellationToken)) {
                     args[x] = CancelTokenSource.Token;
                     continue;

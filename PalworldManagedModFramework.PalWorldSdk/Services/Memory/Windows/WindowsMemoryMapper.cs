@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
+using static PalworldManagedModFramework.Sdk.Services.Memory.Windows.NativeFunctions;
+
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
     public class WindowsMemoryMapper : IMemoryMapper {
         public MemoryRegion[] FindMemoryRegions() {
@@ -17,41 +19,45 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
             return Process.GetCurrentProcess().MainModule!.BaseAddress;
         }
 
+        public SimpleMemoryProtection GetProtection(nint address) {
+            throw new NotImplementedException("This is a linux function. Windows has native function for getting memory protection!");
+        }
+
         private unsafe ICollection<MemoryRegion> EnumerateMemoryRegions(nint hProcess, nint baseAddress) {
-            var sizeOfStruct = sizeof(WindowsStructs.MEMORY_BASIC_INFORMATION64);
-            var memoryInfoStructs = (WindowsStructs.MEMORY_BASIC_INFORMATION64*)Marshal.AllocHGlobal(sizeOfStruct);
+            var sizeOfStruct = sizeof(MEMORY_BASIC_INFORMATION64);
+            var memoryInfoStructs = (MEMORY_BASIC_INFORMATION64*)Marshal.AllocHGlobal(sizeOfStruct);
 
             try {
                 var mappedMemoryRegions = new List<MemoryRegion>();
                 var bytesReturnedQuery = 0;
 
                 while (true) {
-                    bytesReturnedQuery = WindowsNativeMethods.VirtualQuery(hProcess, baseAddress, memoryInfoStructs, (uint)sizeOfStruct);
+                    bytesReturnedQuery = NativeFunctions.VirtualQuery(hProcess, baseAddress, memoryInfoStructs, (uint)sizeOfStruct);
 
                     if (bytesReturnedQuery == 0) {
                         break;
                     }
 
 
-                    var readFlag = memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READ) ||
-                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READWRITE) ||
-                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_READONLY) ||
-                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_READWRITE);
+                    var readFlag = memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READ) ||
+                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READWRITE) ||
+                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_READONLY) ||
+                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_READWRITE);
 
-                    var writeFlag = memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_READWRITE) ||
-                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READWRITE) ||
-                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_WRITECOPY) ||
-                                    memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_WRITECOPY);
+                    var writeFlag = memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_READWRITE) ||
+                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READWRITE) ||
+                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_WRITECOPY) ||
+                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_WRITECOPY);
 
-                    var executeFlag = memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE) ||
-                                      memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READ) ||
-                                      memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_READWRITE) ||
-                                      memoryInfoStructs->Protect.HasFlag(WindowsStructs.MemoryProtection.PAGE_EXECUTE_WRITECOPY);
+                    var executeFlag = memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE) ||
+                                      memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READ) ||
+                                      memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READWRITE) ||
+                                      memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_WRITECOPY);
 
                     baseAddress += (nint)memoryInfoStructs->RegionSize;
 
                     // We only want commited memory when scanning.
-                    if (memoryInfoStructs->State != WindowsStructs.PageState.MEM_COMMIT) {
+                    if (memoryInfoStructs->State != PageState.MEM_COMMIT) {
                         continue;
                     }
 

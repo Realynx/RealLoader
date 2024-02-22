@@ -38,6 +38,7 @@ namespace PalworldManagedModFramework {
             var modLoader = host.Services.GetRequiredService<IModLoader>();
             modLoader.LoadMods();
 
+            loggerInstance.Debug("Mods running, fully loaded.");
             for (; ; )
                 Console.ReadLine();
         }

@@ -1,14 +1,16 @@
 ﻿using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-using static PalworldManagedModFramework.Sdk.Services.Memory.Windows.WindowsStructs;
+using PalworldManagedModFramework.Sdk.Services.Memory.Models;
+
+using static PalworldManagedModFramework.Sdk.Services.Memory.Windows.NativeFunctions;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
     /// <summary>
     /// Native methods for working in Windows process memory.
     /// </summary>
     [SupportedOSPlatform("windows")]
-    public static class WindowsNativeMethods {
+    public static class NativeFunctions {
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern nint VirtualAlloc(nint baseAddress, uint size,
             MemoryProtection allocationType, MemoryProtection protection);
@@ -41,9 +43,18 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
 
         [DllImport("user32.dll", SetLastError = true)]
         public static extern bool SetWindowPos(IntPtr handle, IntPtr relativeToOtherHandle, int x, int y, int with, int height, SetWindowsPosFlags flags);
-    }
 
-    public static class WindowsStructs {
+
+
+        [DllImport("kernel32.dll")]
+        public static extern nint VirtualAlloc(nint lpStartAddr, uint size, PageState flAllocationType, Protection flProtect);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool VirtualFree(nint lpAddress, uint dwSize, PageState dwFreeType);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static unsafe extern bool VirtualProtect(nint lpAddress, uint dwSize, Protection flNewProtect, out uint lpflOldProtect);
+
         [StructLayout(LayoutKind.Sequential)]
         public struct MEMORY_BASIC_INFORMATION64 {
             public ulong BaseAddress;
@@ -56,12 +67,69 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
             public int Type;
             public int __alignment2;
         }
-
-        [Flags]
         public enum PageState {
             MEM_COMMIT = 0x1000,
-            MEM_FREE = 0x10000,
             MEM_RESERVE = 0x2000,
+            MEM_RELEASE = 0x8000,
+            MEM_FREE = 0x10000,
+        }
+
+        public enum Protection {
+            PAGE_READONLY = 0x02,
+            PAGE_READWRITE = 0x04,
+            PAGE_EXECUTE = 0x10,
+            PAGE_EXECUTE_READ = 0x20,
+            PAGE_EXECUTE_READWRITE = 0x40,
+        }
+
+        public static Protection ConvertToProtection(SimpleMemoryProtection memoryProtection) {
+            var hasRead = memoryProtection.HasFlag(SimpleMemoryProtection.Read);
+            var hasWrite = memoryProtection.HasFlag(SimpleMemoryProtection.Write);
+            var hasExecute = memoryProtection.HasFlag(SimpleMemoryProtection.Execute);
+
+            if (hasRead && hasWrite && hasExecute) {
+                return Protection.PAGE_EXECUTE_READWRITE;
+            }
+
+            if (hasRead && hasWrite && !hasExecute) {
+                return Protection.PAGE_READWRITE;
+            }
+
+            if (hasRead && !hasWrite && hasExecute) {
+                return Protection.PAGE_EXECUTE_READ;
+            }
+
+            if (hasRead && !hasWrite && !hasExecute) {
+                return Protection.PAGE_READONLY;
+            }
+
+            if (!hasRead && !hasWrite && hasExecute) {
+                return Protection.PAGE_EXECUTE;
+            }
+
+            return Protection.PAGE_READONLY;
+        }
+
+        public static SimpleMemoryProtection ConvertToMemoryProtection(Protection protection) {
+            var hasRead = protection == Protection.PAGE_EXECUTE_READ || protection == Protection.PAGE_READONLY || protection == Protection.PAGE_EXECUTE_READWRITE || protection == Protection.PAGE_READWRITE;
+            var hasWrite = protection == Protection.PAGE_READWRITE || protection == Protection.PAGE_EXECUTE_READWRITE;
+            var hasExecute = protection == Protection.PAGE_EXECUTE_READWRITE || protection == Protection.PAGE_EXECUTE || protection == Protection.PAGE_EXECUTE_READ;
+
+            var simpleMemoryProtection = SimpleMemoryProtection.None;
+
+            if (hasRead) {
+                simpleMemoryProtection |= SimpleMemoryProtection.Read;
+            }
+
+            if (hasWrite) {
+                simpleMemoryProtection |= SimpleMemoryProtection.Write;
+            }
+
+            if (hasExecute) {
+                simpleMemoryProtection |= SimpleMemoryProtection.Execute;
+            }
+
+            return simpleMemoryProtection;
         }
 
         /// <summary>

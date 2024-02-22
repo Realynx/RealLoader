@@ -4,8 +4,6 @@ using System.Runtime.InteropServices;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Windows;
 
-using static PalworldManagedModFramework.Sdk.Services.Memory.Windows.WindowsStructs;
-
 namespace PalworldManagedModFramework {
     public static class ConsoleExtensions {
         [Conditional("DEBUG")]
@@ -17,11 +15,11 @@ namespace PalworldManagedModFramework {
             logger.Debug("Enabling console always on top...");
 
             var consoleHandle = Process.GetCurrentProcess().MainWindowHandle;
-            var result = WindowsNativeMethods.SetWindowPos(consoleHandle, SET_WINDOW_POS_HWND_TOPMOST, 0, 0, 0, 0,
-                SetWindowsPosFlags.SWP_NOMOVE | SetWindowsPosFlags.SWP_NOSIZE);
+            var result = NativeFunctions.SetWindowPos(consoleHandle, NativeFunctions.SET_WINDOW_POS_HWND_TOPMOST, 0, 0, 0, 0,
+                NativeFunctions.SetWindowsPosFlags.SWP_NOMOVE | NativeFunctions.SetWindowsPosFlags.SWP_NOSIZE);
 
             if (!result) {
-                var error = WindowsNativeMethods.GetLastError();
+                var error = NativeFunctions.GetLastError();
                 logger.Debug($"Unable to enable console always on top, error code: 0x{error:X}");
             }
         }
