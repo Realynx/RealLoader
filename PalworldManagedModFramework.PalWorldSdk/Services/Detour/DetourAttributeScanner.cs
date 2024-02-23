@@ -36,7 +36,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
 
         public DetourAttribute FindDetourAttribute(IEnumerable<DetourAttribute> patternAttributes) {
             var linuxDetours = patternAttributes.Where(i => i is LinuxDetourAttribute);
-            var windowsDetours = patternAttributes.Where(i => i is LinuxDetourAttribute);
+            var windowsDetours = patternAttributes.Where(i => i is WindowsDetourAttribute);
             var detours = patternAttributes.Where(i => i is not null and not WindowsDetourAttribute and not LinuxDetourAttribute);
 
             DetourAttribute? selectedDetourAttribute = null;
