@@ -7,7 +7,6 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<PlatformTarget>x64</PlatformTarget>
 		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-		<DebugType>Embedded</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared.SystemUnderTest", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetSdkBuilderMod", "DotNetSdkBuilderMod\DotNetSdkBuilderMod.csproj", "{9D0B6F70-6367-4E72-BC5F-04746456EF93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalworldManagedModFramework.Tests", "PalworldManagedModFramework.Tests\PalworldManagedModFramework.Tests.csproj", "{0647430C-2325-4AAE-A24F-BC9AA43D8762}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -74,6 +76,12 @@ Global
 		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Dist|x64.Build.0 = Debug|Any CPU
 		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Release|x64.ActiveCfg = Release|Any CPU
 		{9D0B6F70-6367-4E72-BC5F-04746456EF93}.Release|x64.Build.0 = Release|Any CPU
+		{0647430C-2325-4AAE-A24F-BC9AA43D8762}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0647430C-2325-4AAE-A24F-BC9AA43D8762}.Debug|x64.Build.0 = Debug|Any CPU
+		{0647430C-2325-4AAE-A24F-BC9AA43D8762}.Dist|x64.ActiveCfg = Debug|Any CPU
+		{0647430C-2325-4AAE-A24F-BC9AA43D8762}.Dist|x64.Build.0 = Debug|Any CPU
+		{0647430C-2325-4AAE-A24F-BC9AA43D8762}.Release|x64.ActiveCfg = Release|Any CPU
+		{0647430C-2325-4AAE-A24F-BC9AA43D8762}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
