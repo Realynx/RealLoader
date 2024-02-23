@@ -10,7 +10,6 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-		<BaseOutputPath>../GithubSymbols/Net/PalWorldManagedModFramework</BaseOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>

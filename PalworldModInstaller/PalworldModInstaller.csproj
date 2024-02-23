@@ -7,7 +7,6 @@
 		<Nullable>disable</Nullable>
 		<PublishAot>true</PublishAot>
 		<InvariantGlobalization>true</InvariantGlobalization>
-		<BaseOutputPath>../GithubSymbols/Net/PalworldModInstaller</BaseOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>

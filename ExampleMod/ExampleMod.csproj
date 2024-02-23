@@ -6,7 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <BaseOutputPath>../GithubSymbols/Net/ExampleMod</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
