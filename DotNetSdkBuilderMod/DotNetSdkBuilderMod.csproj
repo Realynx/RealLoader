@@ -7,15 +7,11 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<PlatformTarget>x64</PlatformTarget>
 		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.Sdk.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="AssemblyBuilding\Interfaces\" />
-		<Folder Include="AssemblyBuilding\Services\ArtifactService\" />
 	</ItemGroup>
 
 	<ItemGroup>
