@@ -35,14 +35,18 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
         }
 
         public DetourAttribute FindDetourAttribute(IEnumerable<DetourAttribute> patternAttributes) {
+            var linuxDetours = patternAttributes.Where(i => i is LinuxDetourAttribute);
+            var windowsDetours = patternAttributes.Where(i => i is LinuxDetourAttribute);
+            var detours = patternAttributes.Where(i => i is not null and not WindowsDetourAttribute and not LinuxDetourAttribute);
+
             DetourAttribute? selectedDetourAttribute = null;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && patternAttributes.SingleOrDefault(i => i is LinuxDetourAttribute) is { } linuxDetour) {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && linuxDetours.SingleOrDefault() is { } linuxDetour) {
                 selectedDetourAttribute = linuxDetour;
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && patternAttributes.SingleOrDefault(i => i is WindowsDetourAttribute) is { } windowsDetour) {
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && windowsDetours.SingleOrDefault() is { } windowsDetour) {
                 selectedDetourAttribute = windowsDetour;
             }
-            else if (patternAttributes.SingleOrDefault(i => i is not null and not WindowsDetourAttribute and not LinuxDetourAttribute) is { } detour) {
+            else if (detours.SingleOrDefault() is { } detour) {
                 selectedDetourAttribute = detour;
             }
 
