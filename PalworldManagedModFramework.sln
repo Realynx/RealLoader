@@ -17,9 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldModInstaller.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared.SystemUnderTest", "Shared.SystemUnderTest\Shared.SystemUnderTest.csproj", "{C919C1CE-7FC0-48F6-8E6F-764F0FBC13A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetSdkBuilderMod", "DotNetSdkBuilderMod\DotNetSdkBuilderMod.csproj", "{9D0B6F70-6367-4E72-BC5F-04746456EF93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework.Tests", "PalworldManagedModFramework.Tests\PalworldManagedModFramework.Tests.csproj", "{0647430C-2325-4AAE-A24F-BC9AA43D8762}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalworldManagedModFramework.Tests", "PalworldManagedModFramework.Tests\PalworldManagedModFramework.Tests.csproj", "{0647430C-2325-4AAE-A24F-BC9AA43D8762}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PalworldManagedModFramework.Sdk.Tests", "PalworldManagedModFramework.PalWorldSdk.Tests\PalworldManagedModFramework.Sdk.Tests.csproj", "{A839A387-9A69-4739-BD0D-99671EF4B48F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotNetSdkBuilderMod", "DotNetSdkBuilderMod\DotNetSdkBuilderMod.csproj", "{9D0B6F70-6367-4E72-BC5F-04746456EF93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{0647430C-2325-4AAE-A24F-BC9AA43D8762}.Debug|x64.Build.0 = Debug|Any CPU
 		{0647430C-2325-4AAE-A24F-BC9AA43D8762}.Release|x64.ActiveCfg = Release|Any CPU
 		{0647430C-2325-4AAE-A24F-BC9AA43D8762}.Release|x64.Build.0 = Release|Any CPU
+        {A839A387-9A69-4739-BD0D-99671EF4B48F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A839A387-9A69-4739-BD0D-99671EF4B48F}.Debug|x64.Build.0 = Debug|Any CPU
+		{A839A387-9A69-4739-BD0D-99671EF4B48F}.Release|x64.ActiveCfg = Release|Any CPU
+		{A839A387-9A69-4739-BD0D-99671EF4B48F}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
