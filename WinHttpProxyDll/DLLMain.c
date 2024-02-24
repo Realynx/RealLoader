@@ -6,7 +6,7 @@ extern void* g_FunctionTable[];
 
 void PopulateFunctionTable()
 {
-	HMODULE OriginalModule = LoadLibraryExA("winhttp.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+	 HMODULE OriginalModule = LoadLibraryA("C:\\Windows\\System32\\winhttp.dll");
 
 	g_FunctionTable[ 0 ] = GetProcAddress( OriginalModule, "WinHttpPacJsWorkerMain" );
 	g_FunctionTable[ 1 ] = GetProcAddress( OriginalModule, "WinHttpSetSecureLegacyServersAppCompat" );
