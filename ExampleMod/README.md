@@ -5,7 +5,7 @@
 
 To register a dotnet mod using RealLoader, you must attach an attribute to your mod's main class. This class can be named anything.
 
-https://github.com/PoofImaFox/PalworldManagedModFramework/blob/PoofyFeatures/ExampleMod/Sample.cs#L12
+https://github.com/PoofImaFox/PalworldManagedModFramework/blob/6fcb9f537eb43f6b00d2e9ccfe011ea094ddec20/ExampleMod/Sample.cs#L12
   
 The parameters for this attribute are  
 - Your mod's name
