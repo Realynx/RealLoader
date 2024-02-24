@@ -3,6 +3,7 @@ using PalworldManagedModFramework.Models.Config;
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 using PalworldManagedModFramework.Services.Interfaces;
 using PalworldManagedModFramework.Services.SandboxDI.Interfaces;
@@ -39,6 +40,7 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
             _logger.Info("Loading mods");
             var validMods = _assemblyDiscovery.DiscoverValidModAsselblies();
 
+            // DebugUtilities.WaitForDebuggerAttach();
             LoadMods(loadableMods, validMods);
         }
 

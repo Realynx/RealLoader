@@ -20,6 +20,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         private readonly HashSet<nint> _loadedObjects = new();
         private readonly HashSet<nint> _markedObjects = new();
 
+        private bool _synchronized = false;
         public GlobalObjectsTracker(ILogger logger, IGlobalObjects globalObjects, IUnrealHookManager unrealHookManager) {
             _logger = logger;
             _globalObjects = globalObjects;
@@ -27,13 +28,32 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             _thisInstance = this;
 
             _unrealHookManager
-                .RegisterUnrealEvent(GetType().GetMethod(nameof(ObjectsReady))!, this);
+                .RegisterUnrealEvent(GetType().GetMethod(nameof(OnInitialized))!, this)
+                .RegisterUnrealEvent(GetType().GetMethod(nameof(OnEndedWorldAutoSave))!, this);
         }
 
 
-        private bool _synchronized = false;
+        /// <summary>
+        /// Fires for client.
+        /// </summary>
+        /// <param name="unrealEvent"></param>
         [EngineEvent("^WBP_TItle_C::OnInitialized")]
-        public unsafe void ObjectsReady(UnrealEvent unrealEvent) {
+        public unsafe void OnInitialized(UnrealEvent unrealEvent) {
+            _synchronized = true;
+            if (_synchronized) {
+                return;
+            }
+
+            SynchroniseObjectPool();
+            _logger.Debug("Synchronized Object Pool");
+        }
+
+        /// <summary>
+        /// Fires for server.
+        /// </summary>
+        /// <param name="unrealEvent"></param>
+        [EngineEvent("^PalStaticLogCollector::OnEndedWorldAutoSave")]
+        public unsafe void OnEndedWorldAutoSave(UnrealEvent unrealEvent) {
             _synchronized = true;
             if (_synchronized) {
                 return;

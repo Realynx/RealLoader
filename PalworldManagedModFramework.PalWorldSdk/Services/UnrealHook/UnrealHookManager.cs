@@ -52,7 +52,7 @@ namespace PalworldManagedModFramework.Sdk.Services.UnrealHook {
 
         private unsafe void OnUnrealEvent(UnrealEvent unrealEvent, ExecuteOriginalCallback executeOriginalCallback) {
             Task.Factory.StartNew(() => {
-                var eventMasks = _eventImpulses.Keys;
+                var eventMasks = _eventImpulses.Keys.ToArray();
                 var eventsToImpulse = eventMasks.Where(i => i.IsMatch(unrealEvent.EventName));
 
                 foreach (var eventToImpulse in eventsToImpulse) {
