@@ -41,7 +41,7 @@
     ```
 2. Change directory to `Build`
     ```sh
-    cd ./build
+    cd ./Build
     ```
 
 3. Execute install script.
@@ -54,3 +54,8 @@
         ```sh
         ./Build.sh
         ```
+
+
+# Resources
+> [!TIP]
+> You can view example mods under [Client Mod Ex](ExampleMod), [Server Mod Ex](ExampleMod), and [DI Mod Ex](ExampleMod)  
