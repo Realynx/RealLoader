@@ -29,7 +29,7 @@
 
 ## Dependencies ![Required Badge](https://img.shields.io/badge/REQUIRED-darkred)
 
-- ### [DotNet Runtime](https://dotnet.microsoft.com/en-us/download/dotnet) (8+).
+- ### [DotNet Runtime](https://dotnet.microsoft.com/en-us/download/dotnet) (8+)
 - ### [CMake](https://cmake.org/download/) (3.22+)
 - ### [Visual Studio](https://visualstudio.microsoft.com/downloads/) (2022+)
 
