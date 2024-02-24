@@ -1,4 +1,4 @@
-# RealLoader
+# RealLoader 🎷🐛
 
 [![Github License](https://img.shields.io/github/license/PoofImaFox/PalworldManagedModFramework.svg)](LICENSE.md)
 [![CodeFactor](https://www.codefactor.io/repository/github/PoofImaFox/PalworldManagedModFramework/badge)](https://www.codefactor.io/repository/github/PoofImaFox/PalworldManagedModFramework)
