@@ -26,11 +26,11 @@
 		</None>
 	</ItemGroup>
 
-	<ItemGroup>
-		<_CopyItems Include="$(TargetDir)\*.*" Visible="false" />
-	</ItemGroup>
-
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(ModsBuildFolder)' != ''">
+		<ItemGroup>
+			<_CopyItems Include="$(TargetDir)\*.*" Visible="false" />
+		</ItemGroup>
+
 		<Copy SourceFiles="@(_CopyItems)" DestinationFolder="$(ModsBuildFolder)\SdkBuilder" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
 		<Exec Command="echo Successfully copied $(AssemblyName) to $(ModsBuildFolder)" />
 	</Target>
