@@ -21,5 +21,5 @@ The parameters for this attribute are
 ## Mod Constructor
 Your mod may have a parameters-less constructor. We always recommend passing and storing the CancellationToken. You can use this to gracefully shutdown your mod. After cancel has been requested there is a 5 second window to shutdown before a force shutdown occurs.  
 
-https://github.com/PoofImaFox/PalworldManagedModFramework/blob/43bd84b9f30d9bd12649cb0fab93d6888b8d5e9d/ExampleMod/Sample.cs#L20C1-L24C10
+https://github.com/PoofImaFox/PalworldManagedModFramework/blob/395843ccff4bc4af3025416036694a8516bfb1c6/ExampleMod/Sample.cs#L20C1-L24C10
 
