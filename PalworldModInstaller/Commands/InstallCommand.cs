@@ -1,74 +1,38 @@
-﻿using PalworldModInstaller.Models;
-using PalworldModInstaller.Services;
+﻿using System.Diagnostics.CodeAnalysis;
 
-using Spectre.Console;
+using PalworldModInstaller.Models;
+using PalworldModInstaller.Services.Interfaces;
+using PalworldModInstaller.Services.Uninstaller;
+
 using Spectre.Console.Cli;
 
 namespace PalworldModInstaller.Commands {
-    internal class InstallCommand : Command<InstallerOptions> {
-        private readonly LinuxInstaller _linuxInstaller;
-        private readonly WindowsInstaller _windowsInstaller;
+    public class InstallCommand : Command<InstallerOptions> {
+        private readonly IInstaller _installer;
+        private readonly IUninstaller _uninstaller;
+        private InstallerOptions _settings;
 
-        public InstallCommand(LinuxInstaller linuxInstaller, WindowsInstaller windowsInstaller) {
-            _linuxInstaller = linuxInstaller;
-            _windowsInstaller = windowsInstaller;
+        public InstallCommand(IInstaller installer, IUninstaller uninstaller) {
+            _installer = installer;
+            _uninstaller = uninstaller;
         }
 
-        public override int Execute(CommandContext context, InstallerOptions settings) {
-            var currentPlatform = Environment.OSVersion.Platform;
+        public override int Execute([NotNull] CommandContext context, [NotNull] InstallerOptions settings) {
+            _settings = settings;
 
-            IInstaller modloaderInstaller = null;
-            switch (currentPlatform) {
+            var installerTask = Task.Factory.StartNew(ExecuteAsync);
+            var success = installerTask.Wait(TimeSpan.FromSeconds(40));
 
-                // Windows 3.1 that provided partial Win32 API support
-                case PlatformID.Win32S:
-                    break;
+            return success ? 0 : -1;
+        }
 
-                // Windows 95 and Windows 98 platforms
-                case PlatformID.Win32Windows:
-                    break;
-
-                // Windows NT and all modern Windows versions based on the NT architecture, Windows 2000, XP, Vista, 7, 8, 10, and 11
-                case PlatformID.Win32NT:
-                    modloaderInstaller = _windowsInstaller;
-                    break;
-
-                // Windows CE (Compact Edition)
-                case PlatformID.WinCE:
-                    break;
-
-                case PlatformID.Unix:
-                    modloaderInstaller = _linuxInstaller;
-                    break;
-
-                case PlatformID.Xbox:
-                    break;
-
-                case PlatformID.MacOSX:
-                    break;
-
-                case PlatformID.Other:
-                    break;
-
-                default:
-                    break;
-            }
-
-            if (modloaderInstaller is null) {
-                var exception = new Exception($"[{currentPlatform}] System is not supported!");
-                AnsiConsole.WriteException(exception);
-
-                throw exception;
-            }
-
-            if (settings.Uninstall) {
-                modloaderInstaller.UninstallFiles(settings);
+        private void ExecuteAsync() {
+            if (_settings.Uninstall) {
+                _uninstaller.UninstallFiles(_settings);
             }
             else {
-                modloaderInstaller.InstallFiles(settings);
+                _installer.InstallFiles(_settings);
             }
-
-            return 0;
         }
     }
 }

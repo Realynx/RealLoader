@@ -1,5 +1,6 @@
 ﻿using PalworldModInstaller.Models;
-using PalworldModInstaller.Services;
+using PalworldModInstaller.Services.Installer;
+using PalworldModInstaller.Services.Interfaces;
 
 using Shared.SystemUnderTest;
 

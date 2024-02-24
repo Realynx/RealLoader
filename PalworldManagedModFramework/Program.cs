@@ -35,7 +35,7 @@ namespace PalworldManagedModFramework {
                     Services.GetRequiredService<ILogger>();
                 loggerInstance.Debug("DI Container Setup!");
 
-                // ConsoleExtensions.SetWindowAlwaysOnTop(loggerInstance);
+                ConsoleExtensions.SetWindowAlwaysOnTop(loggerInstance);
 
                 var modLoader = host.Services.GetRequiredService<IModLoader>();
                 modLoader.LoadMods();
