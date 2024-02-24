@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.Sdk.csproj" />
+    <ProjectReference Include="..\PalworldManagedModFramework.PalWorldSdk\PalworldManagedModFramework.Sdk.csproj">
+      <Private>false</Private>
+    </ProjectReference>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(ModsBuildFolder)' != ''">
