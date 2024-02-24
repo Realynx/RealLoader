@@ -7,7 +7,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bootstrapper", "PalWorldMan
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CLRHost", "CLRHost\CLRHost.vcxproj", "{C4CF7AE0-30AF-F97B-39C7-8452A52560DD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winhttp Proxy", "WinHttpProxyDll\winhttp Proxy.vcxproj", "{3FF28F45-6628-4023-BBA2-734B67252BE9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinHttpProxy", "WinHttpProxyDll\winhttp Proxy.vcxproj", "{3FF28F45-6628-4023-BBA2-734B67252BE9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VersionProxy", "VersionProxyDll\version Proxy.vcxproj", "{CAEA664A-7890-4268-B687-80F98A3E3EF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +36,12 @@ Global
 		{3FF28F45-6628-4023-BBA2-734B67252BE9}.Dist|x64.Build.0 = Debug|x64
 		{3FF28F45-6628-4023-BBA2-734B67252BE9}.Release|x64.ActiveCfg = Release|x64
 		{3FF28F45-6628-4023-BBA2-734B67252BE9}.Release|x64.Build.0 = Release|x64
+		{CAEA664A-7890-4268-B687-80F98A3E3EF1}.Debug|x64.ActiveCfg = Debug|x64
+		{CAEA664A-7890-4268-B687-80F98A3E3EF1}.Debug|x64.Build.0 = Debug|x64
+		{CAEA664A-7890-4268-B687-80F98A3E3EF1}.Dist|x64.ActiveCfg = Debug|x64
+		{CAEA664A-7890-4268-B687-80F98A3E3EF1}.Dist|x64.Build.0 = Debug|x64
+		{CAEA664A-7890-4268-B687-80F98A3E3EF1}.Release|x64.ActiveCfg = Release|x64
+		{CAEA664A-7890-4268-B687-80F98A3E3EF1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
