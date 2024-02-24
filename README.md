@@ -27,24 +27,28 @@
 > [!NOTE]
 > The following required dependencies must be met in order to compile from source. Dotnet runtime is required to run the mod framework on every location.
 
-## Dependencies ![Required Badge](https://img.shields.io/badge/REQUIRED-darkred)
+## Dependencies
 
-- ### [DotNet Runtime](https://dotnet.microsoft.com/en-us/download/dotnet) (8+)
-- ### [CMake](https://cmake.org/download/) (3.22+)
-- ### [Visual Studio](https://visualstudio.microsoft.com/downloads/) (2022+)
+- ### [.NET 8+ Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)
 
 ## How to Build
 
-1. Clone the repo
+1. Install the [.NET 8+ SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
+
+2. Install [CMake 3.22+](https://cmake.org/download/)
+ 
+3. Install [Visual Studio 2022+](https://visualstudio.microsoft.com/downloads/) with the <b>Desktop development with C++</b> package
+
+4. Clone the repo
     ```bash
     git clone https://github.com/PoofImaFox/PalworldManagedModFramework
     ```
-2. Change directory to `Build`
+5. Change directory to `Build`
     ```sh
     cd ./Build
     ```
 
-3. Execute install script.
+6. Run the build script
 
     - ![Windows Badge](https://img.shields.io/badge/Windows-blue)
          ```sh
