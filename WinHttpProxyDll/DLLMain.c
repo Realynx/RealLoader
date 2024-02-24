@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include "winhttpStubExports.h"
+#include "DLLMain.h"
 
 extern void* g_FunctionTable[];
 
@@ -79,21 +80,31 @@ void PopulateFunctionTable()
 	g_FunctionTable[ 69 ] = GetProcAddress( OriginalModule, "WinHttpWriteProxySettings" );
 }
 
+
+void CheckModdedLaunchFlag()
+{
+	LPWSTR lpwCmdLine = GetCommandLineW();
+	LPWSTR moddedFlag = L"-modded";
+	if (wcsstr(lpwCmdLine, moddedFlag) != NULL) {
+		LoadLibraryA("ManagedModFramework\\CLRHost.Dll");
+	}
+}
+
 DWORD WINAPI ProcessAttach(_In_ LPVOID Parameter)
 {
 	if ( Parameter == NULL )
 		return FALSE;
 
 	PopulateFunctionTable();
-	LoadLibraryA("CLRHost.Dll");
+	CheckModdedLaunchFlag();
 
 	return TRUE;
 }
+
 DWORD WINAPI ProcessDetach(_In_ LPVOID Parameter)
 {
 	if ( Parameter == NULL )
 		return FALSE;
-
 
 	return TRUE;
 }

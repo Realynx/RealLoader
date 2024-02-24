@@ -5,15 +5,15 @@ using Microsoft.Extensions.Hosting;
 
 using PalworldManagedModFramework.DI;
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 
 namespace PalworldManagedModFramework {
     internal static class Program {
-
         internal delegate void VoidDelegateSignature();
         public static void EntryPoint() {
             try {
+                var launchArgs = Environment.GetCommandLineArgs();
+
                 Console.OutputEncoding = Encoding.UTF8;
 
                 AppDomainMonitor.MonitorDomain();
