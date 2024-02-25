@@ -39,7 +39,6 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
             _logger.Info("Loading mods");
             var validMods = _assemblyDiscovery.DiscoverValidModAsselblies();
 
-            // DebugUtilities.WaitForDebuggerAttach();
             LoadMods(loadableMods, validMods);
         }
 

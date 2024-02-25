@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
@@ -16,7 +17,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             var foundPatternsOrdred = new List<nint>[patterns.Length];
             InitLists(foundPatternsOrdred);
 
-            Parallel.ForEach(memoryRegions, (scanRegion) => {
+            Parallel.ForEach(memoryRegions, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (scanRegion) => {
                 var foundAddresses = ScanMemoryRegionImpl(patterns, scanRegion);
                 AppendFoundAddresses(foundPatternsOrdred, foundAddresses);
             });

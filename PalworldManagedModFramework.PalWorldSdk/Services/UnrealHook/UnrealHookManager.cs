@@ -74,27 +74,27 @@ namespace PalworldManagedModFramework.Sdk.Services.UnrealHook {
             }
         }
 
+        // TODO: Make alternative constructor for a more generic detour, process event should be something like EngineFunctions.ProccessEvent enum
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, UFunction*, void*, void> ProcessEvent_Original;
         [LinuxDetour("55 48 ? ? 41 ? 41 ? 41 ? 41 ? ? 48 81 EC B8 00 ? ? F6 47 ? ? 74 ? 48 8D ? ? ? 41 ? 41 ? 41 ? 41 ? ? C3", DetourType.Stack)]
         [WindowsDetour("40 ? ? ? 41 ? 41 ? 41 ? 41 ? 48 81 EC 10 01 ? ? 48 8D 6C ? ? 48 89 9D 38 01", DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void ProcessEvent(UObject* instance, UFunction* uFunction, void* parameters) {
-            if (SingleInstance is not null && uFunction is not null && instance is not null) {
-                var className = SingleInstance._namePoolService
-                    .GetNameString(instance->baseObjectBaseUtility.baseUObjectBase.classPrivate->ObjectName);
-
-                var functionName = SingleInstance._namePoolService.GetNameString(uFunction->baseUstruct.ObjectName);
-                var eventName = $"{className}::{functionName}";
-
-                var executingEvent = new UnrealEvent(eventName, instance, uFunction, parameters);
-
-                SingleInstance.OnUnrealEvent(executingEvent, (UObject* pInstance, UFunction* pUFunction, void* pParams)
-                        => ProcessEvent_Original(pInstance, pUFunction, pParams));
-
+            if (SingleInstance is null || uFunction is null || instance is null) {
+                ProcessEvent_Original(instance, uFunction, parameters);
                 return;
             }
 
-            ProcessEvent_Original(instance, uFunction, parameters);
+            var className = SingleInstance._namePoolService
+                .GetNameString(instance->baseObjectBaseUtility.baseUObjectBase.classPrivate->ObjectName);
+
+            var functionName = SingleInstance._namePoolService.GetNameString(uFunction->baseUstruct.ObjectName);
+            var eventName = $"{className}::{functionName}";
+
+            var executingEvent = new UnrealEvent(eventName, instance, uFunction, parameters);
+
+            SingleInstance.OnUnrealEvent(executingEvent, (UObject* pInstance, UFunction* pUFunction, void* pParams)
+                    => ProcessEvent_Original(pInstance, pUFunction, pParams));
         }
     }
 }
