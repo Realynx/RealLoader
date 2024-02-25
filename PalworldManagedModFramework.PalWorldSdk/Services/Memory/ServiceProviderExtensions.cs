@@ -14,7 +14,8 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
                 .AddSingleton<IOperandResolver, OperandResolver>()
                 .AddSingleton<IPropertyManager, PropertyManager>()
                 .AddSingleton<ISequenceScanner, SequenceScanner>()
-                .AddSingleton<IBulkPatternScanner, BulkPatternScanner>();
+                .AddSingleton<IBulkPatternScanner, BulkPatternScanner>()
+                .AddSingleton<IStackWalker, StackWalker>();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 serviceDescriptors

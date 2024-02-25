@@ -12,21 +12,21 @@ namespace DotNetSdkBuilderMod {
         private readonly CancellationToken _cancellationToken;
         private readonly ILogger _logger;
         private readonly ISourceCodeGenerator _sourceCodeGenerator;
-        private readonly IUnrealHookManager _unrealHookManager;
+        private readonly IUnrealEventRegistrationService _unrealEventRegistrationService;
         private bool _objectsReady = false;
 
-        public SdkBuilder(CancellationToken cancellationToken, ILogger logger, ISourceCodeGenerator sourceCodeGenerator, IUnrealHookManager unrealHookManager) {
+        public SdkBuilder(CancellationToken cancellationToken, ILogger logger, ISourceCodeGenerator sourceCodeGenerator, IUnrealEventRegistrationService unrealEventRegistrationService) {
             _cancellationToken = cancellationToken;
             _logger = logger;
             _sourceCodeGenerator = sourceCodeGenerator;
-            _unrealHookManager = unrealHookManager;
+            _unrealEventRegistrationService = unrealEventRegistrationService;
         }
 
         public unsafe void Load() {
             _logger.Debug("Loading SDK Builder!");
 
-            _unrealHookManager
-                .RegisterUnrealEvent(GetType().GetMethod(nameof(ObjectsReady))!, this);
+            _unrealEventRegistrationService
+                .FindAndRegisterEvents<SdkBuilder>(this);
         }
 
         [EngineEvent("^WBP_TItle_C::OnInitialized")]
@@ -37,6 +37,7 @@ namespace DotNetSdkBuilderMod {
                 _logger.Info($"Objects are ready. Building .NET SDK");
                 _sourceCodeGenerator.BuildSourceCode();
             }
+
         }
 
         public void Unload() {

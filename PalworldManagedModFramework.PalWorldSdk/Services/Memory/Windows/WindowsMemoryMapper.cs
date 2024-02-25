@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
@@ -25,59 +25,56 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
             throw new NotImplementedException("This is a linux function. Windows has native function for getting memory protection!");
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private unsafe ICollection<MemoryRegion> EnumerateMemoryRegions(nint hProcess, nint baseAddress) {
             var sizeOfStruct = sizeof(MEMORY_BASIC_INFORMATION64);
-            var memoryInfoStructs = (MEMORY_BASIC_INFORMATION64*)Marshal.AllocHGlobal(sizeOfStruct);
+            var memoryInfoStructs = stackalloc MEMORY_BASIC_INFORMATION64[1];
 
-            try {
-                var mappedMemoryRegions = new List<MemoryRegion>();
-                var bytesReturnedQuery = 0;
+            var mappedMemoryRegions = new List<MemoryRegion>();
+            var bytesReturnedQuery = 0;
 
-                while (true) {
-                    bytesReturnedQuery = NativeFunctions.VirtualQuery(hProcess, baseAddress, memoryInfoStructs, (uint)sizeOfStruct);
-
-                    if (bytesReturnedQuery == 0) {
-                        break;
-                    }
-
-
-                    var readFlag = memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READ) ||
-                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READWRITE) ||
-                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_READONLY) ||
-                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_READWRITE);
-
-                    var writeFlag = memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_READWRITE) ||
-                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READWRITE) ||
-                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_WRITECOPY) ||
-                                    memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_WRITECOPY);
-
-                    var executeFlag = memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE) ||
-                                      memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READ) ||
-                                      memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READWRITE) ||
-                                      memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_WRITECOPY);
-
-                    baseAddress += (nint)memoryInfoStructs->RegionSize;
-
-                    // We only want commited memory when scanning.
-                    if (memoryInfoStructs->State != PageState.MEM_COMMIT) {
-                        continue;
-                    }
-
-                    mappedMemoryRegions.Add(new MemoryRegion {
-                        StartAddress = memoryInfoStructs->BaseAddress,
-                        EndAddress = memoryInfoStructs->BaseAddress + memoryInfoStructs->RegionSize,
-                        MemorySize = memoryInfoStructs->RegionSize,
-                        ReadFlag = readFlag,
-                        WriteFlag = writeFlag,
-                        ExecuteFlag = executeFlag
-                    });
+            while (true) {
+                bytesReturnedQuery = VirtualQuery(hProcess, baseAddress, memoryInfoStructs, (uint)sizeOfStruct);
+                if (bytesReturnedQuery == 0) {
+                    break;
                 }
 
-                return mappedMemoryRegions;
+                baseAddress += (nint)memoryInfoStructs->RegionSize;
+
+                // We only want commited memory when scanning.
+                if (memoryInfoStructs->State != PageState.MEM_COMMIT) {
+                    continue;
+                }
+
+                ConvertFlags(memoryInfoStructs, out var readFlag, out var writeFlag, out var executeFlag);
+                mappedMemoryRegions.Add(new MemoryRegion {
+                    StartAddress = memoryInfoStructs->BaseAddress,
+                    EndAddress = memoryInfoStructs->BaseAddress + memoryInfoStructs->RegionSize,
+                    MemorySize = memoryInfoStructs->RegionSize,
+                    ReadFlag = readFlag,
+                    WriteFlag = writeFlag,
+                    ExecuteFlag = executeFlag
+                });
             }
-            finally {
-                Marshal.FreeHGlobal((nint)memoryInfoStructs);
-            }
+
+            return mappedMemoryRegions;
+        }
+
+        private static unsafe void ConvertFlags(MEMORY_BASIC_INFORMATION64* memoryInfoStructs, out bool readFlag, out bool writeFlag, out bool executeFlag) {
+            readFlag = memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READ) ||
+                        memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READWRITE) ||
+                        memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_READONLY) ||
+                        memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_READWRITE);
+
+            writeFlag = memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_READWRITE) ||
+                        memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READWRITE) ||
+                        memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_WRITECOPY) ||
+                        memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_WRITECOPY);
+
+            executeFlag = memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE) ||
+                        memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READ) ||
+                        memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_READWRITE) ||
+                        memoryInfoStructs->Protect.HasFlag(MemoryProtection.PAGE_EXECUTE_WRITECOPY);
         }
     }
 }

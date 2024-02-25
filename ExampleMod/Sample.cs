@@ -1,10 +1,11 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
 
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 
 using static PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook.UnrealEvent;
 
@@ -14,13 +15,14 @@ namespace ExampleMod {
         private readonly CancellationToken _cancellationToken;
         private readonly ILogger _logger;
         private readonly IUnrealEventRegistrationService _unrealEventRegistrationService;
-
+        private readonly IStackWalker _stackWalker;
         private readonly HashSet<string> _functions = new();
 
-        public Sample(CancellationToken cancellationToken, ILogger logger, IUnrealEventRegistrationService unrealEventRegistrationService) {
+        public Sample(CancellationToken cancellationToken, ILogger logger, IUnrealEventRegistrationService unrealEventRegistrationService, IStackWalker stackWalker) {
             _cancellationToken = cancellationToken;
             _logger = logger;
             _unrealEventRegistrationService = unrealEventRegistrationService;
+            _stackWalker = stackWalker;
         }
 
         public void Load() {
@@ -33,26 +35,23 @@ namespace ExampleMod {
             _logger.Info("Unloading...");
         }
 
-        [EngineEvent("^.*")]
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public unsafe void AllEvents(UnrealEvent unrealEvent) {
-            if (_functions.Add(unrealEvent.EventName)) {
-                _logger.Debug($"Event: {unrealEvent.EventName}");
-            }
+        //[EngineEvent("^.*")]
+        //[MethodImpl(MethodImplOptions.Synchronized)]
+        //public unsafe void AllEvents(UnrealEvent unrealEvent) {
+        //    if (_functions.Add(unrealEvent.EventName)) {
+        //        _logger.Debug($"Event: {unrealEvent.EventName}");
+        //    }
+        //}
+
+        [EngineEvent(".*PinkCat.*")]
+        public unsafe void PinkCatEvents(UnrealEvent unrealEvent) {
+            _logger.Error($"Event: {unrealEvent.EventName}");
         }
 
-        [EngineEvent("^BP_PalPlayerController_C.*")]
-        public unsafe void CombatEvents(UnrealEvent unrealEvent) {
-            // _logger.Warning($"Event: {unrealEvent.EventName}");
-
-        }
 
         [HookEngineEvent("BP_Player_Female_C::CanJumpInternal")]
         public unsafe void JumpEvent(UnrealEvent unrealEvent, ExecuteOriginalCallback executeOriginalCallback) {
             _logger.Debug("Jumping Disabled!");
-
-            // executeOriginalCallback(unrealEvent.Instance, unrealEvent.UFunction, unrealEvent.Params);
-
             unrealEvent.ContinueExecute = false;
         }
 

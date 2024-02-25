@@ -33,9 +33,6 @@ namespace PalworldManagedModFramework.Services {
             _propertyRegistrationService = propertyRegistrationService;
         }
 
-        /// <summary>
-        /// TODO: Refactor this, it has too many dependencies & responsibilities
-        /// </summary>
         public void ScanAndInstallRuntime() {
             _detourRegistrationService
                 .FindAndRegisterDetours<GlobalObjectsTracker>()

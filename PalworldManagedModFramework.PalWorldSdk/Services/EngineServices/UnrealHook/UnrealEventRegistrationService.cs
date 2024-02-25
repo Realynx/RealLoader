@@ -19,8 +19,6 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook {
         public IUnrealEventRegistrationService FindAndRegisterEvents<TType>() {
             var parentType = typeof(TType);
 
-            DebugUtilities.WaitForDebuggerAttach();
-
             var parentInstance = _serviceProvider.GetService(parentType);
             return parentInstance is null ? this : FindAndRegisterEvents<TType>(parentInstance);
         }

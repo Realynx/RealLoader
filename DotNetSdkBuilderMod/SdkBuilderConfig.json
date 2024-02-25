@@ -1,6 +1,6 @@
 {
   "SdkBuilderConfig": {
-    "BuildInMemory": true,
+    "BuildInMemory": false,
     "BuildLocation": "Sdk/"
   }
 }
