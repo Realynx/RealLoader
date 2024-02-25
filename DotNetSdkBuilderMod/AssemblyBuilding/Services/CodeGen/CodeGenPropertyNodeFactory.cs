@@ -22,6 +22,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
         public unsafe CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty* property) {
             var propertyName = _namePoolService.GetNameString(property->ObjectName);
+            if (char.IsDigit(propertyName[0])) {
+                propertyName = $"_{propertyName}";
+            }
 
             CodeGenAttributeNode[]? attributes = null;
             if (property->propertyFlags.HasFlag(EPropertyFlags.CPF_Deprecated)) {

@@ -14,10 +14,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private readonly ILogger _logger;
         private readonly INamePoolService _namePoolService;
         private readonly IUnrealReflection _unrealReflection;
-        public CodeGenMethodNodeFactory(ILogger logger, INamePoolService namePoolService, IUnrealReflection unrealReflection) {
+        private readonly INameCollisionService _nameCollisionService;
+
+        public CodeGenMethodNodeFactory(ILogger logger, INamePoolService namePoolService, IUnrealReflection unrealReflection,
+            INameCollisionService nameCollisionService) {
             _logger = logger;
             _namePoolService = namePoolService;
             _unrealReflection = unrealReflection;
+            _nameCollisionService = nameCollisionService;
         }
 
         public unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method, Index methodIndex) {
@@ -31,6 +35,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             // }
 
             var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
+            if (char.IsDigit(methodName[0])) {
+                methodName = $"_{methodName}";
+            }
 
             CodeGenAttributeNode[]? attributes = null;
 
@@ -56,17 +63,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                     var type = _namePoolService.GetNameString(currentParam->classPrivate->ObjectName);
                     var name = _namePoolService.GetNameString(currentParam->ObjectName);
 
-                    // Some functions have args with duplicate names
-                    var argName = name;
-                    var j = 1;
-                    while (!argNames.Add(argName)) {
-                        argName = $"name{j}";
-                        j++;
-                    }
-
                     methodArgs[i] = new CodeGenArgumentNode {
                         type = type,
-                        name = argName
+                        name = _nameCollisionService.GetNonCollidingName(name, argNames)
                     };
                 }
             }

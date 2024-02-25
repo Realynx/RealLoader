@@ -46,10 +46,12 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         }
 
         private static string RemoveInvalidChars(string str) {
-            return str.Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase)
-                .Replace("-", "_", StringComparison.InvariantCultureIgnoreCase)
-                .Replace("?", "")
-                .Replace("\uFFFD", "");
+            return str
+                .Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase)
+                .Replace("-", "_")
+                .Replace(".", "_")
+                .Replace("?", "_")
+                .Replace("\uFFFD", "_");
         }
     }
 }

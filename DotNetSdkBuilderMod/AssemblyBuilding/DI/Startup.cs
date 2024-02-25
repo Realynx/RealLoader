@@ -30,6 +30,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
             services
                 .AddSingleton<IPackageNameGenerator, PackageNameGenerator>()
                 .AddSingleton<INameDistanceService, NameDistanceService>()
+                .AddSingleton<INameCollisionService, NameCollisionService>()
                 .AddSingleton<INameSpaceService, NameSpaceService>()
                 .AddSingleton<IImportResolver, ImportResolver>()
 
