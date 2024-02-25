@@ -7,9 +7,10 @@ DLL entry point for running C#
 #include <thread>
 #include <filesystem>
 
-PalMM::Util::String FindDotnetDependencyFolder(char* folder) {
+//checks the given directory for the desired folder
+PalMM::Util::String FindDotnetDependencyFolder(const char* folderName) {
 	for (auto& p : std::filesystem::recursive_directory_iterator(".")) {
-		if (!strcmp(p.path().filename().string().c_str(), folder)) {
+		if (!strcmp(p.path().filename().string().c_str(), folderName)) {
 			return p.path().string();
 		}
 	}
@@ -18,12 +19,22 @@ PalMM::Util::String FindDotnetDependencyFolder(char* folder) {
 //runs the CLR thread and DLL
 void RUNCLR()
 {
+	//gets the runtime mod DLL and json data
+	PalMM::Util::String appPath = FindDotnetDependencyFolder("ManagedModFramework");
+	PalMM::Util::String configPath;
+
 #if defined(_WIN32)
-	PalMM::Util::String appPath; appPath.SetCharData(STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.dll"));
-	PalMM::Util::String configPath; configPath.SetCharData(STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.runtimeconfig.json"));
+	configPath.SetThickCharData((appPath.charData + std::string("\\PalworldManagedModFramework.runtimeconfig.json")).c_str());
+	appPath.SetThickCharData((appPath.charData + std::string("\\PalworldManagedModFramework.dll")).c_str());
+
+	//appPath.SetCharData(STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.dll"));
+	//configPath.SetCharData(STR("Pal\\Binaries\\Win64\\ManagedModFramework\\PalworldManagedModFramework.runtimeconfig.json"));
 #elif defined(__linux__)
-	PalMM::Util::String appPath; appPath.SetCharData(STR("Pal/Binaries/Linux/ManagedModFramework/PalworldManagedModFramework.dll"));
-	PalMM::Util::String configPath; configPath.SetCharData(STR("Pal/Binaries/Linux/ManagedModFramework/PalworldManagedModFramework.runtimeconfig.json"));
+	configPath.SetThickCharData((appPath.charData + std::string("/PalworldManagedModFramework.runtimeconfig.json")).c_str());
+	appPath.SetThickCharData((appPath.charData + std::string("/PalworldManagedModFramework.dll")).c_str());
+	
+	//appPath.SetCharData(STR("Pal/Binaries/Linux/ManagedModFramework/PalworldManagedModFramework.dll"));
+	//configPath.SetCharData(STR("Pal/Binaries/Linux/ManagedModFramework/PalworldManagedModFramework.runtimeconfig.json"));
 #endif
 
 
