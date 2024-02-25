@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -60,7 +61,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             _logger.Debug("Building class-namespace dictionary...");
             var customClassNamespaces = TimedMemoizeTypeNamespaces(rootNode);
 
-            var precompiledAssemblies = new[] { typeof(string).Assembly, typeof(MemoryPool<byte>).Assembly, typeof(SdkBuilder).Assembly, typeof(DetourAttribute).Assembly, typeof(object).Assembly };
+            var precompiledAssemblies = new[] {
+                typeof(string).Assembly, typeof(MemoryPool<byte>).Assembly, typeof(SdkBuilder).Assembly, typeof(DetourAttribute).Assembly, typeof(object).Assembly, typeof(Unsafe).Assembly
+            };
 
             _logger.Debug("Building precompiled class-namespace dictionary...");
             var precompiledClassNamespaces = TimedMemoizePrecompiledTypeNamespaces(precompiledAssemblies);

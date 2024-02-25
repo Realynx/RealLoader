@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
@@ -93,6 +94,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private static void ResolveImportsForProperty(CodeGenPropertyNode propertyNode, string currentPackage, HashSet<string> imports, Dictionary<string, string> customClassNamespaces, Dictionary<string, string> dotnetClassNamespaces) {
+            // Properties use Unsafe.Write on the setter
+            TryAddClassAsImport(nameof(Unsafe), currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
+
             TryAddClassAsImport(propertyNode.returnType, currentPackage, imports, customClassNamespaces, dotnetClassNamespaces);
 
             if (propertyNode.attributes is not null) {
