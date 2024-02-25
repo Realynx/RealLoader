@@ -1,41 +1,32 @@
 ﻿using PalworldModInstaller.Models;
+using PalworldModInstaller.Services.Interfaces;
 
 using Spectre.Console;
 
 namespace PalworldModInstaller.Services.Uninstaller {
     public class LinuxUninstaller : IUninstaller {
+        private readonly IModBackupService _modBackupService;
+
+        public LinuxUninstaller(IModBackupService modBackupService) {
+            _modBackupService = modBackupService;
+        }
+
         public async Task UninstallFiles(InstallerOptions installerOptions) {
+            AnsiConsole.WriteLine($"Removing Mods Folder...");
             var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
-            var dotnetDependenciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "ManagedModFramework");
-
-            var launchScript = Path.Combine(installerOptions.InstallLocation, "PalServer.sh");
-
-
-            if (!string.IsNullOrWhiteSpace(installerOptions.Backup) && !Directory.Exists(installerOptions.Backup)) {
-                AnsiConsole.WriteLine("Backup directory did not exist creating it now...");
-                Directory.CreateDirectory(installerOptions.Backup);
-            }
-
-            if (!string.IsNullOrWhiteSpace(installerOptions.Backup)) {
-                var mods = Directory.GetDirectories(modsFolder);
-
-                var modsBackedup = 0;
-                foreach (var mod in mods) {
-                    var nwPath = Path.Combine(installerOptions.Backup, Path.GetFileName(mod));
-                    File.Move(mod, nwPath);
-                    modsBackedup++;
-                }
-
-                AnsiConsole.WriteLine($"Backed up {modsBackedup} mods.");
-            }
-
-            AnsiConsole.WriteLine($"Uninstalling modloader...");
-
+            // Check if backup requested.
+            _modBackupService.BackupMods(modsFolder);
             Directory.Delete(modsFolder, true);
-            RestoreLaunchScript(launchScript);
+
+            AnsiConsole.WriteLine($"Removing Dependencies Folder...");
+            var dotnetDependenciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "ManagedModFramework");
             Directory.Delete(dotnetDependenciesFolder, true);
 
-            AnsiConsole.WriteLine($"Modloader uninstalled!");
+            AnsiConsole.WriteLine($"Restoring launchs script...");
+            var launchScript = Path.Combine(installerOptions.InstallLocation, "PalServer.sh");
+            RestoreLaunchScript(launchScript);
+
+            AnsiConsole.WriteLine($"Modloader Uninstalled!");
         }
 
         private void RestoreLaunchScript(string launchScript) {

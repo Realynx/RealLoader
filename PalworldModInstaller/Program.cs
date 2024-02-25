@@ -13,11 +13,10 @@ using Polly;
 
 using Spectre.Console.Cli;
 using PalworldModInstaller.Services;
+using PalworldModInstaller.Models;
 
 namespace PalworldModInstaller {
     public class Program {
-        private const string LATEST_GITHUB_ADDRESS = "https://github.com/PowerShell/PowerShell/releases/latest/download/";
-
         public static void Main(string[] args) {
             var registrar = ConfigureServiceRegistry();
 
@@ -46,11 +45,13 @@ namespace PalworldModInstaller {
             }
 
             serviceDescriptors
+                .AddSingleton<InstallerOptions>()
+                .AddSingleton<IModBackupService, ModBackupService>()
+                .AddSingleton<IModFileService, ModFileService>()
                 .AddSingleton<IGithubArtifactDownloader, GithubArtifactDownloader>();
 
             serviceDescriptors
                 .AddHttpClient<IGithubArtifactDownloader, GithubArtifactDownloader>(client => {
-                    client.BaseAddress = new Uri(LATEST_GITHUB_ADDRESS);
                     client.DefaultRequestHeaders.UserAgent.Clear();
                     client.DefaultRequestHeaders.UserAgent.ParseAdd("ManagedModWorks_Installer/1.0 (Windows; Linux; https://github.com/PoofImaFox/PalworldManagedModFramework)");
                 })

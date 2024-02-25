@@ -10,53 +10,52 @@ namespace PalworldModInstaller.Services.Installer {
     [SupportedOSPlatform("windows")]
     public class WindowsInstaller : IInstaller {
         private const string DOTNET_LOCAL_PACKS = "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Host.win-x64";
-        private readonly IGithubArtifactDownloader _githubArtifactDownloader;
 
-        public WindowsInstaller(IGithubArtifactDownloader githubArtifactDownloader) {
+        private readonly IGithubArtifactDownloader _githubArtifactDownloader;
+        private readonly IModFileService _modFileService;
+
+        public WindowsInstaller(IGithubArtifactDownloader githubArtifactDownloader, IModFileService modFileService) {
             _githubArtifactDownloader = githubArtifactDownloader;
+            _modFileService = modFileService;
         }
 
         public async Task InstallFiles(InstallerOptions installerOptions) {
+            AnsiConsole.WriteLine("Checking Mods Folder...");
             var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
-            var win64Folder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Win64");
+            _modFileService.CheckClrModsFolder(modsFolder);
 
+            AnsiConsole.WriteLine("Checking Dependancies Folder...");
+            var win64Folder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Win64");
             var dotnetDependenciesFolder = Path.Combine(win64Folder, "ManagedModFramework");
+            _modFileService.CheckFrameworkInstallFolder(dotnetDependenciesFolder);
+
+            if (!installerOptions.CheckUpdates) {
+                return;
+            }
+
+            AnsiConsole.WriteLine("Checking for updates...");
+            var palworldManagedModFramework = Path.Combine(dotnetDependenciesFolder, "PalworldManagedModFramework.dll");
+            if (!await _githubArtifactDownloader.IsOutOfDate(palworldManagedModFramework)) {
+                AnsiConsole.WriteLine("the newest release is already installed.");
+                return;
+            }
+
+            AnsiConsole.WriteLine("Checking for new nethost.dll...");
             CopyNethost(win64Folder);
 
+            AnsiConsole.WriteLine("Installing new files...");
             var clrHostLocation = Path.Combine(dotnetDependenciesFolder, "CLRHost.dll");
+            await _modFileService.InstallNewFiles(dotnetDependenciesFolder, clrHostLocation);
 
-            if (installerOptions.CreateModsFolder && !Directory.Exists(modsFolder)) {
-                AnsiConsole.WriteLine("Default mod folder did not exist, creating it now. (use -m flag to disable this)");
-                Directory.CreateDirectory(modsFolder);
-            }
-
-            if (!Directory.Exists(dotnetDependenciesFolder)) {
-                AnsiConsole.WriteLine("Framework install folder did not exist, creating it now.");
-                Directory.CreateDirectory(dotnetDependenciesFolder);
-            }
-
-            if (installerOptions.CheckUpdates) {
-                AnsiConsole.WriteLine("Checking for updates...");
-                if (!IsOutOfDate(string.Empty)) {
-                    AnsiConsole.WriteLine("the newest release is already installed.");
-                    return;
-                }
-            }
-
-            await InstallNewFiles(dotnetDependenciesFolder, clrHostLocation);
+            AnsiConsole.WriteLine("Installing proxy dll...");
+            var proxyDllLocation = Path.Combine(win64Folder, installerOptions.ProxyDll);
+            await _modFileService.WriteGithubFile(proxyDllLocation, installerOptions.ProxyDll);
         }
 
         private void CopyNethost(string win64Folder) {
             var netHostLib = Path.Combine(win64Folder, "nethost.dll");
             var localNetHost = Path.Combine(FindNewestNetPackPath(), "runtimes", "win-x64", "native", "nethost.dll");
-            File.Copy(localNetHost, netHostLib);
-        }
-
-        private async Task InstallNewFiles(string dotnetDependenciesFolder, string clrHost) {
-            AnsiConsole.WriteLine("Downloading Github Artifacts...");
-
-            await _githubArtifactDownloader.UnzipFrameworkPackage(dotnetDependenciesFolder);
-            await WriteGithubFile(clrHost, "CLRHost.dll");
+            File.Copy(localNetHost, netHostLib, true);
         }
 
         private string FindNewestNetPackPath() {
@@ -71,15 +70,6 @@ namespace PalworldModInstaller.Services.Installer {
                 .Max();
 
             return $"{DOTNET_LOCAL_PACKS}\\{newestSemiVersion}";
-        }
-
-        private async Task WriteGithubFile(string localLocation, string githubFilename) {
-            var fileBytes = await _githubArtifactDownloader.DownloadGithubReleaseAsync(githubFilename);
-            await File.WriteAllBytesAsync(localLocation, fileBytes);
-        }
-
-        private bool IsOutOfDate(string frameworkFolder) {
-            return true;
         }
     }
 }

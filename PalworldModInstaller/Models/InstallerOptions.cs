@@ -6,6 +6,11 @@ using Spectre.Console.Cli;
 
 namespace PalworldModInstaller.Models {
     public class InstallerOptions : CommandSettings {
+        [CommandOption("-r|--remote")]
+        [DefaultValue("https://github.com/PoofImaFox/PalworldManagedModFramework")]
+        [Description("The remote repository to find update artifacts.")]
+        public string RemoteSource { get; set; }
+
         [CommandOption("-l|--location")]
         [DefaultValue("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Palworld")]
         [Description("This is the directory that your game is installed.")]
@@ -16,10 +21,15 @@ namespace PalworldModInstaller.Models {
         [Description("This will allow you to update the mod loader in place.")]
         public bool CheckUpdates { get; set; }
 
-        [CommandOption("-r|--uninstall")]
+        [CommandOption("--uninstall")]
         [DefaultValue(false)]
         [Description("This flag will allow you to uninstall the mod loader and restore the state of your game (THIS WILL DELETE ALL OF YOUR MODS).")]
         public bool Uninstall { get; set; }
+
+        [CommandOption("-p|--proxylib")]
+        [DefaultValue("winhttp.dll")]
+        [Description("The proxy dll variant you would like to use.")]
+        public string ProxyDll { get; set; }
 
         [CommandOption("-b|--backup")]
         [Description("This will backup all of your mods to the specified directory.")]
@@ -39,6 +49,10 @@ namespace PalworldModInstaller.Models {
 
             if (!string.IsNullOrWhiteSpace(Backup) && !Directory.Exists(Backup)) {
                 errorMessageBuilder.AppendLine("Backup location does not exist!");
+            }
+
+            if (string.IsNullOrWhiteSpace(RemoteSource)) {
+                errorMessageBuilder.AppendLine("Remote source cannot be empty!");
             }
 
             var aggregateErrorMessage = errorMessageBuilder.ToString();

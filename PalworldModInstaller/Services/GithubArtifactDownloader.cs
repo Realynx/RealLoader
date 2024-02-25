@@ -1,5 +1,7 @@
-﻿using System.IO.Compression;
+﻿using System.Diagnostics;
+using System.IO.Compression;
 
+using PalworldModInstaller.Models;
 using PalworldModInstaller.Services.Interfaces;
 
 using Spectre.Console;
@@ -12,9 +14,13 @@ namespace PalworldModInstaller.Services {
         internal const string CLR_HOST_LINUX = "libCLRHost.so";
 
         private readonly HttpClient _httpClient;
+        private readonly InstallerOptions _installerOptions;
 
-        public GithubArtifactDownloader(HttpClient httpClient) {
+        public GithubArtifactDownloader(HttpClient httpClient, InstallerOptions installerOptions) {
             _httpClient = httpClient;
+            _installerOptions = installerOptions;
+
+            _httpClient.BaseAddress = new Uri($"{_installerOptions.RemoteSource}/releases/latest/download/");
         }
 
         public async Task<byte[]> DownloadGithubReleaseAsync(string githubFileName) {
@@ -36,6 +42,18 @@ namespace PalworldModInstaller.Services {
                 var destinationPath = Path.Combine(extractPath, entry.FullName);
                 entry.ExtractToFile(destinationPath, overwrite: true);
             }
+        }
+
+        public async Task<bool> IsOutOfDate(string assemblyImage) {
+            var assemblyVersionInfo = FileVersionInfo.GetVersionInfo(assemblyImage);
+            if (!Version.TryParse(assemblyVersionInfo.ProductVersion, out var assemblyVersion)) {
+                AnsiConsole.WriteLine($"Failed to check identify current installed version.");
+                return true;
+            }
+
+            var githubVersionString = await GetLatestVersion();
+            var githubVersion = Version.Parse(githubVersionString.TrimStart('v', 'V'));
+            return assemblyVersion < githubVersion;
         }
 
         public async Task<string> GetLatestVersion() {

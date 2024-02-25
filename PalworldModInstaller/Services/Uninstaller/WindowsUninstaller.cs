@@ -1,53 +1,38 @@
 ﻿using PalworldModInstaller.Models;
+using PalworldModInstaller.Services.Interfaces;
 
 using Spectre.Console;
 
 namespace PalworldModInstaller.Services.Uninstaller {
     public class WindowsUninstaller : IUninstaller {
-        public WindowsUninstaller() {
+        private readonly IModBackupService _modBackupService;
 
+        public WindowsUninstaller(IModBackupService modBackupService) {
+            _modBackupService = modBackupService;
         }
 
         public async Task UninstallFiles(InstallerOptions installerOptions) {
-            var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
             var win64Folder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Win64");
-
             var dotnetDependenciesFolder = Path.Combine(win64Folder, "ManagedModFramework");
-            var clrHostLocation = Path.Combine(win64Folder, "CLRHost.dll");
-            var entryPELocation = Path.Combine(win64Folder, "Palworld-Win64-Shipping.exe");
-            var renamePELocation = Path.Combine(win64Folder, "Game-Palworld-Win64-Shipping.exe");
 
+            AnsiConsole.WriteLine($"Removing nethost.dll...");
             var netHostLib = Path.Combine(win64Folder, "nethost.dll");
+            File.Delete(netHostLib);
 
+            AnsiConsole.WriteLine($"Removing Proxy dll...");
+            var proxtyDll = Path.Combine(win64Folder, installerOptions.ProxyDll);
+            File.Delete(proxtyDll);
 
-            if (!string.IsNullOrWhiteSpace(installerOptions.Backup) && !Directory.Exists(installerOptions.Backup)) {
-                AnsiConsole.WriteLine("Backup directory did not exist creating it now...");
-                Directory.CreateDirectory(installerOptions.Backup);
-            }
-
-            if (!string.IsNullOrWhiteSpace(installerOptions.Backup)) {
-                var mods = Directory.GetDirectories(modsFolder);
-
-                var modsBackedup = 0;
-                foreach (var mod in mods) {
-                    var nwPath = Path.Combine(installerOptions.Backup, Path.GetFileName(mod));
-                    File.Move(mod, nwPath);
-                    modsBackedup++;
-                }
-
-                AnsiConsole.WriteLine($"Backed up {modsBackedup} mods.");
-            }
-
-            AnsiConsole.WriteLine($"Uninstalling modloader...");
-
+            AnsiConsole.WriteLine($"Removing Mods Folder...");
+            var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
+            // Check if backup requested.
+            _modBackupService.BackupMods(modsFolder);
             Directory.Delete(modsFolder, true);
+
+            AnsiConsole.WriteLine($"Removing Dependencies Folder...");
             Directory.Delete(dotnetDependenciesFolder, true);
 
-            File.Delete(netHostLib);
-            File.Delete(entryPELocation);
-            File.Move(renamePELocation, entryPELocation);
-
-            AnsiConsole.WriteLine($"Modloader uninstalled!");
+            AnsiConsole.WriteLine($"Modloader Uninstalled!");
         }
     }
 }

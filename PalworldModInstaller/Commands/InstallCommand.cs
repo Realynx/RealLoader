@@ -10,11 +10,13 @@ namespace PalworldModInstaller.Commands {
     public class InstallCommand : Command<InstallerOptions> {
         private readonly IInstaller _installer;
         private readonly IUninstaller _uninstaller;
+        private readonly InstallerOptions _installerOptions;
         private InstallerOptions _settings;
 
-        public InstallCommand(IInstaller installer, IUninstaller uninstaller) {
+        public InstallCommand(IInstaller installer, IUninstaller uninstaller, InstallerOptions installerOptions) {
             _installer = installer;
             _uninstaller = uninstaller;
+            _installerOptions = installerOptions;
         }
 
         public override int Execute([NotNull] CommandContext context, [NotNull] InstallerOptions settings) {
@@ -23,7 +25,16 @@ namespace PalworldModInstaller.Commands {
             var installerTask = Task.Factory.StartNew(ExecuteAsync);
             var success = installerTask.Wait(TimeSpan.FromSeconds(40));
 
+            UpdatePropertyValues(settings);
             return success ? 0 : -1;
+        }
+
+        private void UpdatePropertyValues(InstallerOptions settings) {
+            var propeties = _installerOptions.GetType().GetProperties();
+            foreach (var property in propeties) {
+                var configuredValue = property.GetValue(settings);
+                property.SetValue(_installerOptions, configuredValue);
+            }
         }
 
         private void ExecuteAsync() {

@@ -8,41 +8,43 @@ using Spectre.Console;
 namespace PalworldModInstaller.Services.Installer {
     [SupportedOSPlatform("linux")]
     public class LinuxInstaller : IInstaller {
+        private readonly IGithubArtifactDownloader _githubArtifactDownloader;
+        private readonly IModFileService _modFileService;
+
+        public LinuxInstaller(IGithubArtifactDownloader githubArtifactDownloader, IModFileService modFileService) {
+            _githubArtifactDownloader = githubArtifactDownloader;
+            _modFileService = modFileService;
+        }
+
         public async Task InstallFiles(InstallerOptions installerOptions) {
+
+            AnsiConsole.WriteLine("Checking Mods Folder...");
             var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
+            _modFileService.CheckClrModsFolder(modsFolder);
+
+            AnsiConsole.WriteLine("Checking Dependancies Folder...");
             var dotnetDependenciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "ManagedModFramework");
+            _modFileService.CheckFrameworkInstallFolder(dotnetDependenciesFolder);
 
-            var launchScript = Path.Combine(installerOptions.InstallLocation, "PalServer.sh");
 
-
-            if (installerOptions.CreateModsFolder && !Directory.Exists(modsFolder)) {
-                AnsiConsole.WriteLine("Default mod folder did not exist, creating it now. (use -m flag to disable this)");
-                Directory.CreateDirectory(modsFolder);
-            }
-
-            if (!installerOptions.CheckUpdates && Directory.Exists(dotnetDependenciesFolder) && Directory.GetFiles(dotnetDependenciesFolder).Length > 0) {
-                AnsiConsole.WriteLine("Framework was found during install process! If you would like to update run with the -u flag.");
-                AnsiConsole.WriteLine("Aborting...");
+            if (!installerOptions.CheckUpdates) {
                 return;
             }
 
-            if (!Directory.Exists(dotnetDependenciesFolder)) {
-                AnsiConsole.WriteLine("Framework install folder did not exist, creating it now.");
-                Directory.CreateDirectory(dotnetDependenciesFolder);
+            AnsiConsole.WriteLine("Checking for updates...");
+            var palworldManagedModFramework = Path.Combine(dotnetDependenciesFolder, "PalworldManagedModFramework.dll");
+            if (!await _githubArtifactDownloader.IsOutOfDate(palworldManagedModFramework)) {
+                AnsiConsole.WriteLine("the newest release is already installed.");
+                return;
             }
 
-            if (installerOptions.CheckUpdates) {
-                AnsiConsole.WriteLine("Install located, checking for updates...");
+            AnsiConsole.WriteLine("Installing new files...");
+            var clrHostLocation = Path.Combine(dotnetDependenciesFolder, "CLRHost.dll");
+            await _modFileService.InstallNewFiles(dotnetDependenciesFolder, clrHostLocation);
 
-                // TODO: Ping github deployments for updates.
-                EditLaunchScript(launchScript);
-            }
-            else {
-                AnsiConsole.WriteLine("Installing mod loader...");
-
-                // TODO: Drop the dll files required here as well.
-                EditLaunchScript(launchScript);
-            }
+            AnsiConsole.WriteLine("Editing server launch script...");
+            var launchScript = Path.Combine(installerOptions.InstallLocation, "PalServer.sh");
+            EditLaunchScript(launchScript);
         }
 
         private void EditLaunchScript(string launchScript) {
