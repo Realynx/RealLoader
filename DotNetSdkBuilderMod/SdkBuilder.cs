@@ -29,7 +29,7 @@ namespace DotNetSdkBuilderMod {
                 .FindAndRegisterEvents<SdkBuilder>(this);
         }
 
-        [EngineEvent("^WBP_TItle_C::OnInitialized")]
+        [EngineEvent("^*::OnInitialized")]
         public unsafe void ObjectsReady(UnrealEvent unrealEvent) {
             if (!_objectsReady) {
                 _objectsReady = true;
