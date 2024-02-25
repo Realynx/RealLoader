@@ -1,5 +1,5 @@
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
-    public class FullTypePathAttribute {
+    public class FullTypePathAttribute : Attribute {
         public FullTypePathAttribute(string path) {
             Path = path;
         }

@@ -158,7 +158,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private static CodeGenArgumentNode GetFunctionAddressArgument() {
             return new CodeGenArgumentNode
             {
-                type = INT,
+                type = INT_PTR,
                 name = "functionStruct",
             };
         }

@@ -63,7 +63,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
 
                 foreach (var str in methodNode.body) {
-                    codeBuilder.AppendIndentedLine(str, 3);
+                    if (string.IsNullOrWhiteSpace(str)) {
+                        codeBuilder.AppendLine();
+                    }
+                    else {
+                        codeBuilder.AppendIndentedLine(str, 3);
+                    }
                 }
 
                 codeBuilder.AppendIndentedLine(CLOSED_CURLY_BRACKET, 2);

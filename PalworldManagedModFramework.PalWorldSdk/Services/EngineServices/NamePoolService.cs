@@ -36,11 +36,20 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             var nameEntry = GetName(fnameEntryId);
 
             if (nameEntry->header.BIsWide) {
-                return Encoding.Unicode.GetString(&nameEntry->stringContents, nameEntry->header.Len).Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase);
+                var decoded = Encoding.Unicode.GetString(&nameEntry->stringContents, nameEntry->header.Len);
+                return RemoveInvalidChars(decoded);
             }
             else {
-                return Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len).Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase);
+                var decoded = Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len);
+                return RemoveInvalidChars(decoded);
             }
+        }
+
+        private static string RemoveInvalidChars(string str) {
+            return str.Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase)
+                .Replace("-", "_", StringComparison.InvariantCultureIgnoreCase)
+                .Replace("?", "")
+                .Replace("\uFFFD", "");
         }
     }
 }

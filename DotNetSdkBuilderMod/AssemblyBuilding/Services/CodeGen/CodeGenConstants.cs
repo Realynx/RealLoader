@@ -40,6 +40,7 @@
         internal const string BASE = "base";
         internal const string VOID = "void";
         internal const string INT_PTR = "nint";
+        internal const string DEFAULT = "default";
         internal const string INT = "int";
         internal const string GET = "get";
         internal const string SET = "set";
