@@ -17,15 +17,18 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private readonly ICodeGenPropertyNodeFactory _propertyNodeFactory;
         private readonly ICodeGenMethodNodeFactory _methodNodeFactory;
         private readonly ICodeGenOperatorNodeFactory _operatorNodeFactory;
+        private readonly INameCollisionService _nameCollisionService;
 
         public CodeGenClassNodeFactory(INamePoolService namePoolService, ICodeGenAttributeNodeFactory attributeNodeFactory, ICodeGenConstructorNodeFactory constructorNodeFactory,
-            ICodeGenPropertyNodeFactory propertyNodeFactory, ICodeGenMethodNodeFactory methodNodeFactory, ICodeGenOperatorNodeFactory operatorNodeFactory) {
+            ICodeGenPropertyNodeFactory propertyNodeFactory, ICodeGenMethodNodeFactory methodNodeFactory, ICodeGenOperatorNodeFactory operatorNodeFactory,
+            INameCollisionService nameCollisionService) {
             _namePoolService = namePoolService;
             _attributeNodeFactory = attributeNodeFactory;
             _constructorNodeFactory = constructorNodeFactory;
             _propertyNodeFactory = propertyNodeFactory;
             _methodNodeFactory = methodNodeFactory;
             _operatorNodeFactory = operatorNodeFactory;
+            _nameCollisionService = nameCollisionService;
         }
 
         public unsafe CodeGenClassNode GenerateCodeGenClassNode(ClassNode classNode, Dictionary<EClassCastFlags, string> castFlagNames) {
@@ -44,9 +47,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             var classProperties = classNode.properties;
             CodeGenPropertyNode[]? properties = null;
             if (classProperties.Length > 0) {
+                var propertyNames = new HashSet<string>();
+
                 properties = new CodeGenPropertyNode[classProperties.Length];
                 for (var i = 0; i < classProperties.Length; i++) {
                     properties[i] = _propertyNodeFactory.GenerateCodeGenPropertyNode(classProperties[i]);
+                    properties[i].name = _nameCollisionService.GetNonCollidingName(properties[i].name, propertyNames);
                 }
             }
 

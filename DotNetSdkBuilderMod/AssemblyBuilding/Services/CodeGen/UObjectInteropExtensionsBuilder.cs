@@ -63,7 +63,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             };
 
             var body = new List<string> {
-                "const int ARGS_SIZE = 0x1000; // Magic number for some reason",
+                "const int ARGS_SIZE = byte.MaxValue; // The params counter is a byte",
                 string.Empty
             };
             body.AddRange(GetArgMemoryAllocationSegment(true));
@@ -158,7 +158,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private static CodeGenArgumentNode GetFunctionAddressArgument() {
             return new CodeGenArgumentNode
             {
-                type = INT,
+                type = INT_PTR,
                 name = "functionStruct",
             };
         }

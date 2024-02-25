@@ -1,8 +1,9 @@
+using System.Text;
+
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Models.CoreUObject.Flags;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
@@ -13,22 +14,30 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private readonly ILogger _logger;
         private readonly INamePoolService _namePoolService;
         private readonly IUnrealReflection _unrealReflection;
-        public CodeGenMethodNodeFactory(ILogger logger, INamePoolService namePoolService, IUnrealReflection unrealReflection) {
+        private readonly INameCollisionService _nameCollisionService;
+
+        public CodeGenMethodNodeFactory(ILogger logger, INamePoolService namePoolService, IUnrealReflection unrealReflection,
+            INameCollisionService nameCollisionService) {
             _logger = logger;
             _namePoolService = namePoolService;
             _unrealReflection = unrealReflection;
+            _nameCollisionService = nameCollisionService;
         }
 
         public unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method, Index methodIndex) {
             string modifiers;
-            if (method->functionFlags.HasFlag(EFunctionFlags.FUNC_Static)) {
-                modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}";
-            }
-            else {
-                modifiers = $"{PUBLIC}";
-            }
+            // Cannot make methods static because they rely on the object address
+            // if (method->functionFlags.HasFlag(EFunctionFlags.FUNC_Static)) {
+            //     modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}";
+            // }
+            // else {
+            modifiers = $"{PUBLIC}";
+            // }
 
             var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
+            if (char.IsDigit(methodName[0])) {
+                methodName = $"_{methodName}";
+            }
 
             CodeGenAttributeNode[]? attributes = null;
 
@@ -45,6 +54,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             CodeGenArgumentNode[]? methodArgs = null;
             if (parameters.Length > 0) {
+                var argNames = new HashSet<string>();
+
                 methodArgs = new CodeGenArgumentNode[parameters.Length];
                 for (var i = 0; i < parameters.Length; i++) {
                     var currentParam = parameters[i];
@@ -54,7 +65,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
                     methodArgs[i] = new CodeGenArgumentNode {
                         type = type,
-                        name = name
+                        name = _nameCollisionService.GetNonCollidingName(name, argNames)
                     };
                 }
             }
@@ -63,15 +74,31 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             if (methodArgs is not null) {
                 if (returnValue is null) {
                     body = new[] {
-                        $"{THIS}.{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{string.Join($"{COMMA}{WHITE_SPACE}", methodArgs.Select(x => x.name))}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
+                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{string.Join($"{COMMA}{WHITE_SPACE}", methodArgs.Select(x => x.name))}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
                     };
                 }
                 else {
-                    var bodyStart = $"{THIS}.{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{string.Join($"{COMMA}{WHITE_SPACE}", methodArgs.Take(returnValueIndex.Value - 1).Select(x => x.name))}";
-                    var bodyEnd = $"{string.Join($"{COMMA}{WHITE_SPACE}", methodArgs.Skip(returnValueIndex.Value).Select(x => x.name))}{CLOSED_ROUND_BRACKET}";
+                    var sb = new StringBuilder($"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}");
+                    var argsBeforeReturnValue = methodArgs.Take(returnValueIndex.Value).Select(x => x.name).ToArray();
+                    if (argsBeforeReturnValue.Length > 0) {
+                        sb.Append($"{COMMA}{WHITE_SPACE}");
+                        sb.Append(string.Join($"{COMMA}{WHITE_SPACE}", argsBeforeReturnValue));
+                    }
+
+                    sb.Append($"{COMMA}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}");
+
+                    var argsAfterReturnValue = methodArgs.Skip(returnValueIndex.Value).Select(x => x.name).ToArray();
+                    if (argsAfterReturnValue.Length > 0) {
+                        sb.Append($"{COMMA}{WHITE_SPACE}");
+                        sb.Append(string.Join($"{COMMA}{WHITE_SPACE}", argsAfterReturnValue));
+                    }
+
+                    sb.Append(CLOSED_ROUND_BRACKET);
+                    sb.Append(SEMICOLON);
+
                     body = new[] {
-                        $"{returnType}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{SEMICOLON}",
-                        $"{bodyStart}{COMMA}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{COMMA}{WHITE_SPACE}{bodyEnd}{SEMICOLON}",
+                        $"{returnType}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{DEFAULT}{SEMICOLON}",
+                        sb.ToString(),
                         $"{RETURN}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{SEMICOLON}",
                     };
                 }
@@ -79,13 +106,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             else {
                 if (returnValue is null) {
                     body = new[] {
-                        $"{THIS}.{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
+                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
                     };
                 }
                 else {
                     body = new[] {
-                        $"{returnType}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{SEMICOLON}",
-                        $"{THIS}.{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
+                        $"{returnType}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{DEFAULT}{SEMICOLON}",
+                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
                         $"{RETURN}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{SEMICOLON}",
                     };
                 }
