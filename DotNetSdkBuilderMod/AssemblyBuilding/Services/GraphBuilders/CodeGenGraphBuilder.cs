@@ -1,9 +1,11 @@
 ﻿using System.Buffers;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
+using DotNetSdkBuilderMod.Extensions;
 
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Logging;
@@ -72,6 +74,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             _logger.Debug("Applying imports...");
             TimedApplyImports(namespaceTree, customClassNamespaces, precompiledClassNamespaces);
 
+            _logger.Debug("Qualifying base types...");
+            TimedQualifyBaseTypes(namespaceTree, customClassNamespaces);
+
             var assemblyNodes = GenerateAssemblyNodes(namespaceTree);
 
             _logger.Debug("Building namespace-assembly dictionary...");
@@ -79,8 +84,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
             _logger.Debug("Computing assembly references...");
             TimedResolveAssemblyReferences(assemblyNodes, namespaceAssemblyMemo);
-
-            // DebugUtilities.WaitForDebuggerAttach();
 
             return assemblyNodes;
         }
@@ -242,6 +245,39 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             });
 
             _logger.Debug($"Applied imports to namespace tree; {time.TotalMilliseconds:F1} ms to apply.");
+        }
+
+        private void TimedQualifyBaseTypes(CodeGenNamespaceNode[] namespaceTree, Dictionary<string, string> customClassNamespaces) {
+            var time = _functionTimingService.Execute(() => {
+                foreach (var namespaceNode in namespaceTree) {
+                    QualifyBaseTypes(namespaceNode, customClassNamespaces);
+                }
+            });
+
+            _logger.Debug($"Qualified base types; {time.TotalMilliseconds:F1} ms to apply.");
+        }
+
+        private void QualifyBaseTypes(CodeGenNamespaceNode current, Dictionary<string, string> customClassNamespaces) {
+            if (current.classes is not null) {
+                foreach (var classNode in current.classes) {
+                    if (classNode.baseType is null || !customClassNamespaces.TryGetValue(classNode.baseType, out var baseTypeNamespace)) {
+                        continue;
+                    }
+
+                    classNode.baseType = new StringBuilder(baseTypeNamespace)
+                        .TrimStart('/')
+                        .Replace('/', '.')
+                        .Append('.')
+                        .Append(classNode.baseType)
+                        .ToString();
+                }
+            }
+
+            if (current.namespaces is not null) {
+                foreach (var namespaceNode in current.namespaces) {
+                    QualifyBaseTypes(namespaceNode, customClassNamespaces);
+                }
+            }
         }
 
         private Dictionary<string, string> TimedMemoizeAssemblyNamespaces(CodeGenAssemblyNode[] assemblyNodes, Assembly[] precompiledAssemblies) {
