@@ -131,9 +131,8 @@ namespace PalMM::Util
         String() {}
 
         //Constructor
-        String(const std::string& str)
-        {
-            SetThickCharData(str.c_str());
-        }
+        String(const char* str) { SetThickCharData(str); }
+        //Constructor
+        String(const std::string& str) { SetThickCharData(str.c_str()); }
     };
 }
