@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
@@ -6,7 +7,6 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
     public class SourceCodeGenerator : ISourceCodeGenerator {
@@ -86,6 +86,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
 
             var systemMemoryAssembly = typeof(MemoryPool<byte>).Assembly;
             compiler.RegisterExistingAssembly(systemMemoryAssembly);
+
+            var systemRuntimeCompilerServicesAssembly = typeof(Unsafe).Assembly;
+            compiler.RegisterExistingAssembly(systemRuntimeCompilerServicesAssembly);
         }
 
         private void TimedGenerateSdkCode(CodeGenAssemblyNode[] assemblyGraphs, ICodeCompiler codeCompiler) {

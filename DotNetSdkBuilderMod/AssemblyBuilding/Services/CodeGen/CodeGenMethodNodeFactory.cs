@@ -34,7 +34,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             modifiers = $"{PUBLIC}";
             // }
 
-            var methodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
+            var methodName = _namePoolService.GetSanitizedNameString(method->baseUstruct.ObjectName);
             if (char.IsDigit(methodName[0])) {
                 methodName = $"_{methodName}";
             }
@@ -45,7 +45,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             string returnType;
             if (returnValue is not null) {
                 var signatureName = returnValue->classPrivate->ObjectName;
-                var signatureString = _namePoolService.GetNameString(signatureName);
+                var signatureString = _namePoolService.GetSanitizedNameString(signatureName);
                 returnType = signatureString;
             }
             else {
@@ -60,8 +60,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 for (var i = 0; i < parameters.Length; i++) {
                     var currentParam = parameters[i];
 
-                    var type = _namePoolService.GetNameString(currentParam->classPrivate->ObjectName);
-                    var name = _namePoolService.GetNameString(currentParam->ObjectName);
+                    var type = _namePoolService.GetSanitizedNameString(currentParam->classPrivate->ObjectName);
+                    var name = _namePoolService.GetSanitizedNameString(currentParam->ObjectName);
 
                     methodArgs[i] = new CodeGenArgumentNode {
                         type = type,

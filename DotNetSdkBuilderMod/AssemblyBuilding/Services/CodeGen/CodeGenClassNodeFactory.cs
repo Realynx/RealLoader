@@ -32,7 +32,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe CodeGenClassNode GenerateCodeGenClassNode(ClassNode classNode, Dictionary<EClassCastFlags, string> castFlagNames) {
-            var className = _namePoolService.GetNameString(classNode.ClassName);
+            var className = _namePoolService.GetSanitizedNameString(classNode.ClassName);
 
             CodeGenConstructorNode[]? classConstructors = null;
             // TODO: Gather constructors
@@ -47,7 +47,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             var classProperties = classNode.properties;
             CodeGenPropertyNode[]? properties = null;
             if (classProperties.Length > 0) {
-                var propertyNames = new HashSet<string>();
+                var propertyNames = new HashSet<string> { className };
 
                 properties = new CodeGenPropertyNode[classProperties.Length];
                 for (var i = 0; i < classProperties.Length; i++) {
@@ -59,9 +59,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             CodeGenMethodNode[]? methods = null;
             var classMethods = classNode.functions;
             if (classMethods.Length > 0) {
+                var methodNames = new HashSet<string> { className };
+
                 methods = new CodeGenMethodNode[classMethods.Length];
                 for (var i = 0; i < classMethods.Length; i++) {
                     methods[i] = _methodNodeFactory.GenerateCodeGenMethodNode(classMethods[i], i);
+                    methods[i].name = _nameCollisionService.GetNonCollidingName(methods[i].name, methodNames);
                 }
             }
 
@@ -83,7 +86,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             var baseClass = classNode.nodeClass->baseUStruct.superStruct;
             string? baseClassName;
             if (baseClass is not null) {
-                baseClassName = _namePoolService.GetNameString(baseClass->ObjectName);
+                baseClassName = _namePoolService.GetSanitizedNameString(baseClass->ObjectName);
             }
             else {
                 baseClassName = nameof(UObjectInterop);
@@ -125,7 +128,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         private unsafe bool IsClassOrBaseClass(string otherClasName, UStruct uStruct) {
-            var structName = _namePoolService.GetNameString(uStruct.ObjectName);
+            var structName = _namePoolService.GetSanitizedNameString(uStruct.ObjectName);
             if (structName == otherClasName) {
                 return true;
             }

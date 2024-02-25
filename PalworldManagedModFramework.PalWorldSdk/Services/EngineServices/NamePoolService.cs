@@ -36,6 +36,17 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             var nameEntry = GetName(fnameEntryId);
 
             if (nameEntry->header.BIsWide) {
+                return Encoding.Unicode.GetString(&nameEntry->stringContents, nameEntry->header.Len);
+            }
+            else {
+                return Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len);
+            }
+        }
+
+        public unsafe string GetSanitizedNameString(FNameEntryId fnameEntryId) {
+            var nameEntry = GetName(fnameEntryId);
+
+            if (nameEntry->header.BIsWide) {
                 var decoded = Encoding.Unicode.GetString(&nameEntry->stringContents, nameEntry->header.Len);
                 return RemoveInvalidChars(decoded);
             }
@@ -46,12 +57,26 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         }
 
         private static string RemoveInvalidChars(string str) {
-            return str
-                .Replace(" ", "_", StringComparison.InvariantCultureIgnoreCase)
-                .Replace("-", "_")
-                .Replace(".", "_")
-                .Replace("?", "_")
-                .Replace("\uFFFD", "_");
+            const string REPLACEMENT_STRING = "_";
+            const char REPLACEMENT_CHAR = '_';
+
+            // non-ordinal string.Replace always allocates a new string, so we check if there is an invalid char first
+            var index = str.IndexOf(' ', StringComparison.InvariantCulture);
+            if (index is not -1) {
+                str = str.Replace(" ", REPLACEMENT_STRING, StringComparison.InvariantCulture);
+            }
+
+            index = str.AsSpan().IndexOfAny("-.?\uFFFD");
+            if (index is -1) {
+                return str;
+            }
+
+            return new StringBuilder(str)
+                .Replace('-', REPLACEMENT_CHAR)
+                .Replace('.', REPLACEMENT_CHAR)
+                .Replace('?', REPLACEMENT_CHAR)
+                .Replace('\uFFFD', REPLACEMENT_CHAR)
+                .ToString();
         }
     }
 }

@@ -70,7 +70,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         public void MemoizeTypeNamespaces(ClassNode currentNode, Dictionary<string, string> memo) {
-            var className = _namePoolService.GetNameString(currentNode.ClassName);
+            var className = _namePoolService.GetSanitizedNameString(currentNode.ClassName);
             ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(memo, className, out var previouslyExisted);
 
             if (!previouslyExisted) {

@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
@@ -21,10 +23,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty* property) {
-            var propertyName = _namePoolService.GetNameString(property->ObjectName);
+            var propertyName = _namePoolService.GetSanitizedNameString(property->ObjectName);
             if (char.IsDigit(propertyName[0])) {
                 propertyName = $"_{propertyName}";
             }
+
+            var modifiers = PUBLIC;
 
             CodeGenAttributeNode[]? attributes = null;
             if (property->propertyFlags.HasFlag(EPropertyFlags.CPF_Deprecated)) {
@@ -33,15 +37,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 };
             }
 
-            var returnType = _namePoolService.GetNameString(property->baseFField.classPrivate->ObjectName);
+            var returnType = _namePoolService.GetSanitizedNameString(property->baseFField.classPrivate->ObjectName);
 
             var fieldOffset = property->offset_Internal;
 
             var getter = $"{GET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{OPEN_ROUND_BRACKET}{ADDRESS_FIELD_NAME}{WHITE_SPACE}{PLUS}{WHITE_SPACE}{fieldOffset}{CLOSED_ROUND_BRACKET}{SEMICOLON}";
-            var setter = $"{SET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{OPEN_ROUND_BRACKET}{ADDRESS_FIELD_NAME}{WHITE_SPACE}{PLUS}{WHITE_SPACE}{fieldOffset}{CLOSED_ROUND_BRACKET}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{VALUE}{SEMICOLON}";
+            var setter = $"{SET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{nameof(Unsafe)}{DOT}{nameof(Unsafe.Write)}{OPEN_ROUND_BRACKET}{OPEN_ROUND_BRACKET}{VOID}{STAR}{CLOSED_ROUND_BRACKET}{OPEN_ROUND_BRACKET}{ADDRESS_FIELD_NAME}{WHITE_SPACE}{PLUS}{WHITE_SPACE}{fieldOffset}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{VALUE}{DOT}{ADDRESS_FIELD_NAME}{CLOSED_ROUND_BRACKET}{SEMICOLON}";
 
             return new CodeGenPropertyNode {
-                modifier = PUBLIC,
+                modifier = modifiers,
                 name = propertyName,
                 attributes = attributes,
                 returnType = returnType,
