@@ -53,9 +53,6 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook {
         }
 
         private unsafe void OnUnrealEvent(UnrealEvent unrealEvent, ExecuteOriginalCallback executeOriginalCallback) {
-            var watch = WalkStack();
-            _logger.Error($"Stack walk took: {watch.ElapsedMilliseconds} ms");
-
             Task.Factory.StartNew(() => {
                 var eventMasks = _eventImpulses.Keys.ToArray();
                 var eventsToImpulse = eventMasks.Where(i => i.IsMatch(unrealEvent.EventName));
@@ -77,19 +74,6 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook {
             if (unrealEvent.ContinueExecute) {
                 executeOriginalCallback(unrealEvent.Instance, unrealEvent.UFunction, unrealEvent.Params);
             }
-        }
-
-        private unsafe Stopwatch WalkStack() {
-            var watch = new Stopwatch();
-            watch.Start();
-            var currentStackFrames = _stackWalker.WalkStackFrames(35);
-            watch.Stop();
-
-            foreach (var frame in currentStackFrames) {
-                _logger.Debug($"RSP: 0x{frame.StackAddress:X}, Caller: 0x{frame.CallerAddress:X}, Module: {frame.Module?.ModuleName}");
-            }
-
-            return watch;
         }
 
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, UFunction*, void*, void> ProcessEvent_Original;
