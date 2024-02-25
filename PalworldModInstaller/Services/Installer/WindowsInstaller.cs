@@ -37,7 +37,7 @@ namespace PalworldModInstaller.Services.Installer {
 
             if (installerOptions.CheckUpdates) {
                 AnsiConsole.WriteLine("Checking for updates...");
-                if (!IsOutOfDate()) {
+                if (!IsOutOfDate(string.Empty)) {
                     AnsiConsole.WriteLine("the newest release is already installed.");
                     return;
                 }
@@ -78,8 +78,7 @@ namespace PalworldModInstaller.Services.Installer {
             await File.WriteAllBytesAsync(localLocation, fileBytes);
         }
 
-        private bool IsOutOfDate() {
-
+        private bool IsOutOfDate(string frameworkFolder) {
             return true;
         }
     }

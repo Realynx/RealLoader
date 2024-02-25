@@ -40,7 +40,7 @@ namespace PalworldModInstaller.Services {
 
         public async Task<string> GetLatestVersion() {
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, string.Empty);
-            var response = _httpClient.Send(httpRequestMessage);
+            var response = await _httpClient.SendAsync(httpRequestMessage);
 
             var redirectLocation = response.RequestMessage.RequestUri.ToString();
             var versionString = redirectLocation.Substring(redirectLocation.LastIndexOf("/") + 1);

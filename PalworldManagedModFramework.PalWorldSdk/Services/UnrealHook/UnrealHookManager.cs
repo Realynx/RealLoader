@@ -88,14 +88,8 @@ namespace PalworldManagedModFramework.Sdk.Services.UnrealHook {
 
                 var executingEvent = new UnrealEvent(eventName, instance, uFunction, parameters);
 
-                try {
-                    SingleInstance.OnUnrealEvent(executingEvent, (UObject* pInstance, UFunction* pUFunction, void* pParams)
+                SingleInstance.OnUnrealEvent(executingEvent, (UObject* pInstance, UFunction* pUFunction, void* pParams)
                         => ProcessEvent_Original(pInstance, pUFunction, pParams));
-                }
-                catch (Exception e) {
-                    SingleInstance._logger.Error(e.ToString());
-                    DebugUtilities.WaitForDebuggerAttach();
-                }
 
                 return;
             }
