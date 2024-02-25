@@ -1,14 +1,13 @@
 ﻿using System.Diagnostics;
 
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services.Detour;
 using PalworldManagedModFramework.Sdk.Services.Detour.Extensions;
 using PalworldManagedModFramework.Sdk.Services.Detour.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.EngineServices;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
 using PalworldManagedModFramework.Sdk.Services.Memory.Extensions;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook;
 using PalworldManagedModFramework.Services.Interfaces;
 
 namespace PalworldManagedModFramework.Services {

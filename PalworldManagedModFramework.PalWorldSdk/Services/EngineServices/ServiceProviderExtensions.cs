@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Linux;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Windows;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook.Interfaces;
 
 namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
     public static class ServiceProviderExtensions {
@@ -15,7 +17,9 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
                 .AddSingleton<IUnrealReflection, UnrealReflection>()
                 .AddSingleton<INamePoolService, NamePoolService>()
                 .AddSingleton<IPropertyRegistrationService, PropertyRegistrationService>()
-                .AddSingleton<IGlobalObjects, GlobalObjects>();
+                .AddSingleton<IGlobalObjects, GlobalObjects>()
+                .AddSingleton<IUnrealHookManager, UnrealHookManager>()
+                .AddSingleton<IUnrealEventRegistrationService, UnrealEventRegistrationService>();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 serviceDescriptors

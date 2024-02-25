@@ -2,6 +2,7 @@
 
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Extensions;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 

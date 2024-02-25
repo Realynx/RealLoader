@@ -1,7 +1,6 @@
-﻿
-using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
+﻿using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 
-namespace PalworldManagedModFramework.Sdk.Services.UnrealHook {
+namespace PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook {
     public unsafe class UnrealEvent {
         public delegate void ExecuteOriginalCallback(UObject* target, UFunction* function, void* parameter);
 

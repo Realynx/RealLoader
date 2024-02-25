@@ -1,6 +1,6 @@
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     public abstract class UObjectInterop {

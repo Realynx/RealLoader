@@ -3,8 +3,8 @@
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook.Interfaces;
 
 namespace DotNetSdkBuilderMod {
     [PalworldMod(nameof(SdkBuilder), "poofyfox", ".poofyfox", "1.0.0", PalworldModType.Universal)]

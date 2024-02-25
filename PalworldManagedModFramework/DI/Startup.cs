@@ -10,8 +10,6 @@ using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices;
 using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.EngineServices;
 using PalworldManagedModFramework.Sdk.Services.Memory;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
 using PalworldManagedModFramework.Services;
 using PalworldManagedModFramework.Services.AssemblyLoading;
 using PalworldManagedModFramework.Services.Interfaces;
@@ -45,11 +43,6 @@ namespace PalworldManagedModFramework.DI {
                 .SetupSandboxedDIServices()
                 .SetupReflectionModLoader()
                 .SetupDetourServices();
-
-
-            // TODO: Immediate Loading.
-            services
-                .AddSingleton<IUnrealHookManager, UnrealHookManager>();
         }
     }
 }

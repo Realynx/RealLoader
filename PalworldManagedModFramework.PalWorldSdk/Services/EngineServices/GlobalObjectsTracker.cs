@@ -6,30 +6,28 @@ using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.Sdk.Services.Detour.Models;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook.Interfaces;
 
 namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
     public class GlobalObjectsTracker : IGlobalObjectsTracker {
         private readonly ILogger _logger;
         private readonly IGlobalObjects _globalObjects;
-        private readonly IUnrealHookManager _unrealHookManager;
-
+        private readonly IUnrealEventRegistrationService _unrealEventRegistrationService;
         private static GlobalObjectsTracker? _thisInstance;
 
         private readonly HashSet<nint> _loadedObjects = new();
         private readonly HashSet<nint> _markedObjects = new();
 
         private bool _synchronized = false;
-        public GlobalObjectsTracker(ILogger logger, IGlobalObjects globalObjects, IUnrealHookManager unrealHookManager) {
+        public GlobalObjectsTracker(ILogger logger, IGlobalObjects globalObjects, IUnrealEventRegistrationService unrealEventRegistrationService) {
             _logger = logger;
             _globalObjects = globalObjects;
-            _unrealHookManager = unrealHookManager;
+            _unrealEventRegistrationService = unrealEventRegistrationService;
             _thisInstance = this;
 
-            _unrealHookManager
-                .RegisterUnrealEvent(GetType().GetMethod(nameof(OnInitialized))!, this)
-                .RegisterUnrealEvent(GetType().GetMethod(nameof(OnEndedWorldAutoSave))!, this);
+            _unrealEventRegistrationService
+                .FindAndRegisterEvents<IGlobalObjectsTracker>(this);
         }
 
 

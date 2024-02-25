@@ -8,11 +8,11 @@ using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.Sdk.Services.Detour.Models;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook.Interfaces;
 
-using static PalworldManagedModFramework.Sdk.Services.UnrealHook.UnrealEvent;
+using static PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook.UnrealEvent;
 
-namespace PalworldManagedModFramework.Sdk.Services.UnrealHook {
+namespace PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook {
     public class UnrealHookManager : IUnrealHookManager {
         protected static UnrealHookManager? SingleInstance = null!;
 
@@ -91,7 +91,7 @@ namespace PalworldManagedModFramework.Sdk.Services.UnrealHook {
 
             var executingEvent = new UnrealEvent(eventName, instance, uFunction, parameters);
 
-            SingleInstance.OnUnrealEvent(executingEvent, (UObject* pInstance, UFunction* pUFunction, void* pParams)
+            SingleInstance.OnUnrealEvent(executingEvent, (pInstance, pUFunction, pParams)
                     => ProcessEvent_Original(pInstance, pUFunction, pParams));
         }
     }

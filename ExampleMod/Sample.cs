@@ -3,32 +3,30 @@
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook.Interfaces;
 
-using static PalworldManagedModFramework.Sdk.Services.UnrealHook.UnrealEvent;
+using static PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook.UnrealEvent;
 
 namespace ExampleMod {
     [PalworldMod("Sample", "poofyfox", ".poofyfox", "1.0.0", PalworldModType.Universal)]
     public class Sample : IPalworldMod {
         private readonly CancellationToken _cancellationToken;
         private readonly ILogger _logger;
-        private readonly IUnrealHookManager _unrealHookManager;
+        private readonly IUnrealEventRegistrationService _unrealEventRegistrationService;
 
         private readonly HashSet<string> _functions = new();
 
-        public Sample(CancellationToken cancellationToken, ILogger logger, IUnrealHookManager unrealHookManager) {
+        public Sample(CancellationToken cancellationToken, ILogger logger, IUnrealEventRegistrationService unrealEventRegistrationService) {
             _cancellationToken = cancellationToken;
             _logger = logger;
-            _unrealHookManager = unrealHookManager;
+            _unrealEventRegistrationService = unrealEventRegistrationService;
         }
 
         public void Load() {
-            _unrealHookManager
-                .RegisterUnrealHook(GetType().GetMethod(nameof(DamageEvent))!, this)
-                .RegisterUnrealHook(GetType().GetMethod(nameof(JumpEvent))!, this)
-                .RegisterUnrealEvent(GetType().GetMethod(nameof(CombatEvents))!, this)
-                .RegisterUnrealEvent(GetType().GetMethod(nameof(AllEvents))!, this);
+            _unrealEventRegistrationService
+                .FindAndRegisterEvents<Sample>(this)
+                .FindAndRegisterEventHooks<Sample>(this);
         }
 
         public void Unload() {
