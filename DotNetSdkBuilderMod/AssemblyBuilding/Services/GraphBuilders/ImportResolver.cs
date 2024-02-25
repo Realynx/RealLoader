@@ -33,7 +33,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                             .Replace('/', '.')
                             .ToString();
 
-                        namespaceImports[i] = $"{USING}{WHITE_SPACE}{import}{SEMICOLON}";
+                        namespaceImports[i] = import;
                         i++;
                     }
 

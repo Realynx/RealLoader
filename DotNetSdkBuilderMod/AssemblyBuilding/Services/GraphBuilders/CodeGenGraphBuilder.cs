@@ -58,8 +58,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             _logger.Debug("Building class-namespace dictionary...");
             var customClassNamespaces = TimedMemoizeTypeNamespaces(rootNode);
 
-            _logger.Debug("Building dotnet class-namespace dictionary...");
-            var dotnetClassNamespaces = TimedMemoizeDotnetTypeNamespaces();
+            var precompiledAssemblies = new[] { typeof(string).Assembly, typeof(MemoryPool<byte>).Assembly, typeof(SdkBuilder).Assembly, typeof(DetourAttribute).Assembly, typeof(object).Assembly };
+
+            _logger.Debug("Building precompiled class-namespace dictionary...");
+            var precompiledClassNamespaces = TimedMemoizePrecompiledTypeNamespaces(precompiledAssemblies);
 
             _logger.Debug("Counting function arguments...");
             var functionArgCounts = TimedCountFunctionArguments(rootNode);
@@ -68,18 +70,17 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             TimedBuildInteropExtensions(namespaceTree, functionArgCounts);
 
             _logger.Debug("Applying imports...");
-            TimedApplyImports(namespaceTree, customClassNamespaces, dotnetClassNamespaces);
+            TimedApplyImports(namespaceTree, customClassNamespaces, precompiledClassNamespaces);
 
-            var assemblyNodes = new CodeGenAssemblyNode[namespaceTree.Length];
-            for (var i = 0; i < namespaceTree.Length; i++) {
-                assemblyNodes[i] = new CodeGenAssemblyNode {
-                    namespaces = namespaceTree[i].namespaces!,
-                    name = namespaceTree[i].name,
-                    attributes = new[] {
-                        _attributeNodeFactory.GenerateAssemblyAttribute(COMPATIBLE_GAME_VERSION_ATTRIBUTE, "0.1.2")
-                    }, // TODO: Get game version
-                };
-            }
+            var assemblyNodes = GenerateAssemblyNodes(namespaceTree);
+
+            _logger.Debug("Building namespace-assembly dictionary...");
+            var namespaceAssemblyMemo = TimedMemoizeAssemblyNamespaces(assemblyNodes, precompiledAssemblies);
+
+            _logger.Debug("Computing assembly references...");
+            TimedResolveAssemblyReferences(assemblyNodes, namespaceAssemblyMemo);
+
+            // DebugUtilities.WaitForDebuggerAttach();
 
             return assemblyNodes;
         }
@@ -124,12 +125,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var time = _functionTimingService.Execute(() => {
                 _nameSpaceService.MemoizeTypeNamespaces(rootNode, memoizedClassesAndNamespaces);
 
-                var sdkBuilderAssembly = typeof(SdkBuilder).Assembly;
-                _nameSpaceService.MemoizeAssemblyTypeNamespaces(sdkBuilderAssembly, memoizedClassesAndNamespaces);
-
-                var frameworkSdkAssembly = typeof(DetourAttribute).Assembly;
-                _nameSpaceService.MemoizeAssemblyTypeNamespaces(frameworkSdkAssembly, memoizedClassesAndNamespaces);
-
                 memoizedClassesAndNamespaces.Add(U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME, U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE);
             });
 
@@ -137,16 +132,16 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             return memoizedClassesAndNamespaces;
         }
 
-        private Dictionary<string, string> TimedMemoizeDotnetTypeNamespaces() {
+        private Dictionary<string, string> TimedMemoizePrecompiledTypeNamespaces(Assembly[] assemblies) {
             var memoizedClassesAndNamespaces = new Dictionary<string, string>();
 
-            var systemAssembly = Assembly.GetAssembly(typeof(string))!;
-            var time1 = _functionTimingService.Execute(() => _nameSpaceService.MemoizeAssemblyTypeNamespaces(systemAssembly, memoizedClassesAndNamespaces));
+            var time = _functionTimingService.Execute(() => {
+                foreach (var assembly in assemblies) {
+                    _nameSpaceService.MemoizeAssemblyTypeNamespaces(assembly, memoizedClassesAndNamespaces);
+                }
+            });
 
-            var systemBuffersAssembly = Assembly.GetAssembly(typeof(MemoryPool<byte>))!;
-            var time2 = _functionTimingService.Execute(() => _nameSpaceService.MemoizeAssemblyTypeNamespaces(systemBuffersAssembly, memoizedClassesAndNamespaces));
-
-            _logger.Debug($"Memoized dotnet classes and namespaces; {(time1 + time2).TotalMilliseconds:F1} ms to build.");
+            _logger.Debug($"Memoized dotnet classes and namespaces; {time.TotalMilliseconds:F1} ms to build.");
             return memoizedClassesAndNamespaces;
         }
 
@@ -189,13 +184,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             return castFlagNames;
         }
 
-        private void TimedAddClassesToNamespaces(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo, Dictionary<EClassCastFlags, string> castFlagNames) {
+        private void TimedAddClassesToNamespaces(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo,
+            Dictionary<EClassCastFlags, string> castFlagNames) {
             var time = _functionTimingService.Execute(() => PopulateNamespaceClasses(namespaceClassesMemo, namespacesMemo, castFlagNames));
 
             _logger.Debug($"Applied classes to namespace tree; {time.TotalMilliseconds:F1} ms to build.");
         }
 
-        private void PopulateNamespaceClasses(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo, Dictionary<EClassCastFlags, string> castFlagNames) {
+        private void PopulateNamespaceClasses(Dictionary<string, List<ClassNode>> namespaceClassesMemo, Dictionary<string, CodeGenNamespaceNode> namespacesMemo,
+            Dictionary<EClassCastFlags, string> castFlagNames) {
             foreach (var (nameSpace, classNodes) in namespaceClassesMemo) {
                 var namespaceNode = namespacesMemo[nameSpace];
                 var codeGenClassNodes = new CodeGenClassNode[classNodes.Count];
@@ -230,8 +227,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private void TimedBuildInteropExtensions(CodeGenNamespaceNode[] namespaceTree, IReadOnlyList<int> functionArgCounts) {
-            var interopNamespace = namespaceTree.First(x => x.packageName.Equals(CODE_GEN_INTEROP_NAMESPACE));
-            var extensionsNamespace = interopNamespace.namespaces!.First(x => x.packageName.Equals(U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE));
+            var interopNamespace = namespaceTree.First(x => x.fullName.Equals(CODE_GEN_INTEROP_NAMESPACE));
+            var extensionsNamespace = interopNamespace.namespaces!.First(x => x.fullName.Equals(U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE));
             var time = _functionTimingService.Execute(() => _uObjectInteropExtensionsBuilder.PopulateNamespaceNode(extensionsNamespace, functionArgCounts));
 
             _logger.Debug($"Built interop extension methods; {time.TotalMilliseconds:F1} ms to build.");
@@ -244,7 +241,95 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 }
             });
 
-            _logger.Debug($"Applied imports to namespace tree; {time.TotalMilliseconds:F1} ms to build.");
+            _logger.Debug($"Applied imports to namespace tree; {time.TotalMilliseconds:F1} ms to apply.");
+        }
+
+        private Dictionary<string, string> TimedMemoizeAssemblyNamespaces(CodeGenAssemblyNode[] assemblyNodes, Assembly[] precompiledAssemblies) {
+            var time = _functionTimingService.Execute(() => {
+                var memo = MemoizePrecompiledAssemblyNamespaces(precompiledAssemblies);
+
+                foreach (var assemblyNode in assemblyNodes) {
+                    foreach (var namespaceNode in assemblyNode.namespaces) {
+                        MemoizeCustomAssemblyNamespaces(namespaceNode, assemblyNode.name, memo);
+                    }
+                }
+
+                return memo;
+            }, out var memo2);
+
+            _logger.Debug($"Memoized assembly namespaces; {time.TotalMilliseconds:F1} ms to build.");
+            return memo2;
+        }
+
+        private Dictionary<string, string> MemoizePrecompiledAssemblyNamespaces(IEnumerable<Assembly> assemblies) {
+            var memo = new Dictionary<string, string>();
+            foreach (var assembly in assemblies) {
+                var assemblyName = assembly.GetName().Name
+                    ?? throw new NullReferenceException($"{assembly.FullName} does not have a valid short name.");
+
+                var types = assembly.GetTypes();
+                foreach (var type in types.Where(x => x.Namespace is not null)) {
+                    memo.TryAdd(type.Namespace!, assemblyName);
+                }
+            }
+
+            return memo;
+        }
+
+        private void MemoizeCustomAssemblyNamespaces(CodeGenNamespaceNode currentNode, string currentAssembly, Dictionary<string, string> namespaces) {
+            namespaces[currentNode.fullName] = currentAssembly;
+
+            if (currentNode.namespaces is not null) {
+                foreach (var namespaceNode in currentNode.namespaces) {
+                    MemoizeCustomAssemblyNamespaces(namespaceNode, currentAssembly, namespaces);
+                }
+            }
+        }
+
+        private CodeGenAssemblyNode[] GenerateAssemblyNodes(CodeGenNamespaceNode[] namespaceTree) {
+            var assemblyNodes = new CodeGenAssemblyNode[namespaceTree.Length];
+            for (var i = 0; i < namespaceTree.Length; i++) {
+                assemblyNodes[i] = new CodeGenAssemblyNode {
+                    namespaces = namespaceTree[i].namespaces!,
+                    name = namespaceTree[i].name,
+                    attributes = new[] {
+                        _attributeNodeFactory.GenerateAssemblyAttribute(COMPATIBLE_GAME_VERSION_ATTRIBUTE, "0.1.2")
+                    }, // TODO: Get game version
+                };
+            }
+
+            return assemblyNodes;
+        }
+
+        private void TimedResolveAssemblyReferences(CodeGenAssemblyNode[] assemblyNodes, Dictionary<string, string> assemblyNamespaces) {
+            var time = _functionTimingService.Execute(() => {
+                foreach (var assemblyNode in assemblyNodes) {
+                    var references = new HashSet<string>();
+                    foreach (var namespaceNode in assemblyNode.namespaces) {
+                        ResolveReferences(namespaceNode, assemblyNamespaces, references);
+                    }
+
+                    assemblyNode.references = references.Count > 0 ? references.ToArray() : null;
+                }
+            });
+
+            _logger.Debug($"Resolved assembly references; {time.TotalMilliseconds:F1} ms to resolve.");
+        }
+
+        private void ResolveReferences(CodeGenNamespaceNode currentNode, Dictionary<string, string> assemblyNamespaces, HashSet<string> references) {
+            if (currentNode.imports is not null) {
+                foreach (var import in currentNode.imports) {
+                    if (assemblyNamespaces.TryGetValue(import, out var reference)) {
+                        references.Add(reference);
+                    }
+                }
+            }
+
+            if (currentNode.namespaces is not null) {
+                foreach (var namespaceNode in currentNode.namespaces) {
+                    ResolveReferences(namespaceNode, assemblyNamespaces, references);
+                }
+            }
         }
     }
 }

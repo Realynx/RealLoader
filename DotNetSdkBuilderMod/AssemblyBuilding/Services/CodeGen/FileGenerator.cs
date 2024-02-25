@@ -25,7 +25,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             if (namespaceNode.imports is not null) {
                 foreach (var import in namespaceNode.imports) {
-                    codeBuilder.AppendLine(import);
+                    codeBuilder.Append(USING);
+                    codeBuilder.Append(WHITE_SPACE);
+                    codeBuilder.Append(import);
+                    codeBuilder.AppendLine(SEMICOLON);
                 }
 
                 codeBuilder.AppendLine();
@@ -34,7 +37,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             codeBuilder.Append(NAMESPACE);
             codeBuilder.Append(WHITE_SPACE);
 
-            var fullyQualifiedNamespace = namespaceNode.packageName.TrimStart('/').Replace('/', '.');
+            var fullyQualifiedNamespace = namespaceNode.fullName;
             codeBuilder.Append(fullyQualifiedNamespace);
 
             codeBuilder.Append(WHITE_SPACE);

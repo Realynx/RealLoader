@@ -3,7 +3,6 @@ using PalworldManagedModFramework.Models.Config;
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
-using PalworldManagedModFramework.Sdk.Services;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 using PalworldManagedModFramework.Services.Interfaces;
 using PalworldManagedModFramework.Services.SandboxDI.Interfaces;
@@ -52,7 +51,7 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
                 }
 
                 if (!loadableMods.HasFlag(mod.PalworldModAttribute.ModType)) {
-                    _logger.Warning($"Skipping incompatable mod: [{mod.PalworldModAttribute.ModName}]");
+                    _logger.Warning($"Skipping incompatible mod: [{mod.PalworldModAttribute.ModName}]");
                     continue;
                 }
 

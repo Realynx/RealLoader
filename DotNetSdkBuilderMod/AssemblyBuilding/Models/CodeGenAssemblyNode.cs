@@ -5,6 +5,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
     public class CodeGenAssemblyNode {
         public CodeGenNamespaceNode[] namespaces;
         public string name;
+        public string[]? references;
         public CodeGenAttributeNode[]? attributes;
     }
 
@@ -14,6 +15,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public CodeGenClassNode[]? classes;
 
         public string packageName;
+        public string fullName;
         public string name;
         public string[]? imports;
     }

@@ -1,9 +1,12 @@
-﻿using System.Text;
+﻿using System.Buffers;
+using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
+using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
     public class SourceCodeGenerator : ISourceCodeGenerator {
@@ -31,28 +34,28 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             _logger.Debug("Building assembly graphs...");
             var assemblyGraphs = TimeAssemblyGraphBuilder(rootNode);
 
-            var compiler = _codeCompilerFactory.CreateCompiler();
+            // DebugUtilities.WaitForDebuggerAttach();
 
-            foreach (var assemblyGraph in assemblyGraphs) {
-                foreach (var nameSpace in assemblyGraph.namespaces) {
-                    TraverseNodes(nameSpace, compiler);
-                }
+            var codeCompiler = _codeCompilerFactory.CreateCompiler();
+            RegisterAdditionalAssemblies(codeCompiler);
 
-                compiler.Compile(assemblyGraph.name);
-            }
+            _logger.Debug("Generating SDK code...");
+            TimedGenerateSdkCode(assemblyGraphs, codeCompiler);
+
+            codeCompiler.Compile();
         }
 
-        private void TraverseNodes(CodeGenNamespaceNode namespaceNode, ICodeCompiler codeCompiler) {
+        private void TraverseNodes(CodeGenNamespaceNode namespaceNode, ICodeCompiler codeCompiler, string assemblyName) {
             var classFile = new StringBuilder();
 
             _fileGenerator.GenerateFile(classFile, namespaceNode);
             if (classFile.Length > 0) {
-                codeCompiler.AppendFile(classFile, namespaceNode.packageName.TrimStart('/').Replace('/', '.'));
+                codeCompiler.AppendFile(classFile, assemblyName, namespaceNode.fullName);
             }
 
             if (namespaceNode.namespaces is not null) {
                 foreach (var node in namespaceNode.namespaces) {
-                    TraverseNodes(node, codeCompiler);
+                    TraverseNodes(node, codeCompiler, assemblyName);
                 }
             }
         }
@@ -69,6 +72,32 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
 
             _logger.Debug($"Assembly Graph; {time.TotalMilliseconds:F1} ms to build.");
             return assemblyGraph;
+        }
+
+        private void RegisterAdditionalAssemblies(ICodeCompiler compiler) {
+            var sdkBuilderAssembly = typeof(SdkBuilder).Assembly;
+            compiler.RegisterExistingAssembly(sdkBuilderAssembly);
+
+            var frameworkSdkAssembly = typeof(DetourAttribute).Assembly;
+            compiler.RegisterExistingAssembly(frameworkSdkAssembly);
+
+            var systemAssembly = typeof(string).Assembly;
+            compiler.RegisterExistingAssembly(systemAssembly);
+
+            var systemMemoryAssembly = typeof(MemoryPool<byte>).Assembly;
+            compiler.RegisterExistingAssembly(systemMemoryAssembly);
+        }
+
+        private void TimedGenerateSdkCode(CodeGenAssemblyNode[] assemblyGraphs, ICodeCompiler codeCompiler) {
+            var time = _functionTimingService.Execute(() => {
+                foreach (var assemblyGraph in assemblyGraphs) {
+                    foreach (var nameSpace in assemblyGraph.namespaces) {
+                        TraverseNodes(nameSpace, codeCompiler, assemblyGraph.name);
+                    }
+                }
+            });
+
+            _logger.Debug($"Sdk code; {time.TotalMilliseconds:F1} ms to generate.");
         }
     }
 }

@@ -39,6 +39,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
 
                 currentNode.namespaces[x] = new CodeGenNamespaceNode {
                     packageName = fullBranchNamespace,
+                    fullName = fullBranchNamespace.Replace('.', '_').TrimStart('/').Replace('/', '.'),
                     name = branchNamespace
                 };
 

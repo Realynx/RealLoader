@@ -10,9 +10,11 @@ using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConsta
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class UObjectInteropExtensionsBuilder : IUObjectInteropExtensionsBuilder {
         private readonly ILogger _logger;
+        private readonly ICodeGenAttributeNodeFactory _attributeNodeFactory;
 
-        public UObjectInteropExtensionsBuilder(ILogger logger) {
+        public UObjectInteropExtensionsBuilder(ILogger logger, ICodeGenAttributeNodeFactory attributeNodeFactory) {
             _logger = logger;
+            _attributeNodeFactory = attributeNodeFactory;
         }
 
         public void PopulateNamespaceNode(CodeGenNamespaceNode extensionsNamespaceNode, IReadOnlyList<int> functionArgCounts) {
@@ -34,7 +36,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             };
 
             extensionsNamespaceNode.imports = new [] {
-                $"{nameof(System)}{DOT}{nameof(System.Buffers)}"
+                $"{nameof(System)}{DOT}{nameof(System.Buffers)}",
+                $"{nameof(System)}{DOT}{nameof(System.Runtime)}",
+                $"{nameof(System)}{DOT}{nameof(System.Runtime)}{DOT}{nameof(System.Runtime.CompilerServices)}",
             };
         }
 
@@ -68,7 +72,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             var bodyTypes = new[] {
                 nameof(UIntPtr),
-                $"{nameof(MemoryPool<nint>)}",
+                nameof(MemoryPool<nint>),
+            };
+
+            var attributes = new[] {
+                _attributeNodeFactory.GenerateAttribute("CompilerGenerated")
             };
 
             return new CodeGenMethodNode {
@@ -78,6 +86,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 arguments = methodArgs,
                 body = body.ToArray(),
                 bodyTypes = bodyTypes,
+                attributes = attributes,
             };
         }
 
@@ -118,7 +127,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             var bodyTypes = new[] {
                 nameof(UIntPtr),
-                $"{nameof(MemoryPool<nint>)}",
+                nameof(MemoryPool<nint>),
+            };
+
+            var attributes = new[] {
+                _attributeNodeFactory.GenerateAttribute("CompilerGenerated")
             };
 
             return new CodeGenMethodNode {
@@ -129,6 +142,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 genericTypes = genericTypes,
                 body = body.ToArray(),
                 bodyTypes = bodyTypes,
+                attributes = attributes,
             };
         }
 
@@ -171,11 +185,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             return new CodeGenNamespaceNode {
                 packageName = namespaceParts[0],
+                fullName = namespaceParts[0],
                 name = namespaceParts[0],
                 namespaces = new [] {
                     new CodeGenNamespaceNode
                     {
                         packageName = U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE,
+                        fullName = U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE,
                         name = namespaceParts[1]
                     }
                 }

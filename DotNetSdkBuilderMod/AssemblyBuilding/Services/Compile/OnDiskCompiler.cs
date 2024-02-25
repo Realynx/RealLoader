@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -19,8 +21,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
             _buildLocation = buildLocation;
         }
 
-        public void AppendFile(StringBuilder code, string nameSpace) {
-            var directory = Path.Combine(_buildLocation, Path.Combine(nameSpace.Split('.', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)));
+        public void RegisterExistingAssembly(Assembly assembly) {
+            throw new NotImplementedException();
+        }
+
+        public void AppendFile(StringBuilder code, string assemblyName, string nameSpace) {
+            throw new NotImplementedException();
+            var namespaceDirectories = Path.Combine(nameSpace.Split('.', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
+            var directory = Path.Combine(_buildLocation, "source", namespaceDirectories);
             if (Directory.Exists(directory)) {
                 Directory.Delete(directory, true);
             }
@@ -44,10 +52,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
             // _logger.Debug($"Wrote code file {filePath}");
         }
 
-        public void Compile(string assemblyName) {
-            CSharpCompilation.Create(assemblyName, GetSyntaxTrees());
-
+        public void Compile() {
             _writtenFiles.Clear();
+        }
+
+        public bool TryGetCompiledAssembly(string assemblyName, out ImmutableArray<byte> assemblyBytes) {
+            throw new NotImplementedException();
         }
 
         private IEnumerable<SyntaxTree> GetSyntaxTrees() {
