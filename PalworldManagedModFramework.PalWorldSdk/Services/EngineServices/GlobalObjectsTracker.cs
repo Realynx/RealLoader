@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
-using PalworldManagedModFramework.Sdk.Services.Detour;
+using PalworldManagedModFramework.Sdk.Services.Detour.Models;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.UnrealHook;
 using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
@@ -111,9 +111,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         private void ObjectDestroyed(nint pObject) {
             // Consider the Object as already freed from memory at this point the nint pointer is ID only.
             var removed = _markedObjects.Remove(pObject) || _loadedObjects.Remove(pObject);
-            if (!removed) {
-                _logger.Debug($"Could not remove untracked object: 0x{pObject:X}");
-            }
+            //if (!removed) {
+            //}
 
             SetConsoleTitleObjCount();
         }
@@ -122,11 +121,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             Console.Title = $"Active Objects: {_loadedObjects.Count}, GC Marked Objects: {_markedObjects.Count}";
         }
 
-        //TODO: These patterns need to be swapped in the case of linus OS
-
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, void> UObjectPostInitProperties_Original;
-        [LinuxDetour("48 ? ? 48 8B ? ? 48 ? ? 48 8B 80 A0 03 ? ? BA 01 00 ? ? ? ? 45 ? ? FF ?", DetourType.Stack)]
-        [WindowsDetour("48 83 ? ? 48 ? ? 48 C7 44 24 20 00 00 ? ? 48 8B ? ? 45 ? ? 41 ? ?", DetourType.Stack)]
+        [EngineDetour(EngineFunction.UObject_PostInitProperties, DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void UObjectPostInitProperties(UObject* instance) {
             UObjectPostInitProperties_Original(instance);
@@ -135,8 +131,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         }
 
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, void> UObjectBeginDestroy_Original;
-        [LinuxDetour("53 48 83 ? ? 48 ? ? 66 83 7F ? ? 78 ? 48 8B ? ? 48 89 44 ? ? 48 8D 7C ? ? 48 8D 74 ? ?", DetourType.Stack)]
-        [WindowsDetour("40 ? 48 83 ? ? 8B ? ? 48 ? ? C1 ? ? ? ? 75 ? 48 8B ? ? 48 8D 54", DetourType.Stack)]
+        [EngineDetour(EngineFunction.UObject_BeginDestroy, DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void UObjectBeginDestroy(UObject* instance) {
             UObjectBeginDestroy_Original(instance);
@@ -145,8 +140,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         }
 
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, void> UObjectFinishDestroy_Original;
-        [LinuxDetour("53 48 83 ? ? 48 ? ? F6 47 ? ? 75 ? 48 8B ? ? 48 89 44 ? ? 48 8D 7C ? ?", DetourType.Stack)]
-        [WindowsDetour("40 ? 48 83 ? ? F6 41 ? ? 48 ? ? 75 ? 48 8B ? ? 48 8D 54 ? ? 48 8D 4C", DetourType.Stack)]
+        [EngineDetour(EngineFunction.UObject_FinishDestroy, DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void UObjectFinishDestroy(UObject* instance) {
             _thisInstance?.ObjectDestroyed((nint)instance);

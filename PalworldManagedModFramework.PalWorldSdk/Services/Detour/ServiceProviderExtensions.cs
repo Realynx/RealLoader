@@ -15,8 +15,9 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
                 .AddSingleton<IStackDetourService, StackDetourService>()
                 .AddSingleton<IInstructionPatcher, InstructionPatcher>()
                 .AddSingleton<IDetourManager, DetourManager>()
-                .AddSingleton<IDetourAttributeScanner, DetourAttributeScanner>()
-                .AddSingleton<IShellCodeReader, ShellCodeReader>();
+                .AddSingleton<IDetourAttributeService, DetourAttributeService>()
+                .AddSingleton<IShellCodeReader, ShellCodeReader>()
+                .AddSingleton<IDetourRegistrationService, DetourRegistrationService>();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 serviceDescriptors

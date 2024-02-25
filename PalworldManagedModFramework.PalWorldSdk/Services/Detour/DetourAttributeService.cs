@@ -7,15 +7,16 @@ using PalworldManagedModFramework.Sdk.Services.Detour.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Detour.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Detour {
-    public class DetourAttributeScanner : IDetourAttributeScanner {
+    public class DetourAttributeService : IDetourAttributeService {
         private readonly ILogger _logger;
 
-        public DetourAttributeScanner(ILogger logger) {
+        public DetourAttributeService(ILogger logger) {
             _logger = logger;
         }
 
-        public ManagedDetourInfo? FindDetourInformation(MethodInfo detourMethod) {
+        public ManagedDetourInfo? GetManagedDetourInfo(MethodInfo detourMethod) {
             var detourAttribute = FindDetourAttribute(detourMethod);
+
             var parentFields = detourMethod.DeclaringType!.GetFields(BindingFlags.Public | BindingFlags.Static);
             var delegateField = parentFields.FirstOrDefault(i => i.Name.Equals($"{detourMethod.Name}_Original", StringComparison.OrdinalIgnoreCase));
 
@@ -27,14 +28,14 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
             return null;
         }
 
-        public DetourAttribute FindDetourAttribute(MethodInfo detourMethod) {
+        public DetourAttribute? FindDetourAttribute(MethodInfo detourMethod) {
             var detourAttributes = detourMethod.GetCustomAttributes<DetourAttribute>()
                 ?? throw new Exception($"Method: {detourMethod.Name} does not have a {nameof(DetourAttribute)} attribute.");
 
-            return FindDetourAttribute(detourAttributes);
+            return FindPatternDetourAttribute(detourAttributes);
         }
 
-        public DetourAttribute FindDetourAttribute(IEnumerable<DetourAttribute> patternAttributes) {
+        public DetourAttribute? FindPatternDetourAttribute(IEnumerable<DetourAttribute> patternAttributes) {
             var linuxDetours = patternAttributes.Where(i => i is LinuxDetourAttribute);
             var windowsDetours = patternAttributes.Where(i => i is WindowsDetourAttribute);
             var detours = patternAttributes.Where(i => i is not null and not WindowsDetourAttribute and not LinuxDetourAttribute);
@@ -50,53 +51,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
                 selectedDetourAttribute = detour;
             }
 
-            if (selectedDetourAttribute is null) {
-                throw new Exception("Could not find a valid detour attribute!");
-            }
-
             return selectedDetourAttribute;
-        }
-
-        public ManagedDetourInfo[] FindAllDetourInfos(IEnumerable<Assembly> assemblies) {
-            var foundDetours = new HashSet<ManagedDetourInfo>();
-
-            foreach (var assembly in assemblies) {
-                var types = assembly.GetTypes();
-
-                var allAttributedMethods = new List<MethodInfo>();
-                foreach (var type in types) {
-                    allAttributedMethods.AddRange(SearchAttributes(type));
-                }
-
-                foreach (var methodInfo in allAttributedMethods) {
-                    var detourInfo = FindDetourInformation(methodInfo);
-                    if (detourInfo is null) {
-                        continue;
-                    }
-
-                    foundDetours.Add(detourInfo);
-                }
-            }
-
-            return foundDetours.ToArray();
-        }
-
-        private ICollection<MethodInfo> SearchAttributes(Type type) {
-            var foundAttributeMethods = new List<MethodInfo>();
-
-            if (type.BaseType is not null) {
-                foundAttributeMethods.AddRange(SearchAttributes(type.BaseType));
-            }
-
-            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
-            foreach (var method in methods) {
-                var customAttribute = method.GetCustomAttribute<DetourAttribute>();
-                if (customAttribute is not null) {
-                    foundAttributeMethods.Add(method);
-                }
-            }
-
-            return foundAttributeMethods;
         }
     }
 }

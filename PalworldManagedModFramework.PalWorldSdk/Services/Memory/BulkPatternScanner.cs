@@ -5,7 +5,7 @@ using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory {
-    public class BulkTypePatternScanner : IBulkTypePatternScanner {
+    public class BulkPatternScanner : IBulkPatternScanner {
         private readonly ILogger _logger;
         private readonly IMemoryScanner _memoryScanner;
         private readonly IOperandResolver _operandResolver;
@@ -15,7 +15,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
         private readonly Dictionary<ByteCodePattern, nint> _matchedPatterns = new();
         private readonly Dictionary<MemberInfo, object> _typeInstances = new();
 
-        public BulkTypePatternScanner(ILogger logger, IMemoryScanner memoryScanner, IOperandResolver operandResolver, IPropertyManager propertyManager) {
+        public BulkPatternScanner(ILogger logger, IMemoryScanner memoryScanner, IOperandResolver operandResolver, IPropertyManager propertyManager) {
             _logger = logger;
             _memoryScanner = memoryScanner;
             _operandResolver = operandResolver;
@@ -52,7 +52,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             return false;
         }
 
-        public IBulkTypePatternScanner ScanAll() {
+        public IBulkPatternScanner ScanAll() {
             var allPatterns = _registredPatterns.Values.Where(x => !_matchedPatterns.ContainsKey(x)).ToArray();
             var matchedPatterns = _memoryScanner.SequenceScan(allPatterns)
                 ?? throw new Exception("Could not find any patterns!");

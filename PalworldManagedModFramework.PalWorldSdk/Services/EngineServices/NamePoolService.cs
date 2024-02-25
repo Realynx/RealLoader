@@ -3,7 +3,6 @@
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.GNameStructs;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
-using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 
 namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
     public class NamePoolService : INamePoolService {

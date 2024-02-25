@@ -1,65 +1,62 @@
 ﻿using System.Diagnostics;
 
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.Detour;
+using PalworldManagedModFramework.Sdk.Services.Detour.Extensions;
 using PalworldManagedModFramework.Sdk.Services.Detour.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.EngineServices;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.Memory.Extensions;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.UnrealHook;
-using PalworldManagedModFramework.Sdk.Services.UnrealHook.Interfaces;
 using PalworldManagedModFramework.Services.Interfaces;
 
 namespace PalworldManagedModFramework.Services {
     internal class RuntimeInstaller : IRuntimeInstaller {
 
         private readonly ILogger _logger;
-        private readonly IEnginePattern _enginePattern;
-        private readonly IUObjectFuncs _uObjectFuncs;
-        private readonly IBulkTypePatternScanner _bulkTypePatternScanner;
+        private readonly IBulkPatternScanner _bulkTypePatternScanner;
         private readonly IPropertyManager _propertyManager;
         private readonly IDetourManager _detourManager;
-        private readonly IDetourAttributeScanner _detourAttributeScanner;
-        private readonly IGlobalObjectsTracker _globalObjectsTracker;
-        private readonly IUnrealHookManager _unrealHookManager;
+        private readonly IDetourAttributeService _detourAttributeScanner;
+        private readonly IDetourRegistrationService _detourRegistrationService;
+        private readonly IPropertyRegistrationService _propertyRegistrationService;
 
-        public RuntimeInstaller(ILogger logger, IEnginePattern enginePattern, IUObjectFuncs uObjectFuncs, IBulkTypePatternScanner bulkTypePatternScanner,
-            IPropertyManager propertyManager, IDetourManager detourManager, IDetourAttributeScanner detourAttributeScanner, IGlobalObjectsTracker globalObjectsTracker,
-            IUnrealHookManager unrealHookManager) {
+        public RuntimeInstaller(ILogger logger, IBulkPatternScanner bulkTypePatternScanner, IPropertyManager propertyManager,
+            IDetourManager detourManager, IDetourAttributeService detourAttributeScanner, IDetourRegistrationService detourRegistrationService,
+            IPropertyRegistrationService propertyRegistrationService) {
             _logger = logger;
-            _enginePattern = enginePattern;
-            _uObjectFuncs = uObjectFuncs;
             _bulkTypePatternScanner = bulkTypePatternScanner;
             _propertyManager = propertyManager;
             _detourManager = detourManager;
             _detourAttributeScanner = detourAttributeScanner;
-            _globalObjectsTracker = globalObjectsTracker;
-            _unrealHookManager = unrealHookManager;
+            _detourRegistrationService = detourRegistrationService;
+            _propertyRegistrationService = propertyRegistrationService;
         }
 
         /// <summary>
         /// TODO: Refactor this, it has too many dependencies & responsibilities
         /// </summary>
         public void ScanAndInstallRuntime() {
-            _logger.Debug("Starting Pattern Scan");
+            _detourRegistrationService
+                .FindAndRegisterDetours<GlobalObjectsTracker>()
+                .FindAndRegisterDetours<UnrealHookManager>();
+
+            _propertyRegistrationService
+                .FindAndRegisterProperties<IEnginePattern>()
+                .FindAndRegisterProperties<IUObjectFuncs>();
+
+            _logger.Debug("Starting Bulk Pattern Scan");
             var sw = Stopwatch.StartNew();
+            _bulkTypePatternScanner
+                .ScanAll();
+            sw.Stop();
+            _logger.Debug($"Scanning took {sw.ElapsedMilliseconds} ms.");
 
             _bulkTypePatternScanner
-                .RegisterProperty(_enginePattern.GetType().GetProperty(nameof(_enginePattern.PGUObjectArray)), _enginePattern)
-                .RegisterProperty(_enginePattern.GetType().GetProperty(nameof(_enginePattern.PNamePoolData)), _enginePattern)
-                .RegisterProperty(_uObjectFuncs.GetType().GetProperty(nameof(_uObjectFuncs.GetParentPackage)), _uObjectFuncs)
-
-                .RegisterDetour(_globalObjectsTracker.GetType().GetMethod(nameof(GlobalObjectsTracker.UObjectBeginDestroy)), _detourAttributeScanner)
-                .RegisterDetour(_globalObjectsTracker.GetType().GetMethod(nameof(GlobalObjectsTracker.UObjectFinishDestroy)), _detourAttributeScanner)
-                .RegisterDetour(_unrealHookManager.GetType().GetMethod(nameof(UnrealHookManager.ProcessEvent)), _detourAttributeScanner)
-                .RegisterDetour(_globalObjectsTracker.GetType().GetMethod(nameof(GlobalObjectsTracker.UObjectPostInitProperties)), _detourAttributeScanner)
-
-                .ScanAll()
                 .UpdatePropertyValues(_propertyManager)
                 .PrepareDetours(_detourAttributeScanner, _detourManager)
                 .InstallDetours(_detourManager);
-            sw.Stop();
-            _logger.Debug($"Scanning took {sw.ElapsedMilliseconds} ms.");
         }
     }
 }
