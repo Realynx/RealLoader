@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-using PalworldManagedModFramework.Sdk.Attributes;
+﻿using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
@@ -29,8 +27,6 @@ namespace ExampleMod {
             _unrealEventRegistrationService
                 .FindAndRegisterEvents<Sample>(this)
                 .FindAndRegisterEventHooks<Sample>(this);
-
-
         }
 
         public void Unload() {

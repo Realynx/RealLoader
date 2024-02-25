@@ -1,10 +1,6 @@
-﻿using System;
-
-using Iced.Intel;
+﻿using Iced.Intel;
 
 using PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices.Interfaces;
-
-using static Iced.Intel.AssemblerRegisters;
 
 namespace PalworldManagedModFramework.Sdk.Services.Detour.AssemblerServices {
     public class ShellCodeFactory : IShellCodeFactory {

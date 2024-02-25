@@ -7,6 +7,14 @@ DLL entry point for running C#
 #include <thread>
 #include <filesystem>
 
+PalMM::Util::String FindDotnetDependencyFolder(char* folder) {
+	for (auto& p : std::filesystem::recursive_directory_iterator(".")) {
+		if (!strcmp(p.path().filename().string().c_str(), folder)) {
+			return p.path().string();
+		}
+	}
+}
+
 //runs the CLR thread and DLL
 void RUNCLR()
 {
@@ -17,6 +25,9 @@ void RUNCLR()
 	PalMM::Util::String appPath; appPath.SetCharData(STR("Pal/Binaries/Linux/ManagedModFramework/PalworldManagedModFramework.dll"));
 	PalMM::Util::String configPath; configPath.SetCharData(STR("Pal/Binaries/Linux/ManagedModFramework/PalworldManagedModFramework.runtimeconfig.json"));
 #endif
+
+
+	FindDotnetDependencyFolder("ManagedModFramework");
 
 	PalMM::Util::String fullAppPath; fullAppPath.SetThickCharData(std::filesystem::absolute(appPath.GetCharArray()).string().c_str());
 	PalMM::Util::String fullConfigPath; fullConfigPath.SetThickCharData(std::filesystem::absolute(configPath.GetCharArray()).string().c_str());
@@ -33,6 +44,8 @@ void RUNCLR()
 	//starts the main Assembly
 	host.StartAssembly(fullAppPath.GetWideCharArray());
 }
+
+
 
 std::atomic<bool> clrInitialized{ false };
 void SpawnClrThread() {

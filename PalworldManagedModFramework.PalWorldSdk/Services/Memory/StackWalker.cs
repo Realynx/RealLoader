@@ -36,6 +36,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
                     });
                 }
 
+                // rsp is int*, this is increment 4 bytes
                 rsp++;
             }
 
