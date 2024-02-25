@@ -44,12 +44,12 @@ void RUNCLR()
 	//configPath.SetCharData(STR("Pal/Binaries/Linux/ManagedModFramework/PalworldManagedModFramework.runtimeconfig.json"));
 #endif
 
-	//PalMM::Util::String fullAppPath; fullAppPath.SetThickCharData(std::filesystem::absolute(appPath.GetCharArray()).string().c_str());
-	//PalMM::Util::String fullConfigPath; fullConfigPath.SetThickCharData(std::filesystem::absolute(configPath.GetCharArray()).string().c_str());
+	PalMM::Util::String fullAppPath; fullAppPath.SetThickCharData(std::filesystem::absolute(appPath.GetCharArray()).string().c_str());
+	PalMM::Util::String fullConfigPath; fullConfigPath.SetThickCharData(std::filesystem::absolute(configPath.GetCharArray()).string().c_str());
 
 	//init the CLR
 	CLR::CLRHost host;
-	if (!host.Init(configPath.GetWideCharArray())) {
+	if (!host.Init(fullConfigPath.GetWideCharArray())) {
 		std::cout << "Failed To Init Host" << std::endl;
 		return;
 	}
@@ -57,7 +57,7 @@ void RUNCLR()
 	std::cout << "Finished Initializing CLR" << std::endl;
 
 	//starts the main Assembly
-	host.StartAssembly(appPath.GetWideCharArray());
+	host.StartAssembly(fullAppPath.GetWideCharArray());
 }
 
 
