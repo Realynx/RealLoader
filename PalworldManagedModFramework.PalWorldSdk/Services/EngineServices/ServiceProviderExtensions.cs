@@ -13,9 +13,9 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             serviceDescriptors
                 .AddSingleton<IGlobalObjectsTracker, GlobalObjectsTracker>()
                 .AddSingleton<IUnrealReflection, UnrealReflection>()
-                .AddSingleton<IGlobalObjects, GlobalObjects>()
                 .AddSingleton<INamePoolService, NamePoolService>()
-                .AddSingleton<IPropertyRegistrationService, PropertyRegistrationService>();
+                .AddSingleton<IPropertyRegistrationService, PropertyRegistrationService>()
+                .AddSingleton<IGlobalObjects, GlobalObjects>();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 serviceDescriptors

@@ -38,7 +38,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         /// </summary>
         /// <param name="unrealEvent"></param>
         [EngineEvent("^WBP_TItle_C::OnInitialized")]
-        public unsafe void OnInitialized(UnrealEvent unrealEvent) {
+        public unsafe void OnInitialized(UnrealEvent _) {
             _synchronized = true;
             if (_synchronized) {
                 return;
@@ -53,7 +53,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         /// </summary>
         /// <param name="unrealEvent"></param>
         [EngineEvent("^PalStaticLogCollector::OnEndedWorldAutoSave")]
-        public unsafe void OnEndedWorldAutoSave(UnrealEvent unrealEvent) {
+        public unsafe void OnEndedWorldAutoSave(UnrealEvent _) {
             _synchronized = true;
             if (_synchronized) {
                 return;
@@ -126,7 +126,6 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void UObjectPostInitProperties(UObject* instance) {
             UObjectPostInitProperties_Original(instance);
-
             _thisInstance?.ObjectLoaded((nint)instance);
         }
 
@@ -135,7 +134,6 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void UObjectBeginDestroy(UObject* instance) {
             UObjectBeginDestroy_Original(instance);
-
             _thisInstance?.ObjectDestroying((nint)instance);
         }
 
@@ -144,7 +142,6 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void UObjectFinishDestroy(UObject* instance) {
             _thisInstance?.ObjectDestroyed((nint)instance);
-
             UObjectFinishDestroy_Original(instance);
         }
     }

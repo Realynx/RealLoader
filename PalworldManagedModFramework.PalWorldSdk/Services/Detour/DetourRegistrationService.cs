@@ -14,24 +14,28 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour {
         private readonly IDetourAttributeService _detourAttributeService;
         private readonly IEnginePattern _enginePattern;
         private readonly IBulkPatternScanner _bulkPatternScanner;
+        private readonly IServiceProvider _serviceProvider;
 
         public DetourRegistrationService(ILogger logger, IDetourAttributeService detourAttributeService,
-            IEnginePattern enginePattern, IBulkPatternScanner bulkPatternScanner) {
+            IEnginePattern enginePattern, IBulkPatternScanner bulkPatternScanner, IServiceProvider serviceProvider) {
             _logger = logger;
             _detourAttributeService = detourAttributeService;
             _enginePattern = enginePattern;
             _bulkPatternScanner = bulkPatternScanner;
+            _serviceProvider = serviceProvider;
         }
 
         public IDetourRegistrationService FindAndRegisterDetours<TType>() {
             var parentType = typeof(TType);
+
             var methods = parentType.GetMethods(BindingFlags.Static | BindingFlags.Public);
 
             var validDetourInfos = FindDetourInfos(methods);
             foreach (var detourInfo in validDetourInfos) {
                 var pattern = detourInfo.DetourAttribute switch {
                     PatternDetourAttribute patternDetourAttribute => patternDetourAttribute.Pattern,
-                    EngineDetourAttribute engineDetourAttribute => GetEnginePattern(engineDetourAttribute)
+                    EngineDetourAttribute engineDetourAttribute => GetEnginePattern(engineDetourAttribute),
+                    _ => null
                 };
 
                 if (pattern is null) {

@@ -3,6 +3,7 @@ using PalworldManagedModFramework.Models.Config;
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Services.AssemblyLoading.Interfaces;
 using PalworldManagedModFramework.Services.Interfaces;
 using PalworldManagedModFramework.Services.SandboxDI.Interfaces;
@@ -14,15 +15,17 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
         private readonly ModLoaderConfig _modLoaderConfig;
         private readonly IRuntimeInstaller _runtimeInstaller;
         private readonly ISandboxDIService _sandboxDIService;
+        private readonly IGlobalObjectsTracker _globalObjectsTracker;
         private readonly HashSet<LoadedMod> _loadedMods = [];
 
         public ModLoader(ILogger logger, IAssemblyDiscovery assemblyDiscovery, ModLoaderConfig modLoaderConfig,
-            IRuntimeInstaller runtimeInstaller, ISandboxDIService sandboxDIService) {
+            IRuntimeInstaller runtimeInstaller, ISandboxDIService sandboxDIService, IGlobalObjectsTracker globalObjectsTracker) {
             _logger = logger;
             _assemblyDiscovery = assemblyDiscovery;
             _modLoaderConfig = modLoaderConfig;
             _runtimeInstaller = runtimeInstaller;
             _sandboxDIService = sandboxDIService;
+            _globalObjectsTracker = globalObjectsTracker;
         }
 
         public void LoadMods() {
