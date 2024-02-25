@@ -22,11 +22,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
         }
 
         public void RegisterExistingAssembly(Assembly assembly) {
-            throw new NotImplementedException();
+            // throw new NotImplementedException();
         }
 
         public void AppendFile(StringBuilder code, string assemblyName, string nameSpace) {
-            throw new NotImplementedException();
             var namespaceDirectories = Path.Combine(nameSpace.Split('.', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
             var directory = Path.Combine(_buildLocation, "source", namespaceDirectories);
             if (Directory.Exists(directory)) {
