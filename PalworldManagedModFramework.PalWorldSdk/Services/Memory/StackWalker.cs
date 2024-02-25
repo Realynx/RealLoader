@@ -20,7 +20,9 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
 
             var rsp = stackPointer;
             var rbp = stackPointer + 2048;
-            var memoryRegions = _memoryMapper.FindMemoryRegions().Where(i => i.ExecuteFlag);
+            var memoryRegions = _memoryMapper.FindMemoryRegions()
+                .Where(i => i.ExecuteFlag)
+                .ToArray();
 
             var stackFrameList = new List<CustomStackFrame>();
             while (rsp < rbp && stackFrameList.Count <= frames) {

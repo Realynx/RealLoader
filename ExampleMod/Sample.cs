@@ -29,6 +29,8 @@ namespace ExampleMod {
             _unrealEventRegistrationService
                 .FindAndRegisterEvents<Sample>(this)
                 .FindAndRegisterEventHooks<Sample>(this);
+
+
         }
 
         public void Unload() {
