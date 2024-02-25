@@ -126,5 +126,14 @@ namespace PalMM::Util
         inline const char* GetCharArray() { return charData.c_str(); }
 
 #endif
+
+        //Constructor
+        String() {}
+
+        //Constructor
+        String(const std::string& str)
+        {
+            SetThickCharData(str.c_str());
+        }
     };
 }

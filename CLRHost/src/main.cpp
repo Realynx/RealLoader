@@ -7,9 +7,9 @@ DLL entry point for running C#
 #include <thread>
 #include <filesystem>
 
-PalMM::Util::String FindDotnetDependencyFolder(char* folder) {
+PalMM::Util::String FindDotnetDependencyFolder(char* folderName) {
 	for (auto& p : std::filesystem::recursive_directory_iterator(".")) {
-		if (!strcmp(p.path().filename().string().c_str(), folder)) {
+		if (!strcmp(p.path().filename().string().c_str(), folderName)) {
 			return p.path().string();
 		}
 	}
