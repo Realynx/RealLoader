@@ -18,7 +18,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
 
         public OnDiskCompiler(ILogger logger, string buildLocation) {
             _logger = logger;
-            _buildLocation = buildLocation;
+            _buildLocation = Path.Combine(buildLocation, "source");
         }
 
         public void RegisterExistingAssembly(Assembly assembly) {
@@ -27,17 +27,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
 
         public void AppendFile(StringBuilder code, string assemblyName, string nameSpace) {
             var namespaceDirectories = Path.Combine(nameSpace.Split('.', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
-            var directory = Path.Combine(_buildLocation, "source", namespaceDirectories);
+            var directory = Path.Combine(_buildLocation, namespaceDirectories);
             if (Directory.Exists(directory)) {
                 Directory.Delete(directory, true);
             }
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
-                Directory.CreateDirectory(directory);
-            }
-            else {
-                Directory.CreateDirectory(directory, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
-            }
+            CreateDirectory(directory);
 
             var filePath = Path.Combine(directory, $"{nameSpace}.cs");
             if (File.Exists(filePath)) {
@@ -49,6 +44,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
 
             _writtenFiles.Add(filePath);
             // _logger.Debug($"Wrote code file {filePath}");
+        }
+
+        private void CreateDirectory(string directory) {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                Directory.CreateDirectory(directory);
+            }
+            else {
+                Directory.CreateDirectory(directory, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+            }
         }
 
         public void Compile() {

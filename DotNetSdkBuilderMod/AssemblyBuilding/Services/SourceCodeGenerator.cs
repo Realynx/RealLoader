@@ -45,21 +45,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             codeCompiler.Compile();
         }
 
-        private void TraverseNodes(CodeGenNamespaceNode namespaceNode, ICodeCompiler codeCompiler, string assemblyName) {
-            var classFile = new StringBuilder();
-
-            _fileGenerator.GenerateFile(classFile, namespaceNode);
-            if (classFile.Length > 0) {
-                codeCompiler.AppendFile(classFile, assemblyName, namespaceNode.fullName);
-            }
-
-            if (namespaceNode.namespaces is not null) {
-                foreach (var node in namespaceNode.namespaces) {
-                    TraverseNodes(node, codeCompiler, assemblyName);
-                }
-            }
-        }
-
         private ClassNode TimeObjectTreeBuilder() {
             var time = _functionTimingService.Execute(_reflectedGraphBuilder.BuildRootNode, out var treeGraph);
 
@@ -101,6 +86,21 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             });
 
             _logger.Debug($"Sdk code; {time.TotalMilliseconds:F1} ms to generate.");
+        }
+
+        private void TraverseNodes(CodeGenNamespaceNode namespaceNode, ICodeCompiler codeCompiler, string assemblyName) {
+            var classFile = new StringBuilder();
+
+            _fileGenerator.GenerateFile(classFile, namespaceNode);
+            if (classFile.Length > 0) {
+                codeCompiler.AppendFile(classFile, assemblyName, namespaceNode.fullName);
+            }
+
+            if (namespaceNode.namespaces is not null) {
+                foreach (var node in namespaceNode.namespaces) {
+                    TraverseNodes(node, codeCompiler, assemblyName);
+                }
+            }
         }
     }
 }

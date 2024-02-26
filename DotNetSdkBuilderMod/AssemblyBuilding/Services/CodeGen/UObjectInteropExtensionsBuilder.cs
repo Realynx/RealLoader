@@ -76,7 +76,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             };
 
             var attributes = new[] {
-                _attributeNodeFactory.GenerateAttribute("CompilerGenerated")
+                _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)
             };
 
             return new CodeGenMethodNode {
@@ -131,7 +131,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             };
 
             var attributes = new[] {
-                _attributeNodeFactory.GenerateAttribute("CompilerGenerated")
+                _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)
             };
 
             return new CodeGenMethodNode {

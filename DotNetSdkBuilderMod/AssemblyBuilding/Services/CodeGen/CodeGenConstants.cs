@@ -66,6 +66,8 @@
         internal const string CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME = "globalObjectsTracker";
         internal const string OPERATOR_THIS_CLASS_NAME = "self"; // I don't like this but I can't think of anything better
         internal const string FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE = "FullTypePath";
+        internal const string ORIGINAL_TYPE_NAME_ATTRIBUTE = "OriginalTypeName";
+        internal const string ORIGINAL_MEMBER_NAME_ATTRIBUTE = "OriginalMemberName";
         internal const string COMPATIBLE_GAME_VERSION_ATTRIBUTE = "CompatibleGameVersion";
         internal const string DEPRECATED_ATTRIBUTE = "Obsolete";
         internal const char INDENT = ' ';

@@ -15,31 +15,29 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private readonly INamePoolService _namePoolService;
         private readonly IUnrealReflection _unrealReflection;
         private readonly INameCollisionService _nameCollisionService;
+        private readonly ICodeGenAttributeNodeFactory _attributeNodeFactory;
 
         public CodeGenMethodNodeFactory(ILogger logger, INamePoolService namePoolService, IUnrealReflection unrealReflection,
-            INameCollisionService nameCollisionService) {
+            INameCollisionService nameCollisionService, ICodeGenAttributeNodeFactory attributeNodeFactory) {
             _logger = logger;
             _namePoolService = namePoolService;
             _unrealReflection = unrealReflection;
             _nameCollisionService = nameCollisionService;
+            _attributeNodeFactory = attributeNodeFactory;
         }
 
         public unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method, Index methodIndex) {
-            string modifiers;
-            // Cannot make methods static because they rely on the object address
-            // if (method->functionFlags.HasFlag(EFunctionFlags.FUNC_Static)) {
-            //     modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}";
-            // }
-            // else {
-            modifiers = $"{PUBLIC}";
-            // }
+            var modifiers = PUBLIC;
 
+            var nonSanitizedMethodName = _namePoolService.GetSanitizedNameString(method->baseUstruct.ObjectName);
             var methodName = _namePoolService.GetSanitizedNameString(method->baseUstruct.ObjectName);
             if (char.IsDigit(methodName[0])) {
                 methodName = $"_{methodName}";
             }
 
-            CodeGenAttributeNode[]? attributes = null;
+            var attributes = new [] {
+                _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedMethodName}{QUOTE}")
+            };
 
             var parameters = _unrealReflection.GetFunctionSignature(method, out var returnValue, out var returnValueIndex);
             string returnType;
