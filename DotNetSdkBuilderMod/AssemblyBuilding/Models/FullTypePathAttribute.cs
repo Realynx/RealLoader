@@ -1,4 +1,5 @@
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
+    [AttributeUsage(AttributeTargets.Class)]
     public class FullTypePathAttribute : Attribute {
         public FullTypePathAttribute(string path) {
             Path = path;
