@@ -69,6 +69,7 @@
         internal const string ORIGINAL_TYPE_NAME_ATTRIBUTE = "OriginalTypeName";
         internal const string ORIGINAL_MEMBER_NAME_ATTRIBUTE = "OriginalMemberName";
         internal const string COMPATIBLE_GAME_VERSION_ATTRIBUTE = "CompatibleGameVersion";
+        internal const string COMPILER_GENERATED_ATTRIBUTE = "CompilerGenerated";
         internal const string DEPRECATED_ATTRIBUTE = "Obsolete";
         internal const char INDENT = ' ';
         internal const int INDENT_SIZE = 4;
