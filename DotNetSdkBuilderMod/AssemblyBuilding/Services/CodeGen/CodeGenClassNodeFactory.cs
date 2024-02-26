@@ -38,7 +38,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             // TODO: Gather constructors
             if (true) {
                 var constructors = new List<CodeGenConstructorNode> {
-                    _constructorNodeFactory.GenerateDefaultConstructor(classNode, className)
+                    _constructorNodeFactory.GenerateDefaultConstructor(className)
                 };
                 // constructors.Add(GenerateCodeGenConstructorNode());
                 classConstructors = constructors.ToArray();
@@ -139,6 +139,28 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
 
             return IsClassOrBaseClass(otherClasName, *baseClass);
+        }
+
+        public CodeGenClassNode GenerateCustomClass(string name, string baseType) {
+            var constructors = new[] {
+                _constructorNodeFactory.GenerateDefaultConstructor(name)
+            };
+
+            var modifiers = PUBLIC;
+
+            var attributes = new[] {
+                _attributeNodeFactory.GenerateAttribute("CompilerGenerated")
+            };
+
+            var baseClassName = string.IsNullOrWhiteSpace(baseType) ? null : baseType;
+
+            return new CodeGenClassNode {
+                constructorNodes = constructors,
+                modifier = modifiers,
+                name = name,
+                attributes = attributes,
+                baseType = baseClassName,
+            };
         }
     }
 }

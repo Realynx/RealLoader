@@ -203,9 +203,24 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 var namespaceNode = namespacesMemo[nameSpace];
                 var codeGenClassNodes = new CodeGenClassNode[classNodes.Count];
 
-                for (var i = 0; i < classNodes.Count; i++) {
-                    var currentClassNode = classNodes[i];
-                    codeGenClassNodes[i] = _classNodeFactory.GenerateCodeGenClassNode(currentClassNode, castFlagNames);
+                var i = 0;
+                foreach (var classNode in classNodes) {
+                    var generatedClassNode = _classNodeFactory.GenerateCodeGenClassNode(classNode, castFlagNames);
+                    codeGenClassNodes[i] = generatedClassNode;
+
+                    if (generatedClassNode.name is "ClassProperty") {
+                        i++;
+                        Array.Resize(ref codeGenClassNodes, codeGenClassNodes.Length + 1);
+                        codeGenClassNodes[i] = _classNodeFactory.GenerateCustomClass("ClassPtrProperty", generatedClassNode.name);
+                    }
+
+                    if (generatedClassNode.name is "ObjectProperty") {
+                        i++;
+                        Array.Resize(ref codeGenClassNodes, codeGenClassNodes.Length + 1);
+                        codeGenClassNodes[i] = _classNodeFactory.GenerateCustomClass("FieldPathProperty", generatedClassNode.name);
+                    }
+
+                    i++;
                 }
 
                 namespaceNode.classes = codeGenClassNodes;

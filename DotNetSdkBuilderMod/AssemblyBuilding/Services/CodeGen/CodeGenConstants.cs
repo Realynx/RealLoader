@@ -20,6 +20,7 @@
         internal const string PLUS = "+";
         internal const string LAMBDA = "=>";
         internal const string EQUALS = "=";
+        internal const string POUND = "#";
         internal const string VALUE = "value";
         //internal const string NEW_LINE = "\n"; // or Environment.NewLine for OS-specific new lines
         //internal const string TAB = "\t"; // or use "    " for spaces, depending on your coding standards
@@ -48,6 +49,11 @@
         internal const string THIS = "this";
         internal const string RETURN = "return";
         internal const string DELEGATE = "delegate";
+        internal const string PRAGMA = "pragma";
+        internal const string WARNING = "warning";
+        internal const string DISABLE = "disable";
+        internal const string ENABLE = "enable";
+        internal const string ADDRESS_OF_MANAGED_TYPE_WARNING_CODE = "CS8500";
         internal const string CODE_NAMESPACE = "DotNetSdkBuilderMod.Generated";
         internal const string CODE_GEN_INTEROP_NAMESPACE = "CodeGenInterop";
         internal const string CODE_GEN_INTEROP_RETURN_VALUE_NAME = "__returnValue";
