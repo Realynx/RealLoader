@@ -29,6 +29,7 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
                 if (retry > 5) {
                     throw new Exception($"Unable to suspend thread: {thread.Id}");
                 }
+
                 var pOpenThread = NativeFunctions.OpenThread(NativeFunctions.ThreadAccess.SUSPEND_RESUME, false, thread.Id);
                 if (pOpenThread.IsNil) {
                     return;
