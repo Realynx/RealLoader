@@ -1,11 +1,18 @@
 ﻿using System.Diagnostics;
 using System.Runtime.Versioning;
 
+using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
 
 namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
     [SupportedOSPlatform("windows")]
     public class WindowsProcessSuspender : IProcessSuspender {
+        private readonly ILogger _logger;
+
+        public WindowsProcessSuspender(ILogger logger) {
+            _logger = logger;
+        }
+
         public void PauseSelf() {
             var currentProcess = Process.GetCurrentProcess();
             var currentThread = NativeFunctions.GetCurrentThreadId();

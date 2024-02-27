@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services.Memory.Interfaces;
@@ -14,15 +13,15 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
         }
 
         public nint[][] ScanMemoryRegions(ByteCodePattern[] patterns, IEnumerable<MemoryRegion> memoryRegions) {
-            var foundPatternsOrdred = new List<nint>[patterns.Length];
-            InitLists(foundPatternsOrdred);
+            var foundPatternsOrdered = new List<nint>[patterns.Length];
+            InitLists(foundPatternsOrdered);
 
             Parallel.ForEach(memoryRegions, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (scanRegion) => {
                 var foundAddresses = ScanMemoryRegionImpl(patterns, scanRegion);
-                AppendFoundAddresses(foundPatternsOrdred, foundAddresses);
+                AppendFoundAddresses(foundPatternsOrdered, foundAddresses);
             });
 
-            return foundPatternsOrdred.Select(i => i.ToArray()).ToArray();
+            return foundPatternsOrdered.Select(i => i.ToArray()).ToArray();
         }
 
         public nint[][] ScanMemoryRegion(ByteCodePattern[] patterns, MemoryRegion memoryRegion) {
@@ -68,15 +67,15 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory {
             return foundSequencesPerPattern;
         }
 
-        private static void InitLists(List<nint>[] foundPatternsOrdred) {
-            for (var x = 0; x < foundPatternsOrdred.Length; x++) {
-                foundPatternsOrdred[x] = new List<nint>();
+        private static void InitLists(List<nint>[] foundPatternsOrdered) {
+            for (var x = 0; x < foundPatternsOrdered.Length; x++) {
+                foundPatternsOrdered[x] = new List<nint>();
             }
         }
 
-        private static void AppendFoundAddresses(List<nint>[] foundPatternsOrdred, List<nint>[] foundAddresses) {
-            for (var x = 0; x < foundPatternsOrdred.Length; x++) {
-                foundPatternsOrdred[x].AddRange(foundAddresses[x]);
+        private static void AppendFoundAddresses(List<nint>[] foundPatternsOrdered, List<nint>[] foundAddresses) {
+            for (var x = 0; x < foundPatternsOrdered.Length; x++) {
+                foundPatternsOrdered[x].AddRange(foundAddresses[x]);
             }
         }
     }
