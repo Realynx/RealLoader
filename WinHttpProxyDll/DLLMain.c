@@ -80,24 +80,13 @@ void PopulateFunctionTable()
 	g_FunctionTable[ 69 ] = GetProcAddress( OriginalModule, "WinHttpWriteProxySettings" );
 }
 
-
-void CheckModdedLaunchFlag()
-{
-	LPWSTR lpwCmdLine = GetCommandLineW();
-	LPWSTR moddedFlag = L"-modded";
-	if (wcsstr(lpwCmdLine, moddedFlag) != NULL) {
-		LoadLibraryA("ManagedModFramework\\CLRHost.Dll");
-	}
-}
-
 DWORD WINAPI ProcessAttach(_In_ LPVOID Parameter)
 {
 	if ( Parameter == NULL )
 		return FALSE;
 
+	LoadLibraryA("ManagedModFramework\\CLRHost.dll");
 	PopulateFunctionTable();
-	CheckModdedLaunchFlag();
-
 	return TRUE;
 }
 

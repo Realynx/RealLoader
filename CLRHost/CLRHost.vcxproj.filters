@@ -16,5 +16,6 @@
     <ClInclude Include="src\coreclr_delegates.h" />
     <ClInclude Include="src\hostfxr.h" />
     <ClInclude Include="src\nethost.h" />
+    <ClInclude Include="src\cxxopts.hpp" />
   </ItemGroup>
 </Project>

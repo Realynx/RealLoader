@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClInclude Include="src\CLR.hpp" />
     <ClInclude Include="src\coreclr_delegates.h" />
+    <ClInclude Include="src\cxxopts.hpp" />
     <ClInclude Include="src\hostfxr.h" />
     <ClInclude Include="src\nethost.h" />
   </ItemGroup>
