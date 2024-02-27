@@ -12,8 +12,6 @@ namespace PalworldManagedModFramework {
         internal delegate void VoidDelegateSignature();
 
         public static void EntryPoint() {
-            var launchArgs = Environment.GetCommandLineArgs();
-
             Console.OutputEncoding = Encoding.UTF8;
 
             AppDomainMonitor.MonitorDomain();

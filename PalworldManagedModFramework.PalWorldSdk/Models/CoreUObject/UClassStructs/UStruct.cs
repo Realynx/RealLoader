@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 
-using PalworldManagedModFramework.Sdk.Models.CoreUObject;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.GNameStructs;
 
 namespace PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs {
