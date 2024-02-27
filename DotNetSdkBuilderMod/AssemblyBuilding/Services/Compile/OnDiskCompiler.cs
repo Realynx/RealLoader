@@ -12,10 +12,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
     public class OnDiskCompiler : ICodeCompiler {
         private readonly ILogger _logger;
         private readonly string _sourceLocation;
+        private readonly bool _displayCompilerOutput;
 
-        public OnDiskCompiler(ILogger logger, string buildLocation) {
+        public OnDiskCompiler(ILogger logger, string buildLocation, bool displayCompilerOutput) {
             _logger = logger;
             _sourceLocation = Path.Combine(buildLocation, "source");
+            _displayCompilerOutput = displayCompilerOutput;
         }
 
         public void RegisterExistingAssembly(Assembly assembly) {
@@ -79,9 +81,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
                 FileName = "dotnet",
                 Arguments = $"build \"{solutionPath}\"", // -p:{CodeGenConstants.BUILD_OUTPUT_ENVIRONMENT_VARIABLE}=\"{_buildLocation}\"",
                 UseShellExecute = false,
-#if !DEBUG
-                CreateNoWindow = true,
-#endif
+                CreateNoWindow = !_displayCompilerOutput,
             };
 
             var buildProcess = Process.Start(startInfo);
@@ -90,6 +90,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
             }
 
             buildProcess.WaitForExit();
+
+            try {
+                // For some reason...
+                buildProcess.Kill();
+            }
+            catch {
+                // ignored
+            }
 
             if (buildProcess.ExitCode is not 0) {
                 _logger.Error($".NET SDK exited with code {buildProcess.ExitCode}.");

@@ -20,7 +20,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
                 return new InMemoryCompiler(_logger, buildLocation);
             }
 
-            return new OnDiskCompiler(_logger, buildLocation);
+            return new OnDiskCompiler(_logger, buildLocation, _compilerConfig.DisplayCompilerOutput);
         }
     }
 }

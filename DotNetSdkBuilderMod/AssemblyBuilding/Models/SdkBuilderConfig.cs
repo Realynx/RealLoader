@@ -9,5 +9,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
 
         public bool BuildInMemory { get; set; }
         public string BuildLocation { get; set; }
+        public bool DisplayCompilerOutput { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 {
   "SdkBuilderConfig": {
     "BuildInMemory": false,
-    "BuildLocation": "Sdk/"
+    "BuildLocation": "Sdk/",
+    "DisplayCompilerOutput": false
   }
 }
