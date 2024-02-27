@@ -1,4 +1,4 @@
-namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
+namespace PalworldManagedModFramework.Sdk.Models {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
     public class OriginalMemberNameAttribute : Attribute {
         public OriginalMemberNameAttribute(string name) {

@@ -1,4 +1,4 @@
-namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
+namespace PalworldManagedModFramework.Sdk.Models {
     [AttributeUsage(AttributeTargets.Class)]
     public class FullTypePathAttribute : Attribute {
         public FullTypePathAttribute(string path) {
