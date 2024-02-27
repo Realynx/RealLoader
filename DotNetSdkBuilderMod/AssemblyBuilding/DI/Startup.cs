@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using PalworldManagedModFramework.Sdk.Interfaces;
+using PalworldManagedModFramework.Sdk.Services;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
     public class Startup : ISbStartup {

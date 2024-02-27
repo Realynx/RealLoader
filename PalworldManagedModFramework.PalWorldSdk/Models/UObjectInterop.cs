@@ -2,7 +2,7 @@ using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
 
-namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
+namespace PalworldManagedModFramework.Sdk.Models {
     public abstract class UObjectInterop {
         private readonly IUnrealReflection _unrealReflection;
         private readonly IGlobalObjectsTracker _globalObjectsTracker;

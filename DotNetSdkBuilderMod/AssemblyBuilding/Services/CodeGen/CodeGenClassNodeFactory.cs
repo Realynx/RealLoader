@@ -3,6 +3,7 @@ using System.Text;
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
+using PalworldManagedModFramework.Sdk.Models;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.Flags;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;

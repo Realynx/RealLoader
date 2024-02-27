@@ -1,9 +1,8 @@
-using DotNetSdkBuilderMod.AssemblyBuilding.Models;
-
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Models;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
-namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
+namespace PalworldManagedModFramework.Sdk.Services {
     public class UObjectFactory {
         private static UObjectFactory? _singleInstance;
 
