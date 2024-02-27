@@ -1,7 +1,9 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
+using DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
@@ -37,10 +39,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 var fullBranchNamespace = $"{previousNamespace}/{rootLevel[x]}";
                 var branchNamespace = rootLevel[x];
 
+                var fullNamespace = fullBranchNamespace
+                    .TrimStart('/')
+                    .Replace('.', '_')
+                    .Replace('/', '.');
                 currentNode.namespaces[x] = new CodeGenNamespaceNode {
                     packageName = fullBranchNamespace,
-                    fullName = fullBranchNamespace.Replace('.', '_').TrimStart('/').Replace('/', '.'),
-                    name = branchNamespace
+                    fullName = $"{CodeGenConstants.CODE_NAMESPACE}.{fullNamespace}",
                 };
 
                 var nameSpacePrefix = $"/{branchNamespace}/";
@@ -74,7 +79,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(memo, className, out var previouslyExisted);
 
             if (!previouslyExisted) {
-                value = currentNode.packageName;
+                value = new StringBuilder(currentNode.packageName)
+                    .Replace('/', '.')
+                    .Insert(0, CodeGenConstants.CODE_NAMESPACE)
+                    .ToString();
             }
 
             foreach (var child in currentNode.children) {

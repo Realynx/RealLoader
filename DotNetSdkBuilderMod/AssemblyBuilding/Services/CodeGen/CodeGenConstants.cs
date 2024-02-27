@@ -20,6 +20,11 @@
         internal const string PLUS = "+";
         internal const string LAMBDA = "=>";
         internal const string EQUALS = "=";
+        internal const string POUND = "#";
+        internal const string FORWARD_SLASH = "/";
+        internal const string BACK_SLASH = "/";
+        internal const string TRUE = "true";
+        internal const string FALSE = "false";
         internal const string VALUE = "value";
         //internal const string NEW_LINE = "\n"; // or Environment.NewLine for OS-specific new lines
         //internal const string TAB = "\t"; // or use "    " for spaces, depending on your coding standards
@@ -48,7 +53,39 @@
         internal const string THIS = "this";
         internal const string RETURN = "return";
         internal const string DELEGATE = "delegate";
-        internal const string CODE_NAMESPACE = "DotNetSdkBuilderMod.Generated";
+        internal const string PRAGMA = "pragma";
+        internal const string WARNING = "warning";
+        internal const string DISABLE = "disable";
+        internal const string ENABLE = "enable";
+        internal const string CSPROJ = "csproj";
+        internal const string PROJECT = "Project";
+        internal const string SDK = "Sdk";
+        internal const string SDK_VALUE = "Microsoft.NET.Sdk";
+        internal const string PROPERTY_GROUP = "PropertyGroup";
+        internal const string ITEM_GROUP = "ItemGroup";
+        internal const string TARGET = "Target";
+        internal const string COPY_ITEMS = "_CopyItems";
+        internal const string COPY = "Copy";
+        internal const string BUILD_OUTPUT_ENVIRONMENT_VARIABLE = "BuildDestinationDirectory";
+        internal const string TARGET_FRAMEWORK = "TargetFramework";
+        internal const string TARGET_FRAMEWORK_VALUE = "net8.0";
+        internal const string ALLOW_UNSAFE_BLOCKS = "AllowUnsafeBlocks";
+        internal const string IMPLICIT_USINGS = "ImplicitUsings";
+        internal const string REFERENCE = "Reference";
+        internal const string PROJECT_REFERENCE = "ProjectReference";
+        internal const string INCLUDE = "Include";
+        internal const string ADDRESS_OF_MANAGED_TYPE_WARNING_CODE = "CS8500";
+        internal const string END_PROJECT = "EndProject";
+        internal const string GLOBAL = "Global";
+        internal const string END_GLOBAL = "EndGlobal";
+        internal const string GLOBAL_SECTION = "GlobalSection";
+        internal const string END_GLOBAL_SECTION = "EndGlobalSection";
+        internal const string PRE_SOLUTION = "preSolution";
+        internal const string POST_SOLUTION = "postSolution";
+        internal const string SOLUTION_CONFIGURATION_PLATFORMS = "SolutionConfigurationPlatforms";
+        internal const string PROJECT_CONFIGURATION_PLATFORMS = "ProjectConfigurationPlatforms";
+        internal const string CODE_SOLUTION_NAME = "GeneratedSdk";
+        internal const string CODE_NAMESPACE = "GeneratedSdk";
         internal const string CODE_GEN_INTEROP_NAMESPACE = "CodeGenInterop";
         internal const string CODE_GEN_INTEROP_RETURN_VALUE_NAME = "__returnValue";
         internal const string CODE_GEN_INTEROP_INVOKE_METHOD_NAME = "Invoke";
@@ -60,8 +97,12 @@
         internal const string CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME = "globalObjectsTracker";
         internal const string OPERATOR_THIS_CLASS_NAME = "self"; // I don't like this but I can't think of anything better
         internal const string FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE = "FullTypePath";
+        internal const string ORIGINAL_TYPE_NAME_ATTRIBUTE = "OriginalTypeName";
+        internal const string ORIGINAL_MEMBER_NAME_ATTRIBUTE = "OriginalMemberName";
         internal const string COMPATIBLE_GAME_VERSION_ATTRIBUTE = "CompatibleGameVersion";
+        internal const string COMPILER_GENERATED_ATTRIBUTE = "CompilerGenerated";
         internal const string DEPRECATED_ATTRIBUTE = "Obsolete";
+        internal const char TAB = '\t';
         internal const char INDENT = ' ';
         internal const int INDENT_SIZE = 4;
     }

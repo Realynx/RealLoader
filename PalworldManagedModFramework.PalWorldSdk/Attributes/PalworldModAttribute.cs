@@ -1,18 +1,30 @@
 ﻿namespace PalworldManagedModFramework.Sdk.Attributes {
+    [AttributeUsage(AttributeTargets.Class)]
     public class PalworldModAttribute : Attribute {
-        public PalworldModAttribute(string modName, string author, string discordAlias, string semanticVersion, PalworldModType modType) {
+        public PalworldModAttribute(string modName, string author, string contactInfo, string semanticVersion, PalworldModType modType, string? repositoryUrl = null) {
             ModName = modName;
-            Author = author;
-            DiscordAlias = discordAlias;
+            Authors = [author];
+            ContactInfo = contactInfo;
             SemanticVersion = semanticVersion;
             ModType = modType;
+            RepositoryUrl = repositoryUrl;
+        }
+
+        public PalworldModAttribute(string modName, string[] authors, string contactInfo, string semanticVersion, PalworldModType modType, string? repositoryUrl = null) {
+            ModName = modName;
+            Authors = authors;
+            ContactInfo = contactInfo;
+            SemanticVersion = semanticVersion;
+            ModType = modType;
+            RepositoryUrl = repositoryUrl;
         }
 
         public string ModName { get; }
-        public string Author { get; }
-        public string DiscordAlias { get; }
+        public string[] Authors { get; }
+        public string ContactInfo { get; }
         public string SemanticVersion { get; }
         public PalworldModType ModType { get; }
+        public string? RepositoryUrl { get; }
     }
 
     [Flags]

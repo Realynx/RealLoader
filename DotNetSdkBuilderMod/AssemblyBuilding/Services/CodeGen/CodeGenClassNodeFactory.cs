@@ -32,13 +32,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe CodeGenClassNode GenerateCodeGenClassNode(ClassNode classNode, Dictionary<EClassCastFlags, string> castFlagNames) {
+            var nonSanitizedClassName = _namePoolService.GetNameString(classNode.ClassName);
             var className = _namePoolService.GetSanitizedNameString(classNode.ClassName);
 
             CodeGenConstructorNode[]? classConstructors = null;
             // TODO: Gather constructors
             if (true) {
                 var constructors = new List<CodeGenConstructorNode> {
-                    _constructorNodeFactory.GenerateDefaultConstructor(classNode, className)
+                    _constructorNodeFactory.GenerateDefaultConstructor(className)
                 };
                 // constructors.Add(GenerateCodeGenConstructorNode());
                 classConstructors = constructors.ToArray();
@@ -77,7 +78,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
 
             var attributes = new List<CodeGenAttributeNode> {
-                _attributeNodeFactory.GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"{QUOTE}{classNode.packageName}/{className}{QUOTE}")
+                _attributeNodeFactory.GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"{QUOTE}{classNode.packageName}/{className}{QUOTE}"),
+                _attributeNodeFactory.GenerateAttribute(ORIGINAL_TYPE_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedClassName}{QUOTE}")
             };
             if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Deprecated)) {
                 attributes.Add(_attributeNodeFactory.GenerateAttribute(DEPRECATED_ATTRIBUTE));
@@ -139,6 +141,28 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
 
             return IsClassOrBaseClass(otherClasName, *baseClass);
+        }
+
+        public CodeGenClassNode GenerateCustomClass(string name, string baseType) {
+            var constructors = new[] {
+                _constructorNodeFactory.GenerateDefaultConstructor(name)
+            };
+
+            var modifiers = PUBLIC;
+
+            var attributes = new[] {
+                _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)
+            };
+
+            var baseClassName = string.IsNullOrWhiteSpace(baseType) ? null : baseType;
+
+            return new CodeGenClassNode {
+                constructorNodes = constructors,
+                modifier = modifiers,
+                name = name,
+                attributes = attributes,
+                baseType = baseClassName,
+            };
         }
     }
 }

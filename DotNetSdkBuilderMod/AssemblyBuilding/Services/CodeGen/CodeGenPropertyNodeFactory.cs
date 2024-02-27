@@ -23,6 +23,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty* property) {
+            var nonSanitizedPropertyName = _namePoolService.GetNameString(property->ObjectName);
             var propertyName = _namePoolService.GetSanitizedNameString(property->ObjectName);
             if (char.IsDigit(propertyName[0])) {
                 propertyName = $"_{propertyName}";
@@ -30,11 +31,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             var modifiers = PUBLIC;
 
-            CodeGenAttributeNode[]? attributes = null;
+            var attributes = new List<CodeGenAttributeNode> {
+                _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedPropertyName}{QUOTE}")
+            };
             if (property->propertyFlags.HasFlag(EPropertyFlags.CPF_Deprecated)) {
-                attributes = new[] {
-                    _attributeNodeFactory.GenerateAttribute(DEPRECATED_ATTRIBUTE)
-                };
+                attributes.Add(_attributeNodeFactory.GenerateAttribute(DEPRECATED_ATTRIBUTE));
             }
 
             var returnType = _namePoolService.GetSanitizedNameString(property->baseFField.classPrivate->ObjectName);
@@ -47,7 +48,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             return new CodeGenPropertyNode {
                 modifier = modifiers,
                 name = propertyName,
-                attributes = attributes,
+                attributes = attributes.ToArray(),
                 returnType = returnType,
                 get = getter,
                 set = setter,

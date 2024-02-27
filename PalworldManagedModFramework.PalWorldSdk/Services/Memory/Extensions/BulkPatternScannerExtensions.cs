@@ -16,14 +16,14 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Extensions {
         }
 
         public static IBulkPatternScanner UpdatePropertyValues(this IBulkPatternScanner bulkTypePatternScanner, IPropertyManager propertyManager) {
-            foreach (var member in bulkTypePatternScanner.GetAllRegistredMembers()) {
+            foreach (var member in bulkTypePatternScanner.GetAllRegisteredMembers()) {
                 if (member is not PropertyInfo propertyInfo) {
                     continue;
                 }
 
-                var byteCodePattern = bulkTypePatternScanner.GetRegistredByteCode(member);
+                var byteCodePattern = bulkTypePatternScanner.GetRegisteredByteCode(member);
                 var matchedAddress = bulkTypePatternScanner.GetMatchedAddress(byteCodePattern);
-                var instance = bulkTypePatternScanner.GetRegistredTypeInstance(member);
+                var instance = bulkTypePatternScanner.GetRegisteredTypeInstance(member);
 
                 if (matchedAddress is null) {
                     continue;

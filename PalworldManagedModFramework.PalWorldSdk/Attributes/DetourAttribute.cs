@@ -1,8 +1,7 @@
-﻿using System.Runtime.Versioning;
-
-using PalworldManagedModFramework.Sdk.Services.Detour.Models;
+﻿using PalworldManagedModFramework.Sdk.Services.Detour.Models;
 
 namespace PalworldManagedModFramework.Sdk.Attributes {
+    [AttributeUsage(AttributeTargets.Method)]
     public class DetourAttribute : Attribute {
         public DetourAttribute(DetourType detourType) {
             DetourType = detourType;

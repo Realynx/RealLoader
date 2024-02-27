@@ -52,7 +52,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
                 .AddSingleton<IConstructorGenerator, ConstructorGenerator>()
                 .AddSingleton<IPropertyGenerator, PropertyGenerator>()
                 .AddSingleton<IMethodGenerator, MethodGenerator>()
-                .AddSingleton<IOperatorGenerator, OperatorGenerator>();
+                .AddSingleton<IOperatorGenerator, OperatorGenerator>()
+                .AddSingleton<IXmlTagGenerator, XmlTagGenerator>()
+                .AddSingleton<IProjectGenerator, ProjectGenerator>()
+                .AddSingleton<ISolutionGenerator, SolutionGenerator>();
         }
     }
 }

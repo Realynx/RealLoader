@@ -17,8 +17,8 @@ Environment: {Enum.GetName(typeof(PlatformID), Environment.OSVersion.Platform)} 
 {nameof(currentDomain.IsFullyTrusted)}: {currentDomain.IsFullyTrusted}
 {nameof(currentDomain.IsHomogenous)}: {currentDomain.IsHomogenous}
 Loaded Assemblies: {AppDomain.CurrentDomain.GetAssemblies().Length}
-Available Memory: {GC.GetGCMemoryInfo().TotalAvailableMemoryBytes:x2}
-Heap Size: {GC.GetGCMemoryInfo().HeapSizeBytes:x2}
+Available Memory: 0x{GC.GetGCMemoryInfo().TotalAvailableMemoryBytes:x2}
+Heap Size: 0x{GC.GetGCMemoryInfo().HeapSizeBytes:x2}
 ");
 
             CatchErrors();

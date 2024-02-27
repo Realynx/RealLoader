@@ -7,7 +7,7 @@ using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook.Interfaces;
 
 namespace DotNetSdkBuilderMod {
-    [PalworldMod(nameof(SdkBuilder), "poofyfox", ".poofyfox", "1.0.0", PalworldModType.Universal)]
+    [PalworldMod(nameof(SdkBuilder), ["scrubn", "poofyfox"], "", "1.0.0", PalworldModType.Universal)]
     public class SdkBuilder : IPalworldMod {
         private readonly CancellationToken _cancellationToken;
         private readonly ILogger _logger;
@@ -29,7 +29,7 @@ namespace DotNetSdkBuilderMod {
                 .FindAndRegisterEvents<SdkBuilder>(this);
         }
 
-        [EngineEvent("^*::OnInitialized")]
+        [EngineEvent("^.*::OnInitialized")]
         public unsafe void ObjectsReady(UnrealEvent unrealEvent) {
             if (!_objectsReady) {
                 _objectsReady = true;

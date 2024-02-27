@@ -16,7 +16,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
 
         public string packageName;
         public string fullName;
-        public string name;
         public string[]? imports;
     }
 

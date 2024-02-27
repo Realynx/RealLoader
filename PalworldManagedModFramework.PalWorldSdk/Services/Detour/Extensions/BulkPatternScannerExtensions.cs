@@ -21,12 +21,12 @@ namespace PalworldManagedModFramework.Sdk.Services.Detour.Extensions {
         public static IBulkPatternScanner PrepareDetours(this IBulkPatternScanner bulkPatternScanner,
             IDetourAttributeService detourAttributeScanner, IDetourManager detourManager) {
 
-            foreach (var member in bulkPatternScanner.GetAllRegistredMembers()) {
+            foreach (var member in bulkPatternScanner.GetAllRegisteredMembers()) {
                 if (member is not MethodInfo methodInfo) {
                     continue;
                 }
 
-                var byteCodePattern = bulkPatternScanner.GetRegistredByteCode(member);
+                var byteCodePattern = bulkPatternScanner.GetRegisteredByteCode(member);
                 var matchedAddress = bulkPatternScanner.GetMatchedAddress(byteCodePattern);
 
                 var detourInfo = detourAttributeScanner.GetManagedDetourInfo(methodInfo);

@@ -23,6 +23,16 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 return;
             }
 
+            codeBuilder.Append(POUND);
+            codeBuilder.Append(PRAGMA);
+            codeBuilder.Append(WHITE_SPACE);
+            codeBuilder.Append(WARNING);
+            codeBuilder.Append(WHITE_SPACE);
+            codeBuilder.Append(DISABLE);
+            codeBuilder.Append(WHITE_SPACE);
+            codeBuilder.AppendLine(ADDRESS_OF_MANAGED_TYPE_WARNING_CODE);
+            codeBuilder.AppendLine();
+
             if (namespaceNode.imports is not null) {
                 foreach (var import in namespaceNode.imports) {
                     codeBuilder.Append(USING);

@@ -14,7 +14,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             _logger = logger;
         }
 
-        public unsafe CodeGenConstructorNode GenerateDefaultConstructor(ClassNode classNode, string className) {
+        public unsafe CodeGenConstructorNode GenerateDefaultConstructor(string className) {
             CodeGenAttributeNode[]? attributes = null;
 
             var arguments = new[] {
