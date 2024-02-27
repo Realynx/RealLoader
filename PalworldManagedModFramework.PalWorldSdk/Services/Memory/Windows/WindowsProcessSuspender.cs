@@ -22,13 +22,25 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
                     continue;
                 }
 
-                var pOpenThread = NativeFunctions.OpenThread(NativeFunctions.ThreadAccess.SUSPEND_RESUME, false, (uint)thread.Id);
-                if (pOpenThread == IntPtr.Zero) {
-                    continue;
+                suspendThread(thread);
+            }
+
+            static void suspendThread(ProcessThread thread, int retry = 0) {
+                if (retry > 5) {
+                    throw new Exception($"Unable to suspend thread: {thread.Id}");
+                }
+                var pOpenThread = NativeFunctions.OpenThread(NativeFunctions.ThreadAccess.SUSPEND_RESUME, false, thread.Id);
+                if (pOpenThread.IsNil) {
+                    return;
                 }
 
-                NativeFunctions.SuspendThread(pOpenThread);
-                NativeFunctions.CloseHandle(pOpenThread);
+                var suspendCount = NativeFunctions.SuspendThread(pOpenThread);
+                if (suspendCount != -1) {
+                    NativeFunctions.CloseHandle(pOpenThread);
+                    return;
+                }
+
+                suspendThread(thread, retry++);
             }
         }
 
@@ -41,29 +53,26 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
                     continue;
                 }
 
+                resumeThread(thread);
+            }
 
-                var pOpenThread = NativeFunctions.OpenThread(NativeFunctions.ThreadAccess.SUSPEND_RESUME, false, (uint)thread.Id);
-                if (pOpenThread == IntPtr.Zero) {
-                    continue;
+            static void resumeThread(ProcessThread thread, int retry = 0) {
+                if (retry > 5) {
+                    throw new Exception($"Unable to resume thread: {thread.Id}");
                 }
 
-                uint suspendCount = 1;
-                uint tryCount = 0;
-
-                do {
-                    suspendCount = NativeFunctions.ResumeThread(pOpenThread);
-                    tryCount++;
-                } while (suspendCount > 0 && tryCount < 5);
-
-                if (suspendCount == unchecked((uint)-1)) {
-                    var err = NativeFunctions.GetLastError();
-                    throw new Exception($"Unable to resume thread error code: 0x{err:x}");
-                }
-                if (suspendCount > 0) {
-                    throw new Exception($"Unable to resume thread suspendCount: {suspendCount}");
+                var pOpenThread = NativeFunctions.OpenThread(NativeFunctions.ThreadAccess.SUSPEND_RESUME, false, thread.Id);
+                if (pOpenThread.IsNil) {
+                    return;
                 }
 
-                NativeFunctions.CloseHandle(pOpenThread);
+                var suspendCount = NativeFunctions.ResumeThread(pOpenThread);
+                if (suspendCount != -1) {
+                    NativeFunctions.CloseHandle(pOpenThread);
+                    return;
+                }
+
+                resumeThread(thread, retry++);
             }
         }
     }

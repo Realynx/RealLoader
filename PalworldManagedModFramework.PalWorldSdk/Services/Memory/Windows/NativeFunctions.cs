@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
 using PalworldManagedModFramework.Sdk.Services.Memory.Models;
@@ -22,16 +23,16 @@ namespace PalworldManagedModFramework.Sdk.Services.Memory.Windows {
             MEMORY_BASIC_INFORMATION64* lpBuffer, uint dwLength);
 
         [DllImport("kernel32.dll")]
-        public static extern uint SuspendThread(IntPtr hThread);
+        public static extern int SuspendThread(Handle hThread);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern uint ResumeThread(IntPtr hThread);
+        public static extern int ResumeThread(Handle hThread);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+        public static extern Handle OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, int dwThreadId);
 
         [DllImport("kernel32", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern bool CloseHandle(IntPtr handle);
+        public static extern bool CloseHandle(Handle handle);
 
         [DllImport("kernel32.dll")]
         public static extern uint GetCurrentThreadId();

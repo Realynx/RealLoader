@@ -1,4 +1,5 @@
 ﻿using GeneratedSdk.Game.Pal.Blueprint.Character.Base.BP_PlayerBase;
+using GeneratedSdk.Script.Engine;
 
 using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Interfaces;
