@@ -5,6 +5,7 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models;
+using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 
 using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
 
@@ -121,7 +122,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             body.AddRange(GetArgMemoryAllocationSegment(false));
             body.Add(string.Empty);
             for (var i = 0; i < genericArgCount; i++) {
-                body.Add($"span[{i}] = objectInterop.{nameof(UObjectInterop.GetObjectAddress)}(ref arg{i + 1});");
+                body.Add($"span[{i}] = {nameof(UObjectInterop)}.{nameof(UObjectInterop.GetObjectAddress)}(ref arg{i + 1});");
             }
             body.Add(string.Empty);
             body.AddRange(GetProcessEventCallSegment());
@@ -159,7 +160,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private static CodeGenArgumentNode GetFunctionAddressArgument() {
             return new CodeGenArgumentNode
             {
-                type = INT_PTR,
+                type = $"{nameof(UFunction)}{STAR}",
                 name = "functionStruct",
             };
         }

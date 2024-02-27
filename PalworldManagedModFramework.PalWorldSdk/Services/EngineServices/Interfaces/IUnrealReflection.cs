@@ -5,6 +5,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces {
         unsafe FField*[] GetFunctionSignature(UFunction* uFunction, out FField* returnValue, out Index returnValueIndex);
         unsafe FProperty*[] GetTypeFields(UClass* uClass);
         unsafe UFunction*[] GetTypeFunctions(UClass* uClass);
-        unsafe UFunction* GetFunctionAtIndex(UClass* uClass, Index index);
+        unsafe UFunction*[] GetTypeFunctions(UStruct* uStruct);
+        unsafe UFunction* GetFunctionAtIndex(UStruct* uStruct, Index index);
     }
 }

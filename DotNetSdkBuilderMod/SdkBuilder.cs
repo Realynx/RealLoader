@@ -35,7 +35,7 @@ namespace DotNetSdkBuilderMod {
                 _objectsReady = true;
 
                 _logger.Info($"Objects are ready. Building .NET SDK");
-                // _sourceCodeGenerator.BuildSourceCode();
+                _sourceCodeGenerator.BuildSourceCode();
             }
 
         }

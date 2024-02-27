@@ -14,7 +14,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             _logger = logger;
         }
 
-        public unsafe CodeGenConstructorNode GenerateDefaultConstructor(string className) {
+        public CodeGenConstructorNode GenerateDefaultConstructor(string className) {
+            var modifiers = $"{PROTECTED}{WHITE_SPACE}{INTERNAL}";
+            // var modifiers = $"{PUBLIC}";
+
             CodeGenAttributeNode[]? attributes = null;
 
             var arguments = new[] {
@@ -35,7 +38,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             var baseConstructor = $"{BASE}{OPEN_ROUND_BRACKET}{CONSTRUCTOR_ADDRESS_NAME}{COMMA}{WHITE_SPACE}{CONSTRUCTOR_UNREAL_REFLECTION_NAME}{COMMA}{WHITE_SPACE}{CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME}{CLOSED_ROUND_BRACKET}";
 
             return new CodeGenConstructorNode {
-                modifier = PUBLIC,
+                modifier = modifiers,
                 name = className,
                 attributes = attributes,
                 arguments = arguments,

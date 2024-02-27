@@ -141,6 +141,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private static void TryAddClassAsImport(string className, string currentPackage, HashSet<string> imports, Dictionary<string, string> customClassNamespaces, Dictionary<string, string> dotnetClassNamespaces) {
+            className = className.TrimEnd('*');
+
             if (customClassNamespaces.TryGetValue(className, out var customClassNamespace) && !currentPackage.StartsWith(customClassNamespace)) {
                 imports.Add(customClassNamespace);
             }

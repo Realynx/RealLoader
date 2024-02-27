@@ -40,9 +40,23 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             return pFields;
         }
 
-        public unsafe UFunction* GetFunctionAtIndex(UClass* uClass, Index index) {
+        public unsafe UFunction*[] GetTypeFunctions(UStruct* uStruct) {
+            var fields = new List<nint>();
+            for (var field = uStruct->children; field is not null; field = field->next) {
+                fields.Add((nint)field);
+            }
+
+            var pFields = new UFunction*[fields.Count];
+            for (var x = 0; x < pFields.Length; x++) {
+                pFields[x] = (UFunction*)fields[x];
+            }
+
+            return pFields;
+        }
+
+        public unsafe UFunction* GetFunctionAtIndex(UStruct* uStruct, Index index) {
             var i = 0;
-            for (var field = uClass->baseUStruct.children; field is not null; field = field->next) {
+            for (var field = uStruct->children; field is not null; field = field->next) {
                 if (i == index.Value) {
                     return (UFunction*)field;
                 }
@@ -50,7 +64,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
                 i++;
             }
 
-            var typeName = _namePoolService.GetNameString(uClass->ObjectName);
+            var typeName = _namePoolService.GetNameString(uStruct->ObjectName);
             throw new Exception($"Could not find function {index} for {typeName}. Found {i} functions.");
         }
 

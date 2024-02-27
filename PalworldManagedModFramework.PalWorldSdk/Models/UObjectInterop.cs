@@ -1,31 +1,42 @@
+using System.Diagnostics.CodeAnalysis;
+
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
 
 namespace PalworldManagedModFramework.Sdk.Models {
-    public abstract class UObjectInterop {
+    [RequiresUnreferencedCode("Used by source generated SDK")]
+    public abstract unsafe class UObjectInterop {
         private readonly IUnrealReflection _unrealReflection;
         private readonly IGlobalObjectsTracker _globalObjectsTracker;
 
-        // TODO: Expose UObject creation to the user via a factory service
-        public UObjectInterop(nint address, IUnrealReflection unrealReflection, IGlobalObjectsTracker globalObjectsTracker) {
-            Address = address;
+        /// <remarks>
+        /// This constructor is not intended to be used by mod developers.
+        /// </remarks>
+        [RequiresUnreferencedCode("Used by source generated SDK")]
+        protected internal UObjectInterop(nint address, IUnrealReflection unrealReflection, IGlobalObjectsTracker globalObjectsTracker) {
+            Address = (UObject*)address;
+            ExecutingAddress = (UStruct*)((UObject*)address)->baseObjectBaseUtility.baseUObjectBase.classPrivate;
             _unrealReflection = unrealReflection;
             _globalObjectsTracker = globalObjectsTracker;
         }
 
         public bool Disposed {
+            [RequiresUnreferencedCode("Used by source generated SDK")]
             get {
-                return _globalObjectsTracker.IsObjectDestroyed(_addressUnsafe);
+                return _globalObjectsTracker.IsObjectDestroyed((nint)_addressUnsafe);
             }
         }
 
-        private nint _addressUnsafe;
+        protected internal UStruct* ExecutingAddress;
 
-        public nint Address {
+        private UObject* _addressUnsafe;
+
+        public UObject* Address {
+            [RequiresUnreferencedCode("Used by source generated SDK")]
             get {
                 if (Disposed) {
-                    throw new ObjectDisposedException($"{_addressUnsafe}", $"The object at 0x{_addressUnsafe:X} does not exist.");
+                    throw new ObjectDisposedException($"{(nint)_addressUnsafe}", $"The object at 0x{(nint)_addressUnsafe:X} does not exist.");
                 }
 
                 return _addressUnsafe;
@@ -35,9 +46,9 @@ namespace PalworldManagedModFramework.Sdk.Models {
             }
         }
 
-        public bool TryRegisterInUnreal(out nint address) {
+        public bool TryRegisterInUnreal(out UObject* address) {
             if (Disposed) {
-                address = nint.Zero;
+                address = null;
                 return false;
             }
 
@@ -46,17 +57,22 @@ namespace PalworldManagedModFramework.Sdk.Models {
             return true;
         }
 
-        public unsafe void Invoke(nint functionStruct, void* arguments) {
-            UnrealHookManager.ProcessEvent((UObject*)Address, (UFunction*)functionStruct, arguments);
+        [RequiresUnreferencedCode("Used by source generated SDK")]
+        public void Invoke(UFunction* functionStruct, void* arguments) {
+            UnrealHookManager.ProcessEvent(Address, functionStruct, arguments);
         }
 
-        public unsafe nint GetFunctionStructPointer(Index functionIndex) {
-            return (nint)_unrealReflection.GetFunctionAtIndex((UClass*)Address, functionIndex);
+        [RequiresUnreferencedCode("Used by source generated SDK")]
+        public UFunction* GetFunctionStructPointer(Index functionIndex) {
+            var result = _unrealReflection.GetFunctionAtIndex(ExecutingAddress, functionIndex);
+            ExecutingAddress = (UStruct*)Address->baseObjectBaseUtility.baseUObjectBase.classPrivate;
+            return result;
         }
 
-        public nint GetObjectAddress<T>(ref T obj) {
+        [RequiresUnreferencedCode("Used by source generated SDK")]
+        public static nint GetObjectAddress<T>(ref T obj) {
             if (obj is UObjectInterop uObjectInterop) {
-                return uObjectInterop.Address;
+                return (nint)uObjectInterop.Address;
             }
 
             if (obj is nint pointer) {

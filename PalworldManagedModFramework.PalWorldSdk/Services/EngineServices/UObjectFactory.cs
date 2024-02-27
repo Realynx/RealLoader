@@ -1,9 +1,12 @@
+using System.Reflection;
+
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models;
+using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
 namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
-    public class UObjectFactory {
+    public unsafe class UObjectFactory {
         private static UObjectFactory? _singleInstance;
 
         private readonly ILogger _logger;
@@ -19,14 +22,15 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             _singleInstance = this;
         }
 
-        public static T Create<T>(nint address) where T : UObjectInterop {
+        public static T CreateProxy<T>(UObject* existingObject) where T : UObjectInterop {
             if (_singleInstance is null) {
                 throw new NullReferenceException($"{nameof(_singleInstance)} was null");
             }
 
+            const BindingFlags BINDING_FLAGS = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.CreateInstance;
             var unrealReflection = _singleInstance._unrealReflection;
             var globalObjectsTracker = _singleInstance._globalObjectsTracker;
-            return (T)Activator.CreateInstance(typeof(T), address, unrealReflection, globalObjectsTracker)!;
+            return (T)Activator.CreateInstance(typeof(T), BINDING_FLAGS, null, [(nint)existingObject, unrealReflection, globalObjectsTracker], null)!;
         }
     }
 }

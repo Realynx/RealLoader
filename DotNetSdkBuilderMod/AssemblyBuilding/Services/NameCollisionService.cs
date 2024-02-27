@@ -30,6 +30,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
                 "var",
                 "class",
                 "struct",
+                "fixed",
                 "Dispose",
                 "GetType",
             };

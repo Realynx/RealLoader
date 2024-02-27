@@ -56,7 +56,7 @@ namespace ExampleMod {
         [HookEngineEvent("BP_Player_Female_C::CanJumpInternal")]
         public unsafe void JumpEvent(UnrealEvent unrealEvent, ExecuteOriginalCallback executeOriginalCallback) {
             try {
-                var bitchPlayer = UObjectFactory.Create<BP_Player_Female_C>((nint)unrealEvent.Instance);
+                var bitchPlayer = UObjectFactory.CreateProxy<BP_Player_Female_C>(unrealEvent.Instance);
                 bitchPlayer.Jump();
 
                 _logger.Debug("Bitch Jumpin 🧨🧨🧨🧨🎈🎈🎃🎃🎃🎃📎🖇📏📐✂🗃🗄🗑📌📌📊📊📊📊📊");

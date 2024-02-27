@@ -30,7 +30,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         public unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method, Index methodIndex) {
             var modifiers = PUBLIC;
 
-            var nonSanitizedMethodName = _namePoolService.GetSanitizedNameString(method->baseUstruct.ObjectName);
+            var nonSanitizedMethodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
             var methodName = _namePoolService.GetSanitizedNameString(method->baseUstruct.ObjectName);
             if (char.IsDigit(methodName[0])) {
                 methodName = $"_{methodName}";
