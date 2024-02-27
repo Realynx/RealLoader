@@ -15,7 +15,7 @@ using static PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook.
 
 namespace PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook {
     public class UnrealHookManager : IUnrealHookManager {
-        protected static UnrealHookManager? SingleInstance = null!;
+        private static UnrealHookManager? _singleInstance = null!;
 
         private readonly ILogger _logger;
         private readonly INamePoolService _namePoolService;
@@ -29,8 +29,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook {
             _logger = logger;
             _namePoolService = namePoolService;
             _stackWalker = stackWalker;
-            _logger.Debug($"Setup single Instance {nameof(SingleInstance)}");
-            SingleInstance = this;
+            _logger.Debug($"Setup single Instance {nameof(_singleInstance)}");
+            _singleInstance = this;
         }
 
         public IUnrealHookManager RegisterUnrealHook(MethodInfo hookEngineEventMethod, object instance) {
@@ -63,11 +63,10 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook {
                 }
             });
 
-            if (_hookEvents.ContainsKey(unrealEvent.EventName)) {
-                var methodInfo = _hookEvents[unrealEvent.EventName];
-                var methodInstance = _methodInstances[methodInfo];
+            if (_hookEvents.TryGetValue(unrealEvent.EventName, out var methodInfo1)) {
+                var methodInstance = _methodInstances[methodInfo1];
 
-                methodInfo.Invoke(methodInstance, [unrealEvent, executeOriginalCallback]);
+                methodInfo1.Invoke(methodInstance, [unrealEvent, executeOriginalCallback]);
             }
 
             if (unrealEvent.ContinueExecute) {
@@ -79,20 +78,20 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook {
         [EngineDetour(EngineFunction.ProccessEvent, DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void ProcessEvent(UObject* instance, UFunction* uFunction, void* parameters) {
-            if (SingleInstance is null || uFunction is null || instance is null) {
+            if (_singleInstance is null || uFunction is null || instance is null) {
                 ProcessEvent_Original(instance, uFunction, parameters);
                 return;
             }
 
-            var className = SingleInstance._namePoolService
+            var className = _singleInstance._namePoolService
                 .GetNameString(instance->baseObjectBaseUtility.baseUObjectBase.classPrivate->ObjectName);
 
-            var functionName = SingleInstance._namePoolService.GetNameString(uFunction->baseUstruct.ObjectName);
+            var functionName = _singleInstance._namePoolService.GetNameString(uFunction->baseUstruct.ObjectName);
             var eventName = $"{className}::{functionName}";
 
             var executingEvent = new UnrealEvent(eventName, instance, uFunction, parameters);
 
-            SingleInstance.OnUnrealEvent(executingEvent, (pInstance, pUFunction, pParams)
+            _singleInstance.OnUnrealEvent(executingEvent, (pInstance, pUFunction, pParams)
                     => ProcessEvent_Original(pInstance, pUFunction, pParams));
         }
     }

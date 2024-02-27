@@ -12,6 +12,7 @@ using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Services;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
+    // TODO: make this class work
     public class InMemoryCompiler : ICodeCompiler {
         private readonly ILogger _logger;
         private readonly string _buildLocation;
@@ -41,6 +42,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
             }
 
             assemblyMetadata = MetadataReference.CreateFromFile(assembly.Location);
+        }
+
+        public void AppendSolutionFile(StringBuilder code) {
+            throw new NotImplementedException();
+        }
+
+        public void AppendProjectFile(StringBuilder code, string assemblyName) {
+            throw new NotImplementedException();
         }
 
         public void AppendFile(StringBuilder code, string assemblyName, string nameSpace) {
@@ -74,15 +83,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
 
                 _logger.Debug($"Wrote {assemblyName} to {outputPath}!");
             }
-        }
-
-        public bool TryGetCompiledAssembly(string assemblyName, out ImmutableArray<byte> assemblyBytes) {
-            if (_compiledAssemblies.TryGetValue(assemblyName, out assemblyBytes)) {
-                return true;
-            }
-
-            assemblyBytes = ImmutableArray<byte>.Empty;
-            return false;
         }
 
         private IEnumerable<SyntaxTree> GetSyntaxTrees(string assemblyName) {

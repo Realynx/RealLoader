@@ -57,12 +57,12 @@ namespace PalworldManagedModFramework.Services.AssemblyLoading {
                     continue;
                 }
 
-                _logger.Info($"[Loading] Mod: {mod.PalworldModAttribute.ModName}, Author: {mod.PalworldModAttribute.Author}");
+                _logger.Info($"[Loading] Mod: {mod.PalworldModAttribute.ModName}, Author(s): {string.Join(", ", mod.PalworldModAttribute.Authors)}");
 
                 var modEntryPoint = GetEntryPoint(mod);
                 if (modEntryPoint is null) {
                     _logger.Error($"[{mod.PalworldModAttribute.ModName}] No valid mod entry point was found! " +
-                        $"You should contact ({mod.PalworldModAttribute.Author}) {mod.PalworldModAttribute.DiscordAlias} in discord.");
+                        $"You should contact ({mod.PalworldModAttribute.Authors}) {mod.PalworldModAttribute.ContactInfo} in discord.");
 
                     continue;
                 }

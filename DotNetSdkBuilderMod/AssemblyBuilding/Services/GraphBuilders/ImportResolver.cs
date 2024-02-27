@@ -29,12 +29,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                     var namespaceImports = new string[imports.Count];
                     var i = 0;
                     foreach (var package in imports.Order()) {
-                        var import = new StringBuilder(package)
-                            .TrimStart('/')
-                            .Replace('/', '.')
-                            .ToString();
-
-                        namespaceImports[i] = import;
+                        namespaceImports[i] = package;
                         i++;
                     }
 

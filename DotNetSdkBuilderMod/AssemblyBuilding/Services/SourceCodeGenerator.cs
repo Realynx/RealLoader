@@ -16,15 +16,20 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
         private readonly ICodeGenGraphBuilder _codeGenGraphBuilder;
         private readonly IFunctionTimingService _functionTimingService;
         private readonly ICodeCompilerFactory _codeCompilerFactory;
+        private readonly IProjectGenerator _projectGenerator;
+        private readonly ISolutionGenerator _solutionGenerator;
 
         public SourceCodeGenerator(ILogger logger, IFileGenerator fileGenerator, IReflectedGraphBuilder reflectedGraphBuilder,
-            ICodeGenGraphBuilder codeGenGraphBuilder, IFunctionTimingService functionTimingService, ICodeCompilerFactory codeCompilerFactory) {
+            ICodeGenGraphBuilder codeGenGraphBuilder, IFunctionTimingService functionTimingService, ICodeCompilerFactory codeCompilerFactory,
+            IProjectGenerator projectGenerator, ISolutionGenerator solutionGenerator) {
             _logger = logger;
             _fileGenerator = fileGenerator;
             _reflectedGraphBuilder = reflectedGraphBuilder;
             _codeGenGraphBuilder = codeGenGraphBuilder;
             _functionTimingService = functionTimingService;
             _codeCompilerFactory = codeCompilerFactory;
+            _projectGenerator = projectGenerator;
+            _solutionGenerator = solutionGenerator;
         }
 
         public unsafe void BuildSourceCode() {
@@ -37,7 +42,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             // DebugUtilities.WaitForDebuggerAttach();
 
             var codeCompiler = _codeCompilerFactory.CreateCompiler();
-            RegisterAdditionalAssemblies(codeCompiler);
+            // RegisterAdditionalAssemblies(codeCompiler);
 
             _logger.Debug("Generating SDK code...");
             TimedGenerateSdkCode(assemblyGraphs, codeCompiler);
@@ -76,13 +81,19 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             compiler.RegisterExistingAssembly(systemRuntimeCompilerServicesAssembly);
         }
 
-        private void TimedGenerateSdkCode(CodeGenAssemblyNode[] assemblyGraphs, ICodeCompiler codeCompiler) {
+        private void TimedGenerateSdkCode(CodeGenAssemblyNode[] assemblyNodes, ICodeCompiler codeCompiler) {
             var time = _functionTimingService.Execute(() => {
-                foreach (var assemblyGraph in assemblyGraphs) {
-                    foreach (var nameSpace in assemblyGraph.namespaces) {
-                        TraverseNodes(nameSpace, codeCompiler, assemblyGraph.name);
+                foreach (var assemblyNode in assemblyNodes) {
+                    foreach (var nameSpace in assemblyNode.namespaces) {
+                        TraverseNodes(nameSpace, codeCompiler, assemblyNode.name);
                     }
+
+                    var projectFile = _projectGenerator.GenerateProject(assemblyNode);
+                    codeCompiler.AppendProjectFile(projectFile, assemblyNode.name);
                 }
+
+                var solutionFile = _solutionGenerator.GenerateSolution(assemblyNodes);
+                codeCompiler.AppendSolutionFile(solutionFile);
             });
 
             _logger.Debug($"Sdk code; {time.TotalMilliseconds:F1} ms to generate.");

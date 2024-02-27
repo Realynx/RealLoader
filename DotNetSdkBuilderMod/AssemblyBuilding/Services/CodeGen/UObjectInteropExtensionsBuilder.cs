@@ -180,19 +180,19 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             yield return "}";
         }
 
-        public CodeGenNamespaceNode GetScaffoldNamespaceNode() {
+        public CodeGenNamespaceNode GetScaffoldNamespaceNode(string baseNamespace) {
             var namespaceParts = U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE.Split('.');
+            var fullUpperNamespace = $"{baseNamespace}.{namespaceParts[0]}";
+            var fullLowerNamespace = $"{baseNamespace}.{U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE}";
 
             return new CodeGenNamespaceNode {
-                packageName = namespaceParts[0],
-                fullName = namespaceParts[0],
-                name = namespaceParts[0],
+                packageName = fullUpperNamespace,
+                fullName = fullUpperNamespace,
                 namespaces = new [] {
                     new CodeGenNamespaceNode
                     {
-                        packageName = U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE,
-                        fullName = U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE,
-                        name = namespaceParts[1]
+                        packageName = fullLowerNamespace,
+                        fullName = fullLowerNamespace,
                     }
                 }
             };

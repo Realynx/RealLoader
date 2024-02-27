@@ -16,6 +16,16 @@ namespace DotNetSdkBuilderMod.Extensions {
                 .Append(str);
         }
 
+        public static StringBuilder AppendIndent(this StringBuilder sb, int indentSize) {
+            return sb
+                .Append(CodeGenConstants.INDENT, indentSize * CodeGenConstants.INDENT_SIZE);
+        }
+
+        public static StringBuilder AppendTabIndent(this StringBuilder sb, int tabCount) {
+            return sb
+                .Append(CodeGenConstants.TAB, tabCount);
+        }
+
         public static StringBuilder RemoveLine(this StringBuilder sb) {
             if (sb.Length < Environment.NewLine.Length) {
                 return sb;

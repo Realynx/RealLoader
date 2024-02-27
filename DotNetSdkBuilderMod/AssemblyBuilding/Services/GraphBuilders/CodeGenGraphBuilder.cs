@@ -106,7 +106,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                 _nameSpaceService.BuildNamespaceTree(namespaces, string.Empty, namespaceTree);
 
                 Array.Resize(ref namespaceTree.namespaces, namespaceTree.namespaces!.Length + 1);
-                namespaceTree.namespaces[^1] = _uObjectInteropExtensionsBuilder.GetScaffoldNamespaceNode();
+                namespaceTree.namespaces[^1] = _uObjectInteropExtensionsBuilder.GetScaffoldNamespaceNode(CODE_NAMESPACE);
             });
 
             _logger.Debug($"Built namespace tree; {time.TotalMilliseconds:F1} ms to build.");
@@ -131,7 +131,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var time = _functionTimingService.Execute(() => {
                 _nameSpaceService.MemoizeTypeNamespaces(rootNode, memoizedClassesAndNamespaces);
 
-                memoizedClassesAndNamespaces.Add(U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME, U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE);
+                memoizedClassesAndNamespaces.Add(U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME, $"{CODE_NAMESPACE}{DOT}{U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE}");
             });
 
             _logger.Debug($"Memoized classes and namespaces; {time.TotalMilliseconds:F1} ms to build.");
@@ -248,8 +248,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private void TimedBuildInteropExtensions(CodeGenNamespaceNode[] namespaceTree, IReadOnlyList<int> functionArgCounts) {
-            var interopNamespace = namespaceTree.First(x => x.fullName.Equals(CODE_GEN_INTEROP_NAMESPACE));
-            var extensionsNamespace = interopNamespace.namespaces!.First(x => x.fullName.Equals(U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE));
+            var interopNamespace = namespaceTree.Single(x => x.fullName.Contains(CODE_GEN_INTEROP_NAMESPACE));
+            var extensionsNamespace = interopNamespace.namespaces!.Single(x => x.fullName.Contains(U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE));
             var time = _functionTimingService.Execute(() => _uObjectInteropExtensionsBuilder.PopulateNamespaceNode(extensionsNamespace, functionArgCounts));
 
             _logger.Debug($"Built interop extension methods; {time.TotalMilliseconds:F1} ms to build.");
@@ -318,12 +318,18 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         private Dictionary<string, string> MemoizePrecompiledAssemblyNamespaces(IEnumerable<Assembly> assemblies) {
             var memo = new Dictionary<string, string>();
             foreach (var assembly in assemblies) {
-                var assemblyName = assembly.GetName().Name
-                    ?? throw new NullReferenceException($"{assembly.FullName} does not have a valid short name.");
+                if (!File.Exists(assembly.Location)) {
+                    _logger.Debug($"{assembly.GetName().FullName} does not exist on disk at {assembly.Location}.");
+                    continue;
+                }
+
+                if (assembly.GetName().Name is "System.Private.CoreLib") {
+                    continue;
+                }
 
                 var types = assembly.GetTypes();
                 foreach (var type in types.Where(x => x.Namespace is not null)) {
-                    memo.TryAdd(type.Namespace!, assemblyName);
+                    memo.TryAdd(type.Namespace!, assembly.Location);
                 }
             }
 
@@ -341,16 +347,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private CodeGenAssemblyNode[] GenerateAssemblyNodes(CodeGenNamespaceNode[] namespaceTree) {
-            var assemblyNodes = new CodeGenAssemblyNode[namespaceTree.Length];
-            for (var i = 0; i < namespaceTree.Length; i++) {
-                assemblyNodes[i] = new CodeGenAssemblyNode {
-                    namespaces = namespaceTree[i].namespaces!,
-                    name = namespaceTree[i].name,
-                    attributes = new[] {
-                        _attributeNodeFactory.GenerateAssemblyAttribute(COMPATIBLE_GAME_VERSION_ATTRIBUTE, "0.1.2")
-                    }, // TODO: Get game version
-                };
-            }
+            // TODO: Maybe we could separate by engine code and game code
+            var assemblyNodes = new CodeGenAssemblyNode[1];
+            assemblyNodes[0] = new CodeGenAssemblyNode {
+                namespaces = namespaceTree,
+                name = CODE_NAMESPACE,
+                attributes = new[] {
+                    _attributeNodeFactory.GenerateAssemblyAttribute(COMPATIBLE_GAME_VERSION_ATTRIBUTE, "0.1.2")
+                }, // TODO: Get game version
+            };
 
             return assemblyNodes;
         }
@@ -363,6 +368,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
                         ResolveReferences(namespaceNode, assemblyNamespaces, references);
                     }
 
+                    references.Remove(assemblyNode.name);
                     assemblyNode.references = references.Count > 0 ? references.ToArray() : null;
                 }
             });
