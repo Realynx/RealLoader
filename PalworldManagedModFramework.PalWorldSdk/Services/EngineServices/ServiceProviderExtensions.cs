@@ -19,7 +19,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
                 .AddSingleton<IPropertyRegistrationService, PropertyRegistrationService>()
                 .AddSingleton<IGlobalObjects, GlobalObjects>()
                 .AddSingleton<IUnrealHookManager, UnrealHookManager>()
-                .AddSingleton<IUnrealEventRegistrationService, UnrealEventRegistrationService>();
+                .AddSingleton<IUnrealEventRegistrationService, UnrealEventRegistrationService>()
+                .AddSingleton<UObjectFactory>();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
                 serviceDescriptors

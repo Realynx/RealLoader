@@ -2,7 +2,7 @@ using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
-namespace PalworldManagedModFramework.Sdk.Services {
+namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
     public class UObjectFactory {
         private static UObjectFactory? _singleInstance;
 

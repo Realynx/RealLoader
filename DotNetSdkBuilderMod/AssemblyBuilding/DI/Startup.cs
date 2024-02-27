@@ -29,9 +29,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
                 .AddSingleton<IFunctionTimingService, FunctionTimingService>();
 
             services
-                .AddSingleton<UObjectFactory>();
-
-            services
                 .AddSingleton<IPackageNameGenerator, PackageNameGenerator>()
                 .AddSingleton<INameDistanceService, NameDistanceService>()
                 .AddSingleton<INameCollisionService, NameCollisionService>()
