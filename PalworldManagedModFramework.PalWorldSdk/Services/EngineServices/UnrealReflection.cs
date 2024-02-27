@@ -5,9 +5,11 @@ using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
     public class UnrealReflection : IUnrealReflection {
         private readonly ILogger _logger;
+        private readonly INamePoolService _namePoolService;
 
-        public UnrealReflection(ILogger logger) {
+        public UnrealReflection(ILogger logger, INamePoolService namePoolService) {
             _logger = logger;
+            _namePoolService = namePoolService;
         }
 
         public unsafe FProperty*[] GetTypeFields(UClass* uClass) {
@@ -48,7 +50,8 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
                 i++;
             }
 
-            throw new Exception($"Could not find function {index} for {uClass->ObjectName}. Found {i} functions.");
+            var typeName = _namePoolService.GetNameString(uClass->ObjectName);
+            throw new Exception($"Could not find function {index} for {typeName}. Found {i} functions.");
         }
 
         public unsafe FField*[] GetFunctionSignature(UFunction* uFunction, out FField* returnValue, out Index returnValueIndex) {
