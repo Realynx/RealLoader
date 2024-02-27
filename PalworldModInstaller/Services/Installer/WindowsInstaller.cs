@@ -9,7 +9,8 @@ using Spectre.Console;
 namespace PalworldModInstaller.Services.Installer {
     [SupportedOSPlatform("windows")]
     public class WindowsInstaller : IInstaller {
-        private const string DOTNET_LOCAL_PACKS = "C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Host.win-x64";
+        private const string DOTNET_LOCAL_PACKS = @"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x64";
+        private const string NET_HOST = "nethost.dll";
 
         private readonly IGithubArtifactDownloader _githubArtifactDownloader;
         private readonly IModFileService _modFileService;
@@ -24,8 +25,8 @@ namespace PalworldModInstaller.Services.Installer {
             var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
             _modFileService.CheckClrModsFolder(modsFolder);
 
-            AnsiConsole.WriteLine("Checking Dependancies Folder...");
-            var win64Folder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Win64");
+            AnsiConsole.WriteLine("Checking Dependencies Folder...");
+            var win64Folder = GetWin64Folder(installerOptions.InstallLocation);
             var dotnetDependenciesFolder = Path.Combine(win64Folder, "ManagedModFramework");
             _modFileService.CheckFrameworkInstallFolder(dotnetDependenciesFolder);
 
@@ -40,7 +41,7 @@ namespace PalworldModInstaller.Services.Installer {
                 return;
             }
 
-            AnsiConsole.WriteLine("Checking for new nethost.dll...");
+            AnsiConsole.WriteLine($"Checking for new {NET_HOST}...");
             CopyNethost(win64Folder);
 
             AnsiConsole.WriteLine("Installing new files...");
@@ -52,9 +53,29 @@ namespace PalworldModInstaller.Services.Installer {
             await _modFileService.WriteGithubFile(proxyDllLocation, installerOptions.ProxyDll);
         }
 
+        private string GetWin64Folder(string rootFolder) {
+            foreach (var directory in Directory.EnumerateDirectories(rootFolder)) {
+                foreach (var subDirectory in Directory.EnumerateDirectories(directory)) {
+                    if (!subDirectory.EndsWith("Binaries")) {
+                        continue;
+                    }
+
+                    foreach (var subSubDirectory in Directory.EnumerateDirectories(subDirectory)) {
+                        if (!subSubDirectory.EndsWith("Win64")) {
+                            continue;
+                        }
+
+                        return Path.Combine(subSubDirectory, "Win64");
+                    }
+                }
+            }
+
+            throw new DirectoryNotFoundException("Could not find Win64 folder.");
+        }
+
         private void CopyNethost(string win64Folder) {
-            var netHostLib = Path.Combine(win64Folder, "nethost.dll");
-            var localNetHost = Path.Combine(FindNewestNetPackPath(), "runtimes", "win-x64", "native", "nethost.dll");
+            var netHostLib = Path.Combine(win64Folder, NET_HOST);
+            var localNetHost = Path.Combine(FindNewestNetPackPath(), "runtimes", "win-x64", "native", NET_HOST);
             File.Copy(localNetHost, netHostLib, true);
         }
 
@@ -65,7 +86,7 @@ namespace PalworldModInstaller.Services.Installer {
 
             var newestSemiVersion = Directory
                 .GetDirectories(DOTNET_LOCAL_PACKS, "*.*.*")
-                .Select(i => i.Substring(i.LastIndexOf("\\") + 1))
+                .Select(i => i.Substring(i.LastIndexOf('\\') + 1))
                 .Select(Version.Parse)
                 .Max();
 
