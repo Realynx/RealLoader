@@ -106,7 +106,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
 
             var buildPath = Path.Combine(_sourceLocation, CodeGenConstants.CODE_NAMESPACE, "bin", "Debug", "net8.0");
 
-            _logger.Info($"Successfully compiled proxy SDK to {buildPath}!");
+            _logger.Info($"Successfully compiled proxy SDK to {buildPath}");
         }
     }
 }

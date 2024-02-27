@@ -27,17 +27,7 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
         }
 
         public unsafe UFunction*[] GetTypeFunctions(UClass* uClass) {
-            var fields = new List<nint>();
-            for (var field = uClass->baseUStruct.children; field is not null; field = field->next) {
-                fields.Add((nint)field);
-            }
-
-            var pFields = new UFunction*[fields.Count];
-            for (var x = 0; x < pFields.Length; x++) {
-                pFields[x] = (UFunction*)fields[x];
-            }
-
-            return pFields;
+            return GetTypeFunctions((UStruct*)uClass);
         }
 
         public unsafe UFunction*[] GetTypeFunctions(UStruct* uStruct) {

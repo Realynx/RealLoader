@@ -5,7 +5,6 @@ using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.UnrealHook;
 
 namespace PalworldManagedModFramework.Sdk.Models {
-    [RequiresUnreferencedCode("Used by source generated SDK")]
     public abstract unsafe class UObjectInterop {
         private readonly IUnrealReflection _unrealReflection;
         private readonly IGlobalObjectsTracker _globalObjectsTracker;
@@ -15,8 +14,9 @@ namespace PalworldManagedModFramework.Sdk.Models {
         /// </remarks>
         [RequiresUnreferencedCode("Used by source generated SDK")]
         protected internal UObjectInterop(nint address, IUnrealReflection unrealReflection, IGlobalObjectsTracker globalObjectsTracker) {
-            Address = (UObject*)address;
-            ExecutingAddress = (UStruct*)((UObject*)address)->baseObjectBaseUtility.baseUObjectBase.classPrivate;
+            var uObject = (UObject*)address;
+            Address = uObject;
+            ExecutingAddress = (UStruct*)uObject->baseObjectBaseUtility.baseUObjectBase.classPrivate;
             _unrealReflection = unrealReflection;
             _globalObjectsTracker = globalObjectsTracker;
         }

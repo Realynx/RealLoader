@@ -16,7 +16,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
         public CodeGenConstructorNode GenerateDefaultConstructor(string className) {
             var modifiers = $"{PROTECTED}{WHITE_SPACE}{INTERNAL}";
-            // var modifiers = $"{PUBLIC}";
 
             CodeGenAttributeNode[]? attributes = null;
 
