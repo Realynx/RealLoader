@@ -40,6 +40,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         internal const string PRIVATE = "private";
         internal const string PROTECTED = "protected";
         internal const string INTERNAL = "internal";
+        internal const string VIRTUAL = "virtual";
+        internal const string OVERRIDE = "override";
         internal const string STATIC = "static";
         internal const string EXPLICIT = "explicit";
         internal const string IMPLICIT = "implicit";

@@ -28,7 +28,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method, Index methodIndex) {
-            var modifiers = PUBLIC;
+            var modifiers = $"{PUBLIC}{WHITE_SPACE}{VIRTUAL}";
 
             var nonSanitizedMethodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
             var methodName = _namePoolService.GetSanitizedNameString(method->baseUstruct.ObjectName);
@@ -77,6 +77,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                     };
                 }
                 else {
+                    // TODO: Return values will cause NullReferenceException
                     var sb = new StringBuilder($"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}");
                     var argsBeforeReturnValue = methodArgs.Take(returnValueIndex.Value).Select(x => x.name).ToArray();
                     if (argsBeforeReturnValue.Length > 0) {
@@ -109,6 +110,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                     };
                 }
                 else {
+                    // TODO: Return values will cause NullReferenceException
                     body = new[] {
                         $"{returnType}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{DEFAULT}{SEMICOLON}",
                         $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
@@ -133,7 +135,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe CodeGenMethodNode GenerateInheritedMethod(UFunction* method) {
-            var modifiers = $"{PUBLIC}{WHITE_SPACE}{NEW}";
+            var modifiers = $"{PUBLIC}{WHITE_SPACE}{OVERRIDE}";
 
             var nonSanitizedMethodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
             var methodName = _namePoolService.GetSanitizedNameString(method->baseUstruct.ObjectName);
