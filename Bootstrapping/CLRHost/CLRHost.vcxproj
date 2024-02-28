@@ -89,7 +89,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x64\8.0.2\runtimes\win-x64\native\nethost.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>..\GithubSymbols\Windows\CLRHost.lib</ImportLibrary>
+      <ImportLibrary>..\..\GithubSymbols\Windows\CLRHost.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
