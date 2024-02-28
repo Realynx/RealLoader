@@ -1,7 +1,7 @@
 # RealLoader 🎷🐛
 
-[![Github License](https://img.shields.io/github/license/PoofImaFox/PalworldManagedModFramework.svg)](LICENSE.md)
-[![CodeFactor](https://www.codefactor.io/repository/github/PoofImaFox/PalworldManagedModFramework/badge)](https://www.codefactor.io/repository/github/PoofImaFox/PalworldManagedModFramework)
+[![Github License](https://img.shields.io/github/license/PoofImaFox/RealLoader.svg)](LICENSE.md)
+[![CodeFactor](https://www.codefactor.io/repository/github/PoofImaFox/RealLoader/badge)](https://www.codefactor.io/repository/github/PoofImaFox/RealLoader)
 
 ### Unreal Engine modding tools, framework, and mod orchestration.
 
@@ -11,9 +11,9 @@
 
 | Branch                                                                                | Status                                                                                                                                                                                                                                                                                                   |
 |---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Master](https://github.com/PoofImaFox/PalworldManagedModFramework/tree/master)       | [![Build Status](https://dev.azure.com/PalworldNetCoreMods/Palworld%20Modding%20Framework/_apis/build/status%2FPoofImaFox.PalworldManagedModFramework?branchName=master)](https://dev.azure.com/PalworldNetCoreMods/Palworld%20Modding%20Framework/_build/latest?definitionId=1&branchName=master)       |
-| [Testing](https://github.com/PoofImaFox/PalworldManagedModFramework/tree/testing)     | [![Build Status](https://dev.azure.com/PalworldNetCoreMods/Palworld%20Modding%20Framework/_apis/build/status%2FPoofImaFox.PalworldManagedModFramework?branchName=testing)](https://dev.azure.com/PalworldNetCoreMods/Palworld%20Modding%20Framework/_build/latest?definitionId=1&branchName=testing)     |
-| [Developer](https://github.com/PoofImaFox/PalworldManagedModFramework/tree/developer) | [![Build Status](https://dev.azure.com/PalworldNetCoreMods/Palworld%20Modding%20Framework/_apis/build/status%2FPoofImaFox.PalworldManagedModFramework?branchName=developer)](https://dev.azure.com/PalworldNetCoreMods/Palworld%20Modding%20Framework/_build/latest?definitionId=1&branchName=developer) |
+| [Master](https://github.com/PoofImaFox/RealLoader/tree/master)       | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FPoofImaFox.PalworldManagedModFramework?branchName=master)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=master)       |
+| [Testing](https://github.com/PoofImaFox/RealLoader/tree/testing)     | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FPoofImaFox.PalworldManagedModFramework?branchName=testing)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=testing)     |
+| [Developer](https://github.com/PoofImaFox/RealLoader/tree/developer) | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FPoofImaFox.PalworldManagedModFramework?branchName=developer)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=developer) |
 
 # Building from Source
 
@@ -41,7 +41,7 @@
 
 4. Clone the repo
     ```bash
-    git clone https://github.com/PoofImaFox/PalworldManagedModFramework
+    git clone https://github.com/PoofImaFox/RealLoader
     ```
 5. Change directory to `Build`
     ```sh
@@ -62,4 +62,4 @@
 
 # Resources
 > [!TIP]
-> You can view example mods under [Client Mod Ex](ExampleMod), [Server Mod Ex](ExampleMod), and [DI Mod Ex](ExampleMod)  
+> You can view example mods under [Client Mod Ex](Mods/ExampleMod), [Server Mod Ex](Mods/ExampleServerMod), and [DI Mod Ex](Mods)  

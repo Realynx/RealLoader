@@ -79,7 +79,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
             var solutionPath = Path.Combine(_sourceLocation, $"{CodeGenConstants.CODE_SOLUTION_NAME}.sln");
             var startInfo = new ProcessStartInfo {
                 FileName = "dotnet",
-                Arguments = $"build \"{solutionPath}\"", // -p:{CodeGenConstants.BUILD_OUTPUT_ENVIRONMENT_VARIABLE}=\"{_buildLocation}\"",
+                Arguments = $"build \"{solutionPath}\" -p:UseSharedCompilation=false", // -p:{CodeGenConstants.BUILD_OUTPUT_ENVIRONMENT_VARIABLE}=\"{_buildLocation}\"",
                 UseShellExecute = false,
                 CreateNoWindow = !_displayCompilerOutput,
             };
@@ -90,14 +90,6 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
             }
 
             buildProcess.WaitForExit();
-
-            try {
-                // For some reason...
-                buildProcess.Kill();
-            }
-            catch {
-                // ignored
-            }
 
             if (buildProcess.ExitCode is not 0) {
                 _logger.Error($".NET SDK exited with code {buildProcess.ExitCode}.");
