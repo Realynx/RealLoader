@@ -1,4 +1,6 @@
-﻿namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
+﻿using PalworldManagedModFramework.Sdk.Models;
+
+namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     internal static class CodeGenConstants {
         internal const string OPEN_CURLY_BRACKET = "{";
         internal const string CLOSED_CURLY_BRACKET = "}";
@@ -19,6 +21,7 @@
         internal const string AMPERSAND = "&";
         internal const string PLUS = "+";
         internal const string LAMBDA = "=>";
+        internal const string ARROW = "->";
         internal const string EQUALS = "=";
         internal const string POUND = "#";
         internal const string FORWARD_SLASH = "/";
@@ -91,7 +94,8 @@
         internal const string CODE_GEN_INTEROP_INVOKE_METHOD_NAME = "Invoke";
         internal const string U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE = $"{CODE_GEN_INTEROP_NAMESPACE}.Extensions";
         internal const string U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME = "UObjectInteropExtensions";
-        internal const string ADDRESS_FIELD_NAME = "Address";
+        internal const string EXECUTING_ADDRESS_FIELD_NAME = nameof(UObjectInterop.ExecutingAddress);
+        internal const string ADDRESS_FIELD_NAME = nameof(UObjectInterop.Address);
         internal const string CONSTRUCTOR_ADDRESS_NAME = "address";
         internal const string CONSTRUCTOR_UNREAL_REFLECTION_NAME = "unrealReflection";
         internal const string CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME = "globalObjectsTracker";

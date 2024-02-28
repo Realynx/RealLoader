@@ -19,10 +19,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private readonly ICodeGenMethodNodeFactory _methodNodeFactory;
         private readonly ICodeGenOperatorNodeFactory _operatorNodeFactory;
         private readonly INameCollisionService _nameCollisionService;
+        private readonly IUnrealReflection _unrealReflection;
 
         public CodeGenClassNodeFactory(INamePoolService namePoolService, ICodeGenAttributeNodeFactory attributeNodeFactory, ICodeGenConstructorNodeFactory constructorNodeFactory,
             ICodeGenPropertyNodeFactory propertyNodeFactory, ICodeGenMethodNodeFactory methodNodeFactory, ICodeGenOperatorNodeFactory operatorNodeFactory,
-            INameCollisionService nameCollisionService) {
+            INameCollisionService nameCollisionService, IUnrealReflection unrealReflection) {
             _namePoolService = namePoolService;
             _attributeNodeFactory = attributeNodeFactory;
             _constructorNodeFactory = constructorNodeFactory;
@@ -30,6 +31,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             _methodNodeFactory = methodNodeFactory;
             _operatorNodeFactory = operatorNodeFactory;
             _nameCollisionService = nameCollisionService;
+            _unrealReflection = unrealReflection;
         }
 
         public unsafe CodeGenClassNode GenerateCodeGenClassNode(ClassNode classNode, Dictionary<EClassCastFlags, string> castFlagNames) {
@@ -42,7 +44,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 var constructors = new List<CodeGenConstructorNode> {
                     _constructorNodeFactory.GenerateDefaultConstructor(className)
                 };
-                // constructors.Add(GenerateCodeGenConstructorNode());
+                // constructors.Add(_constructorNodeFactory.GenerateCodeGenConstructorNode());
                 classConstructors = constructors.ToArray();
             }
 
@@ -53,27 +55,46 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
                 properties = new CodeGenPropertyNode[classProperties.Length];
                 for (var i = 0; i < classProperties.Length; i++) {
-                    properties[i] = _propertyNodeFactory.GenerateCodeGenPropertyNode(classProperties[i]);
-                    properties[i].name = _nameCollisionService.GetNonCollidingName(properties[i].name, propertyNames);
+                    var propertyNode = _propertyNodeFactory.GenerateCodeGenPropertyNode(classProperties[i]);
+                    propertyNode.name = _nameCollisionService.GetNonCollidingName(propertyNode.name, propertyNames);
+                    properties[i] = propertyNode;
                 }
             }
 
             CodeGenMethodNode[]? methods = null;
+            var methodNames = new HashSet<string> { className };
             var classMethods = classNode.functions;
             if (classMethods.Length > 0) {
-                var methodNames = new HashSet<string> { className };
 
                 methods = new CodeGenMethodNode[classMethods.Length];
                 for (var i = 0; i < classMethods.Length; i++) {
-                    methods[i] = _methodNodeFactory.GenerateCodeGenMethodNode(classMethods[i], i);
-                    methods[i].name = _nameCollisionService.GetNonCollidingName(methods[i].name, methodNames);
+                    var methodNode = _methodNodeFactory.GenerateCodeGenMethodNode(classMethods[i], i);
+                    methodNode.name = _nameCollisionService.GetNonCollidingName(methodNode.name, methodNames);
+                    methods[i] = methodNode;
+                    // methodNames.Add($"{methodNode.name}{methodNode.returnType}{string.Concat(methodNode.arguments?.Select(x => x.type) ?? Enumerable.Empty<string>())}");
                 }
             }
 
-            var modifiers = new StringBuilder(PUBLIC);
-            if (properties is not null) {
-                modifiers.Append($"{WHITE_SPACE}{UNSAFE}");
+            var baseClassMethods = new List<CodeGenMethodNode>();
+            for (var baseStruct = classNode.nodeClass->baseUStruct.superStruct; baseStruct is not null; baseStruct = baseStruct->superStruct) {
+                var functions = _unrealReflection.GetTypeFunctions(baseStruct);
+                foreach (var uFunction in functions) {
+                    var methodNode = _methodNodeFactory.GenerateInheritedMethod(uFunction);
+                    if (methodNames.Add($"{methodNode.name}{string.Concat(methodNode.arguments?.Select(x => x.type) ?? Enumerable.Empty<string>())}")) {
+                        baseClassMethods.Add(methodNode);
+                    }
+                }
             }
+
+            if (baseClassMethods.Count > 0) {
+                if (methods != null) {
+                    baseClassMethods.InsertRange(0, methods);
+                }
+
+                methods = baseClassMethods.ToArray();
+            }
+
+            var modifiers = new StringBuilder($"{PUBLIC}{WHITE_SPACE}{UNSAFE}");
             if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Abstract)) {
                 modifiers.Append($"{WHITE_SPACE}{ABSTRACT}");
             }
@@ -149,7 +170,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 _constructorNodeFactory.GenerateDefaultConstructor(name)
             };
 
-            var modifiers = PUBLIC;
+            var modifiers = $"{PUBLIC}{WHITE_SPACE}{UNSAFE}";
 
             var attributes = new[] {
                 _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)

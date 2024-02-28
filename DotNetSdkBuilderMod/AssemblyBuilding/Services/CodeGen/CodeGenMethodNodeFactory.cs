@@ -131,5 +131,73 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 bodyTypes = bodyTypes,
             };
         }
+
+        public unsafe CodeGenMethodNode GenerateInheritedMethod(UFunction* method) {
+            var modifiers = $"{PUBLIC}{WHITE_SPACE}{NEW}";
+
+            var nonSanitizedMethodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
+            var methodName = _namePoolService.GetSanitizedNameString(method->baseUstruct.ObjectName);
+            methodName = _nameCollisionService.GetNonCollidingName(methodName);
+            if (char.IsDigit(methodName[0])) {
+                methodName = $"_{methodName}";
+            }
+
+            var attributes = new [] {
+                _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedMethodName}{QUOTE}"),
+                _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)
+            };
+
+            var parameters = _unrealReflection.GetFunctionSignature(method, out var returnValue, out var returnValueIndex);
+            string returnType;
+            if (returnValue is not null) {
+                var signatureName = returnValue->classPrivate->ObjectName;
+                var signatureString = _namePoolService.GetSanitizedNameString(signatureName);
+                returnType = signatureString;
+            }
+            else {
+                returnType = VOID;
+            }
+
+            CodeGenArgumentNode[]? methodArgs = null;
+            if (parameters.Length > 0) {
+                var argNames = new HashSet<string>();
+
+                methodArgs = new CodeGenArgumentNode[parameters.Length];
+                for (var i = 0; i < parameters.Length; i++) {
+                    var currentParam = parameters[i];
+
+                    var type = _namePoolService.GetSanitizedNameString(currentParam->classPrivate->ObjectName);
+                    var name = _namePoolService.GetSanitizedNameString(currentParam->ObjectName);
+
+                    methodArgs[i] = new CodeGenArgumentNode {
+                        type = type,
+                        name = _nameCollisionService.GetNonCollidingName(name, argNames)
+                    };
+                }
+            }
+
+            string[] body;
+            if (returnValue is not null) {
+                body = new[] {
+                    $"{EXECUTING_ADDRESS_FIELD_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{EXECUTING_ADDRESS_FIELD_NAME}{ARROW}{nameof(UStruct.superStruct)}{SEMICOLON}",
+                    $"{RETURN}{WHITE_SPACE}{BASE}{DOT}{methodName}{OPEN_ROUND_BRACKET}{string.Join($"{COMMA}{WHITE_SPACE}", methodArgs?.Select(x => x.name) ?? Enumerable.Empty<string>())}{CLOSED_ROUND_BRACKET}{SEMICOLON}"
+                };
+            }
+            else {
+                body = new[] {
+                    $"{EXECUTING_ADDRESS_FIELD_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{EXECUTING_ADDRESS_FIELD_NAME}{ARROW}{nameof(UStruct.superStruct)}{SEMICOLON}",
+                    $"{BASE}{DOT}{methodName}{OPEN_ROUND_BRACKET}{string.Join($"{COMMA}{WHITE_SPACE}", methodArgs?.Select(x => x.name) ?? Enumerable.Empty<string>())}{CLOSED_ROUND_BRACKET}{SEMICOLON}"
+                };
+            }
+
+            return new CodeGenMethodNode {
+                modifier = modifiers,
+                name = methodName,
+                attributes = attributes,
+                returnType = returnType,
+                arguments = methodArgs,
+                body = body,
+            };
+        }
     }
 }
