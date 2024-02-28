@@ -78,7 +78,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
 
             var baseClassMethods = new List<CodeGenMethodNode>();
-            for (var baseStruct = classNode.nodeClass->baseUStruct.superStruct; baseStruct is not null; baseStruct = baseStruct->superStruct) {
+            for (var baseStruct = classNode.nodeClass->baseUStruct.superStruct; false && baseStruct is not null; baseStruct = baseStruct->superStruct) {
                 var functions = _unrealReflection.GetTypeFunctions(baseStruct);
                 foreach (var uFunction in functions) {
                     var methodNode = _methodNodeFactory.GenerateInheritedMethod(uFunction);
