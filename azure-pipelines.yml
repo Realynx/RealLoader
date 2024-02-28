@@ -13,20 +13,20 @@ stages:
   jobs:
   - job: DotnetTesting
     displayName: 'Test the .NET code'
-    pool: 
+    pool:
       name: 'PoofyHost'
     steps:
     - task: DotNetCoreCLI@2
       displayName: 'Restoring nuget packages'
       inputs:
         command: 'restore'
-        projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
+        projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
     - task: DotNetCoreCLI@2
       displayName: 'Running dotnet unit tests'
       inputs:
         command: 'test'
-        projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
+        projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
 - ${{ if or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/developer')), eq(variables['Build.SourceBranch'], 'refs/heads/testing')) }}:
   - stage: Build
@@ -34,7 +34,7 @@ stages:
     jobs:
     - job: BuildWindows
       displayName: 'Build on Windows'
-      pool: 
+      pool:
         name: 'Windows'
       steps:
       - task: UseDotNet@2
@@ -48,21 +48,21 @@ stages:
         displayName: 'Restoring nuget packages'
         inputs:
           command: 'restore'
-          projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
-        
+          projects: '$(Build.SourcesDirectory)/RealLoader.sln'
+
       - task: MSBuild@1
         displayName: 'Build C++ Windows Solution'
         inputs:
-          solution: '$(Build.SourcesDirectory)/C++WindowsBuild.sln'
+          solution: '$(Build.SourcesDirectory)/RealLoader.sln'
           msbuildArchitecture: 'x64'
           platform: 'x64'
           configuration: 'Dist'
           msbuildArguments: '/target:Rebuild'
 
       - task: MSBuild@1
-        displayName: 'Build Palworld Managed Mod Framework Solution'
+        displayName: 'Build RealLoader Solution'
         inputs:
-          solution: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
+          solution: '$(Build.SourcesDirectory)/RealLoader.sln'
           msbuildArchitecture: 'x64'
           platform: 'x64'
           configuration: 'Release'
@@ -77,14 +77,14 @@ stages:
 
     - job: BuildLinux
       displayName: 'Build on Linux'
-      pool: 
+      pool:
         name: 'PoofyHost'
       steps:
       - task: DotNetCoreCLI@2
         displayName: 'Restoring nuget packages'
         inputs:
           command: 'restore'
-          projects: '$(Build.SourcesDirectory)/PalworldManagedModFramework.sln'
+          projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
       - task: CMake@1
         displayName: 'CMake Configure'
@@ -105,7 +105,7 @@ stages:
 
 - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
   - stage: Deploy
-    displayName: 'Deploy built artifacts to github'
+    displayName: 'Deploy built artifacts to GitHub'
     dependsOn: Build
     jobs:
     - job: DeployJob
@@ -131,16 +131,16 @@ stages:
 
       - task: ArchiveFiles@2
         inputs:
-          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/Net/PalWorldManagedModFramework/Release'
+          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/Net/RealLoaderFramework/Release'
           archiveType: 'zip'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/ManagedModFramework.zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/RealLoaderFramework.zip'
 
       - task: GitHubRelease@1
         displayName: 'Create GitHub Release'
         inputs:
           action: 'create'
           gitHubConnection: 'PoofimafoxPAT'
-          repository: 'PoofImaFox/PalworldManagedModFramework'
+          repository: 'PoofImaFox/RealLoader'
           tagSource: 'gitTag'
           tagPattern: 'v[0-9]+.[0-9]+.[0-9]+'
           title: 'Release $(version)-ci'
