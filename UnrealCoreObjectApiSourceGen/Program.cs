@@ -23,7 +23,10 @@ namespace UnrealCoreObjectApiSourceGen {
                 .Build();
 
             var codeParser = host.Services.GetRequiredService<NativeCodeParser>();
-            var parsed = codeParser.ParseSourceFile("C:\\Users\\poofi\\source\\repos\\PalworldManagedModFramework\\UnrealCoreObjectApiSourceGen\\LocalHeaderFiles\\UObject\\Class.h");
+
+            // Environment.CurrentDirectory = "C:\\Users\\poofi\\Documents\\UnrealEngineHeaderFiles5.1\\";
+            Environment.CurrentDirectory = "C:\\Users\\poofi\\source\\repos\\UnrealEngine\\Engine\\Source\\Runtime";
+            var parsed = codeParser.ParseSourceFile("CoreUObject\\Public\\UObject\\Class.h");
             Console.WriteLine($"Parsed: {parsed}");
 
             for (; ; )
