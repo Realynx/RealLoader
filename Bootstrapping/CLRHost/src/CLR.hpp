@@ -33,35 +33,35 @@ int GetLastError() { return 0; }
 
 //-------------------------UTILS FOR LOADING LIBRARIES AT RUNTIME FROM DLLS-------------------------------//
 
-namespace CLR::Util
-{
+namespace CLR::Util {
+
 #if defined(_WIN32)
 
 	//loads a library
-	void* LoadDLLibrary(const char_t* path)
-	{
+	static inline void* LoadDLLibrary(const char_t* path){
+
 		HMODULE h = ::LoadLibraryW(path);
 		assert(h != nullptr);
 		return (void*)h;
 	}
 
 	//gets a exported DLL function
-	void* GetDLLExportedFunction(void* h, const char* name)
-	{
+	static inline void* GetDLLExportedFunction(void* h, const char* name) {
+
 		void* f = ::GetProcAddress((HMODULE)h, name);
 		assert(f != nullptr);
 		return f;
 	}
 
 #elif defined(__linux__)
-	void* LoadDLLibrary(const char_t* path)
-	{
+	static inline void* LoadDLLibrary(const char_t* path){
+
 		void* h = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
 		assert(h != nullptr);
 		return h;
 	}
-	void* GetDLLExportedFunction(void* h, const char* name)
-	{
+	static inline void* GetDLLExportedFunction(void* h, const char* name){
+
 		void* f = dlsym(h, name);
 		assert(f != nullptr);
 		return f;
@@ -71,11 +71,11 @@ namespace CLR::Util
 
 //----------------------------------MAIN CLR-----------------------//
 
-namespace CLR
-{
+namespace CLR {
+
 	//defines a CLR Host
-	struct CLRHost
-	{
+	struct CLRHost {
+
 		hostfxr_handle cxt = nullptr; //the context for the CLR Host
 
 		//the function pointer handles
@@ -89,14 +89,14 @@ namespace CLR
 	public:
 
 		//inits the CLR Host
-		inline bool Init(const char_t* config_Path)
-		{
+		inline bool Init(const char_t* config_Path){
+
 			//gets the hostfxr path automatically
 			get_hostfxr_parameters params{ sizeof(get_hostfxr_parameters), nullptr, nullptr };
 			char_t buffer[999];
 			size_t buffer_size = sizeof(buffer) / sizeof(char_t);
-			if (get_hostfxr_path(buffer, &buffer_size, &params) != 0)
-			{
+			if (get_hostfxr_path(buffer, &buffer_size, &params) != 0){
+
 				std::cout << "Failed to find HostFXR on your system! Please make sure you have the Dot Net SDK or Runtime installed. Thank you.\n";
 				return false;
 			}
@@ -116,8 +116,8 @@ namespace CLR
 			const auto runtimeConfig = PalMM::Util::ConvertThickStringToCString(config_Path);
 			std::cout << "Using config: " << runtimeConfig << std::endl;
 			int rc = hostfxr_funcPtr_initConfig(config_Path, nullptr, &cxt);
-			if (cxt == nullptr || rc != 0)
-			{
+			if (cxt == nullptr || rc != 0){
+
 				std::cerr << "Init failed: " << std::hex << std::showbase << rc << std::endl;
 				return false;
 			}
@@ -130,17 +130,17 @@ namespace CLR
 
 #if defined(_WIN32)
 		//sets a property in the CLR
-		inline void SetCLRProperty(const wchar_t* propertyStr, const wchar_t* newValue, bool ignoreLogging = false)
+		inline void SetCLRProperty(const wchar_t* propertyStr, const wchar_t* newValue, bool ignoreLogging = false) {
 
 #else
 		//sets a property in the CLR
-		inline void SetCLRProperty(const char* propertyStr, const char* newValue, bool ignoreLogging = false)
-#endif
-		{
-			if (!hostfxr_funcPtr_SetRuntimeProperty)
-			{
-				if (!ignoreLogging)
+		inline void SetCLRProperty(const char* propertyStr, const char* newValue, bool ignoreLogging = false) {
+#endif 
+		
+			if (!hostfxr_funcPtr_SetRuntimeProperty) {
+				if (!ignoreLogging) {
 					std::cout << "RealLoader Error: CLR || Func: \"SetCLRProperty\" || Failed to set \"" << propertyStr << "\" to Value \"" << newValue << "\" due to hostfxr_funcPtr_SetRuntimeProperty being NULL. Please check that HostFXR hasn't failed at being found on your system. And any other previous CLR initialize states are running as expected.\n";
+				}
 
 				return;
 			}
@@ -150,8 +150,7 @@ namespace CLR
 		}
 
 		//sets the base app context || takes in a file to the config path, we strip out the file name and just use the directory
-		inline void SetAppContextBase(const char_t* configPath)
-		{
+		inline void SetAppContextBase(const char_t* configPath) {
 			//calculate and set up the base directory for the app context
 			std::string baseAppContextDir = PalMM::Util::ConvertThickStringToCString(configPath);
 

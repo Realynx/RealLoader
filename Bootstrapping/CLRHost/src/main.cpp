@@ -8,10 +8,9 @@ DLL entry point for running C#
 #include <filesystem>
 
 //finds the desired folder and returns the relative path
-PalMM::Util::String FindDotnetDependencyFolderPath_Relative(const char* folderName)
-{
-	for (auto& p : std::filesystem::recursive_directory_iterator("."))
-	{
+static inline PalMM::Util::String FindDotnetDependencyFolderPath_Relative(const char* folderName){
+
+	for (auto& p : std::filesystem::recursive_directory_iterator(".")){
 		//if the folder is found, return the path
 		if (p.is_directory() && !strcmp(p.path().filename().string().c_str(), folderName))
 			return p.path().string();
@@ -22,8 +21,8 @@ PalMM::Util::String FindDotnetDependencyFolderPath_Relative(const char* folderNa
 }
 
 //finds the desired folder and returns the absolute path
-PalMM::Util::String FindDotnetDependencyFolderPath_Absolute(const char* folderName)
-{
+static inline PalMM::Util::String FindDotnetDependencyFolderPath_Absolute(const char* folderName){
+
 	PalMM::Util::String path = FindDotnetDependencyFolderPath_Relative(folderName);
 	if (path.charData.empty()) //if it failed
 		return "";
@@ -33,8 +32,8 @@ PalMM::Util::String FindDotnetDependencyFolderPath_Absolute(const char* folderNa
 
 
 //runs the CLR thread and DLL
-void RUNCLR()
-{
+static inline void RUNCLR(){
+
 	PalMM::Util::String appPath;
 	PalMM::Util::String configPath;
 	//gets the RealLoader Framework folder
@@ -65,7 +64,7 @@ void RUNCLR()
 
 
 std::atomic<bool> clrInitialized{ false };
-void SpawnClrThread() {
+static inline void SpawnClrThread() {
 	if (clrInitialized.exchange(true)) {
 		return;
 	}
@@ -84,8 +83,8 @@ void SpawnClrThread() {
 
 #if defined(_WIN32)
 // Windows-specific code
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD  reason, LPVOID lpReserved)
-{
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  reason, LPVOID lpReserved){
+
 	//checks the state of the DLL
 	switch (reason)
 	{
