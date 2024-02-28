@@ -144,12 +144,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 methodName = $"_{methodName}";
             }
 
-            var attributes = new [] {
+            var attributes = new[] {
                 _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedMethodName}{QUOTE}"),
                 _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)
             };
 
-            var parameters = _unrealReflection.GetFunctionSignature(method, out var returnValue, out var returnValueIndex);
+            var parameters = _unrealReflection.GetFunctionSignature(method, out var returnValue, out _);
             string returnType;
             if (returnValue is not null) {
                 var signatureName = returnValue->classPrivate->ObjectName;
