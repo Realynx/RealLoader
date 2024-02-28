@@ -13,11 +13,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private readonly ILogger _logger;
         private readonly IAttributeGenerator _attributeGenerator;
         private readonly IArgumentGenerator _argumentGenerator;
+        private readonly IGenericGenerator _genericGenerator;
 
-        public MethodGenerator(ILogger logger, IAttributeGenerator attributeGenerator, IArgumentGenerator argumentGenerator) {
+        public MethodGenerator(ILogger logger, IAttributeGenerator attributeGenerator, IArgumentGenerator argumentGenerator,
+            IGenericGenerator genericGenerator) {
             _logger = logger;
             _attributeGenerator = attributeGenerator;
             _argumentGenerator = argumentGenerator;
+            _genericGenerator = genericGenerator;
         }
 
         public unsafe void GenerateMethod(StringBuilder codeBuilder, CodeGenMethodNode methodNode) {
@@ -36,18 +39,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             codeBuilder.Append(methodNode.name);
 
             if (methodNode.genericTypes is not null) {
-                codeBuilder.Append(OPEN_ANGLE_BRACKET);
-
-                foreach (var generic in methodNode.genericTypes) {
-                    codeBuilder.Append(generic);
-                    codeBuilder.Append($"{COMMA}{WHITE_SPACE}");
-                }
-
-                // Remove the trailing comma and whitespace
-                var separatorWidth = COMMA.Length + WHITE_SPACE.Length;
-                codeBuilder.Remove(codeBuilder.Length - separatorWidth, separatorWidth);
-
-                codeBuilder.Append(CLOSED_ANGLE_BRACKET);
+                _genericGenerator.GenerateGenerics(codeBuilder, methodNode.genericTypes);
             }
 
             codeBuilder.Append(OPEN_ROUND_BRACKET);

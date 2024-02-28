@@ -1,5 +1,4 @@
-using System.Reflection;
-
+using PalworldManagedModFramework.Sdk.Interfaces;
 using PalworldManagedModFramework.Sdk.Logging;
 using PalworldManagedModFramework.Sdk.Models;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.UClassStructs;
@@ -22,15 +21,14 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             _singleInstance = this;
         }
 
-        public static T CreateProxy<T>(UObject* existingObject) where T : UObjectInterop {
+        public static T CreateProxy<T>(UObject* existingObject) where T : UObjectInterop, ICreatableUObject<T> {
             if (_singleInstance is null) {
                 throw new NullReferenceException($"{nameof(_singleInstance)} was null");
             }
 
-            const BindingFlags BINDING_FLAGS = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.CreateInstance;
             var unrealReflection = _singleInstance._unrealReflection;
             var globalObjectsTracker = _singleInstance._globalObjectsTracker;
-            return (T)Activator.CreateInstance(typeof(T), BINDING_FLAGS, null, [(nint)existingObject, unrealReflection, globalObjectsTracker], null)!;
+            return T.Create(existingObject, unrealReflection, globalObjectsTracker);
         }
     }
 }

@@ -12,13 +12,21 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class ConstructorGenerator : IConstructorGenerator {
         private readonly ILogger _logger;
         private readonly IArgumentGenerator _argumentGenerator;
+        private readonly IAttributeGenerator _attributeGenerator;
 
-        public ConstructorGenerator(ILogger logger, IArgumentGenerator argumentGenerator) {
+        public ConstructorGenerator(ILogger logger, IArgumentGenerator argumentGenerator, IAttributeGenerator attributeGenerator) {
             _logger = logger;
             _argumentGenerator = argumentGenerator;
+            _attributeGenerator = attributeGenerator;
         }
 
         public void GenerateConstructor(StringBuilder codeBuilder, CodeGenConstructorNode constructorNode) {
+            if (constructorNode.attributes is not null) {
+                foreach (var attributeNode in constructorNode.attributes) {
+                    _attributeGenerator.GenerateAttribute(codeBuilder, attributeNode, 2);
+                }
+            }
+
             codeBuilder.AppendIndented(constructorNode.modifier, 2);
             codeBuilder.Append(WHITE_SPACE);
 

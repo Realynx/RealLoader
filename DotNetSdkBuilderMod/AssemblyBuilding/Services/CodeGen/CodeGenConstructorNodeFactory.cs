@@ -9,15 +9,19 @@ using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConsta
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class CodeGenConstructorNodeFactory : ICodeGenConstructorNodeFactory {
         private readonly ILogger _logger;
+        private readonly ICodeGenAttributeNodeFactory _attributeNodeFactory;
 
-        public CodeGenConstructorNodeFactory(ILogger logger) {
+        public CodeGenConstructorNodeFactory(ILogger logger, ICodeGenAttributeNodeFactory attributeNodeFactory) {
             _logger = logger;
+            _attributeNodeFactory = attributeNodeFactory;
         }
 
         public CodeGenConstructorNode GenerateDefaultConstructor(string className) {
-            var modifiers = $"{PROTECTED}{WHITE_SPACE}{INTERNAL}";
+            var modifiers = PROTECTED;
 
-            CodeGenAttributeNode[]? attributes = null;
+            var attributes = new[] {
+                _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)
+            };
 
             var arguments = new[] {
                 new CodeGenArgumentNode {

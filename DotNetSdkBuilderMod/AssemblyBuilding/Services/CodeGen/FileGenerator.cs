@@ -47,7 +47,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             codeBuilder.Append(NAMESPACE);
             codeBuilder.Append(WHITE_SPACE);
 
-            var fullyQualifiedNamespace = namespaceNode.fullName;
+            var fullyQualifiedNamespace = namespaceNode.fullNamespace;
             codeBuilder.Append(fullyQualifiedNamespace);
 
             codeBuilder.Append(WHITE_SPACE);
@@ -59,7 +59,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
 
             // Remove trailing newline between classes end and namespace closing bracket
-            codeBuilder.RemoveLine();
+            codeBuilder.RemoveNewLine();
 
             codeBuilder.Append(CLOSED_CURLY_BRACKET);
         }

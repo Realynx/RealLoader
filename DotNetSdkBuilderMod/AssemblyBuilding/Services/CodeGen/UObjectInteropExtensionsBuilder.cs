@@ -189,12 +189,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             return new CodeGenNamespaceNode {
                 packageName = fullUpperNamespace,
-                fullName = fullUpperNamespace,
-                namespaces = new [] {
+                fullNamespace = fullUpperNamespace,
+                namespaces = new[] {
                     new CodeGenNamespaceNode
                     {
                         packageName = fullLowerNamespace,
-                        fullName = fullLowerNamespace,
+                        fullNamespace = fullLowerNamespace,
                     }
                 }
             };

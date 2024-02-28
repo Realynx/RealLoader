@@ -26,7 +26,7 @@ namespace DotNetSdkBuilderMod.Extensions {
                 .Append(CodeGenConstants.TAB, tabCount);
         }
 
-        public static StringBuilder RemoveLine(this StringBuilder sb) {
+        public static StringBuilder RemoveNewLine(this StringBuilder sb) {
             if (sb.Length < Environment.NewLine.Length) {
                 return sb;
             }

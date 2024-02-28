@@ -15,7 +15,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public CodeGenClassNode[]? classes;
 
         public string packageName;
-        public string fullName;
+        public string fullNamespace;
         public string[]? imports;
     }
 
@@ -27,6 +27,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Models {
         public CodeGenOperatorNode[]? operatorNodes;
 
         public string? baseType;
+        public CodeGenInterfaceNode[]? interfaces;
+    }
+
+    [DebuggerDisplay("{name}: {methodNodes.Length} methods")]
+    public class CodeGenInterfaceNode {
+        public string name;
+        public string[]? genericTypes;
+        public CodeGenMethodNode[] methodNodes;
     }
 
     [DebuggerDisplay("{name}: {arguments?.Length ?? 0} arguments")]

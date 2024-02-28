@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using PalworldManagedModFramework.Sdk.Interfaces;
-using PalworldManagedModFramework.Sdk.Services;
 
 namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
     public class Startup : ISbStartup {
@@ -40,6 +39,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
                 .AddSingleton<ICodeGenPropertyNodeFactory, CodeGenPropertyNodeFactory>()
                 .AddSingleton<ICodeGenConstructorNodeFactory, CodeGenConstructorNodeFactory>()
                 .AddSingleton<ICodeGenOperatorNodeFactory, CodeGenOperatorNodeFactory>()
+                .AddSingleton<ICodeGenInterfaceNodeFactory, CodeGenInterfaceNodeFactory>()
                 .AddSingleton<ICodeGenClassNodeFactory, CodeGenClassNodeFactory>()
                 .AddSingleton<ICodeGenGraphBuilder, CodeGenGraphBuilder>()
                 .AddSingleton<IUObjectInteropExtensionsBuilder, UObjectInteropExtensionsBuilder>()
@@ -54,6 +54,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.DI {
                 .AddSingleton<IPropertyGenerator, PropertyGenerator>()
                 .AddSingleton<IMethodGenerator, MethodGenerator>()
                 .AddSingleton<IOperatorGenerator, OperatorGenerator>()
+                .AddSingleton<IInterfaceGenerator, InterfaceGenerator>()
+                .AddSingleton<IGenericGenerator, GenericGenerator>()
                 .AddSingleton<IXmlTagGenerator, XmlTagGenerator>()
                 .AddSingleton<IProjectGenerator, ProjectGenerator>()
                 .AddSingleton<ISolutionGenerator, SolutionGenerator>();

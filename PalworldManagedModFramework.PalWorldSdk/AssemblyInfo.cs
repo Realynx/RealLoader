@@ -18,3 +18,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("70dd1933-38f8-4e43-a525-a535ea07496c")]
 [assembly: InternalsVisibleTo("PalworldManagedModFramework.PalWorldSdk.Tests")]
 [assembly: InternalsVisibleTo("DotnetSdkBuilderMod")]
+[assembly: InternalsVisibleTo("GeneratedSdk")]

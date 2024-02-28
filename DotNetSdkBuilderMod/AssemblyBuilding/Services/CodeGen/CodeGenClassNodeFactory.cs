@@ -18,18 +18,20 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private readonly ICodeGenPropertyNodeFactory _propertyNodeFactory;
         private readonly ICodeGenMethodNodeFactory _methodNodeFactory;
         private readonly ICodeGenOperatorNodeFactory _operatorNodeFactory;
+        private readonly ICodeGenInterfaceNodeFactory _interfaceNodeFactory;
         private readonly INameCollisionService _nameCollisionService;
         private readonly IUnrealReflection _unrealReflection;
 
         public CodeGenClassNodeFactory(INamePoolService namePoolService, ICodeGenAttributeNodeFactory attributeNodeFactory, ICodeGenConstructorNodeFactory constructorNodeFactory,
             ICodeGenPropertyNodeFactory propertyNodeFactory, ICodeGenMethodNodeFactory methodNodeFactory, ICodeGenOperatorNodeFactory operatorNodeFactory,
-            INameCollisionService nameCollisionService, IUnrealReflection unrealReflection) {
+            ICodeGenInterfaceNodeFactory interfaceNodeFactory, INameCollisionService nameCollisionService, IUnrealReflection unrealReflection) {
             _namePoolService = namePoolService;
             _attributeNodeFactory = attributeNodeFactory;
             _constructorNodeFactory = constructorNodeFactory;
             _propertyNodeFactory = propertyNodeFactory;
             _methodNodeFactory = methodNodeFactory;
             _operatorNodeFactory = operatorNodeFactory;
+            _interfaceNodeFactory = interfaceNodeFactory;
             _nameCollisionService = nameCollisionService;
             _unrealReflection = unrealReflection;
         }
@@ -94,10 +96,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 methods = baseClassMethods.ToArray();
             }
 
-            var modifiers = new StringBuilder($"{PUBLIC}{WHITE_SPACE}{UNSAFE}");
+            var modifiers = new StringBuilder(PUBLIC);
             if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Abstract)) {
                 modifiers.Append($"{WHITE_SPACE}{ABSTRACT}");
             }
+
+            // Preserve modifier order
+            modifiers.Append($"{WHITE_SPACE}{UNSAFE}");
 
             var attributes = new List<CodeGenAttributeNode> {
                 _attributeNodeFactory.GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"{QUOTE}{classNode.packageName}/{className}{QUOTE}"),
@@ -114,6 +119,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
             else {
                 baseClassName = nameof(UObjectInterop);
+            }
+
+            CodeGenInterfaceNode[]? interfaces = null;
+            if (!classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Abstract)) {
+                interfaces = new[] {
+                    _interfaceNodeFactory.GenerateICreatableUObject(className)
+                };
             }
 
             CodeGenOperatorNode[]? operators = null;
@@ -147,6 +159,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 name = className,
                 attributes = attributes.ToArray(),
                 baseType = baseClassName,
+                interfaces = interfaces,
                 operatorNodes = operators,
             };
         }

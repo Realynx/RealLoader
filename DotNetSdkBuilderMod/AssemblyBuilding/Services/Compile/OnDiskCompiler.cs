@@ -48,7 +48,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
 
         public void AppendFile(StringBuilder code, string assemblyName, string nameSpace) {
             var namespaceDirectories = Path.Combine(nameSpace.Split('.', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries));
-            var directory = Path.Combine(_sourceLocation, assemblyName, namespaceDirectories);
+            var directory = Path.Combine(_sourceLocation, namespaceDirectories);
             if (Directory.Exists(directory)) {
                 Directory.Delete(directory, true);
             }

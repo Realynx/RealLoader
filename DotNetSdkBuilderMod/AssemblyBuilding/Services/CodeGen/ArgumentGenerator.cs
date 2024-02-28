@@ -29,7 +29,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                         _attributeGenerator.GenerateAttribute(codeBuilder, attributeNode, 0);
 
                         // GenerateAttribute ends with a new line. We need to remove that.
-                        codeBuilder.RemoveLine();
+                        codeBuilder.RemoveNewLine();
                         codeBuilder.Append(WHITE_SPACE);
                     }
                 }

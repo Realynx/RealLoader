@@ -8,8 +8,8 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 using DotNetSdkBuilderMod.Extensions;
 
-using PalworldManagedModFramework.Sdk.Attributes;
 using PalworldManagedModFramework.Sdk.Logging;
+using PalworldManagedModFramework.Sdk.Models;
 using PalworldManagedModFramework.Sdk.Models.CoreUObject.Flags;
 using PalworldManagedModFramework.Sdk.Services.EngineServices.Interfaces;
 
@@ -62,7 +62,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var customClassNamespaces = TimedMemoizeTypeNamespaces(rootNode);
 
             var precompiledAssemblies = new[] {
-                typeof(string).Assembly, typeof(MemoryPool<byte>).Assembly, typeof(SdkBuilder).Assembly, typeof(DetourAttribute).Assembly, typeof(object).Assembly, typeof(Unsafe).Assembly
+                typeof(string).Assembly, typeof(MemoryPool<byte>).Assembly, typeof(UObjectInterop).Assembly, typeof(object).Assembly, typeof(Unsafe).Assembly
             };
 
             _logger.Debug("Building precompiled class-namespace dictionary...");
@@ -248,8 +248,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private void TimedBuildInteropExtensions(CodeGenNamespaceNode[] namespaceTree, IReadOnlyList<int> functionArgCounts) {
-            var interopNamespace = namespaceTree.Single(x => x.fullName.Contains(CODE_GEN_INTEROP_NAMESPACE));
-            var extensionsNamespace = interopNamespace.namespaces!.Single(x => x.fullName.Contains(U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE));
+            var interopNamespace = namespaceTree.Single(x => x.fullNamespace.Contains(CODE_GEN_INTEROP_NAMESPACE));
+            var extensionsNamespace = interopNamespace.namespaces!.Single(x => x.fullNamespace.Contains(U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE));
             var time = _functionTimingService.Execute(() => _uObjectInteropExtensionsBuilder.PopulateNamespaceNode(extensionsNamespace, functionArgCounts));
 
             _logger.Debug($"Built interop extension methods; {time.TotalMilliseconds:F1} ms to build.");
@@ -337,7 +337,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private void MemoizeCustomAssemblyNamespaces(CodeGenNamespaceNode currentNode, string currentAssembly, Dictionary<string, string> namespaces) {
-            namespaces[currentNode.fullName] = currentAssembly;
+            namespaces[currentNode.fullNamespace] = currentAssembly;
 
             if (currentNode.namespaces is not null) {
                 foreach (var namespaceNode in currentNode.namespaces) {

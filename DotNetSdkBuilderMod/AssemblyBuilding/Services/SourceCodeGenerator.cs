@@ -104,7 +104,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
 
             _fileGenerator.GenerateFile(classFile, namespaceNode);
             if (classFile.Length > 0) {
-                codeCompiler.AppendFile(classFile, assemblyName, namespaceNode.fullName);
+                codeCompiler.AppendFile(classFile, assemblyName, namespaceNode.fullNamespace);
             }
 
             if (namespaceNode.namespaces is not null) {

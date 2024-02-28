@@ -16,15 +16,18 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private readonly IPropertyGenerator _propertyGenerator;
         private readonly IMethodGenerator _methodGenerator;
         private readonly IOperatorGenerator _operatorGenerator;
+        private readonly IInterfaceGenerator _interfaceGenerator;
 
         public ClassGenerator(ILogger logger, IAttributeGenerator attributeGenerator, IConstructorGenerator constructorGenerator,
-            IPropertyGenerator propertyGenerator, IMethodGenerator methodGenerator, IOperatorGenerator operatorGenerator) {
+            IPropertyGenerator propertyGenerator, IMethodGenerator methodGenerator, IOperatorGenerator operatorGenerator,
+            IInterfaceGenerator interfaceGenerator) {
             _logger = logger;
             _attributeGenerator = attributeGenerator;
             _constructorGenerator = constructorGenerator;
             _propertyGenerator = propertyGenerator;
             _methodGenerator = methodGenerator;
             _operatorGenerator = operatorGenerator;
+            _interfaceGenerator = interfaceGenerator;
         }
 
         public unsafe void GenerateClass(StringBuilder codeBuilder, CodeGenClassNode classNode) {
@@ -41,15 +44,25 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             codeBuilder.Append(WHITE_SPACE);
 
             codeBuilder.Append(classNode.name);
-            codeBuilder.Append(WHITE_SPACE);
 
             var baseClass = classNode.baseType;
             if (baseClass is not null) {
+                codeBuilder.Append(WHITE_SPACE);
                 codeBuilder.Append(COLON);
                 codeBuilder.Append(WHITE_SPACE);
                 codeBuilder.Append(baseClass);
-                codeBuilder.Append(WHITE_SPACE);
             }
+
+            if (classNode.interfaces is { Length: > 0 }) {
+                if (baseClass is not null) {
+                    codeBuilder.Append(COMMA);
+                }
+
+                codeBuilder.Append(WHITE_SPACE);
+                _interfaceGenerator.GenerateInterfaces(codeBuilder, classNode.interfaces);
+            }
+
+            codeBuilder.Append(WHITE_SPACE);
 
             if (classNode.constructorNodes is null && classNode.propertyNodes is null && classNode.methodNodes is null && classNode.operatorNodes is null) {
                 codeBuilder.Append(OPEN_CURLY_BRACKET);
@@ -80,6 +93,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
+            if (classNode.interfaces is not null) {
+                foreach (var interfaceNode in classNode.interfaces) {
+                    foreach (var method in interfaceNode.methodNodes) {
+                        _methodGenerator.GenerateMethod(codeBuilder, method);
+                        codeBuilder.AppendLine();
+                    }
+                }
+            }
+
             if (classNode.operatorNodes is not null) {
                 foreach (var classOperator in classNode.operatorNodes) {
                     _operatorGenerator.GenerateOperator(codeBuilder, classOperator);
@@ -87,9 +109,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
-            if (classNode.constructorNodes is not null || classNode.propertyNodes is not null || classNode.methodNodes is not null || classNode.operatorNodes is not null) {
+            if (classNode.constructorNodes is not null || classNode.propertyNodes is not null || classNode.methodNodes is not null || classNode.operatorNodes is not null || classNode.interfaces is not null) {
                 // Remove trailing newline between members end and class closing bracket
-                codeBuilder.RemoveLine();
+                codeBuilder.RemoveNewLine();
             }
 
             codeBuilder.AppendIndentedLine(CLOSED_CURLY_BRACKET, 1);
