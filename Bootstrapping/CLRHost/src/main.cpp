@@ -8,9 +8,8 @@ DLL entry point for running C#
 #include <filesystem>
 
 //finds the desired folder and returns the relative path
-static inline PalMM::Util::String FindDotnetDependencyFolderPath_Relative(const char* folderName){
-
-	for (auto& p : std::filesystem::recursive_directory_iterator(".")){
+static inline PalMM::Util::String FindDotnetDependencyFolderPath_Relative(const char* folderName) {
+	for (auto& p : std::filesystem::recursive_directory_iterator(".")) {
 		//if the folder is found, return the path
 		if (p.is_directory() && !strcmp(p.path().filename().string().c_str(), folderName))
 			return p.path().string();
@@ -21,8 +20,7 @@ static inline PalMM::Util::String FindDotnetDependencyFolderPath_Relative(const 
 }
 
 //finds the desired folder and returns the absolute path
-static inline PalMM::Util::String FindDotnetDependencyFolderPath_Absolute(const char* folderName){
-
+static inline PalMM::Util::String FindDotnetDependencyFolderPath_Absolute(const char* folderName) {
 	PalMM::Util::String path = FindDotnetDependencyFolderPath_Relative(folderName);
 	if (path.charData.empty()) //if it failed
 		return "";
@@ -32,8 +30,7 @@ static inline PalMM::Util::String FindDotnetDependencyFolderPath_Absolute(const 
 
 
 //runs the CLR thread and DLL
-static inline void RUNCLR(){
-
+static inline void RUNCLR() {
 	PalMM::Util::String appPath;
 	PalMM::Util::String configPath;
 	//gets the RealLoader Framework folder
@@ -62,8 +59,8 @@ static inline void RUNCLR(){
 }
 
 
+std::atomic<bool> clrInitialized{false};
 
-std::atomic<bool> clrInitialized{ false };
 static inline void SpawnClrThread() {
 	if (clrInitialized.exchange(true)) {
 		return;
@@ -83,18 +80,16 @@ static inline void SpawnClrThread() {
 
 #if defined(_WIN32)
 // Windows-specific code
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD  reason, LPVOID lpReserved){
-
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID lpReserved) {
 	//checks the state of the DLL
-	switch (reason)
-	{
-	case DLL_PROCESS_ATTACH:
-		SpawnClrThread();
-		break;
+	switch (reason) {
+		case DLL_PROCESS_ATTACH:
+			SpawnClrThread();
+			break;
 
-	case DLL_PROCESS_DETACH:
-		FreeConsole();
-		break;
+		case DLL_PROCESS_DETACH:
+			FreeConsole();
+			break;
 	}
 
 	return TRUE;

@@ -4,7 +4,7 @@
 
 extern void* g_FunctionTable[];
 
-static inline void PopulateFunctionTable(){
+static inline void PopulateFunctionTable() {
 
 	// version.dll is not called in the same working dir as winhttp.dll, so the mod path string must be altered to use it.
 	HMODULE OriginalModule = LoadLibraryA("C:\\Windows\\System32\\version.dll");
@@ -29,7 +29,7 @@ static inline void PopulateFunctionTable(){
 }
 
 
-void CheckModdedLaunchFlag(){
+void CheckModdedLaunchFlag() {
 
 	LPWSTR lpwCmdLine = GetCommandLineW();
 	LPWSTR moddedFlag = L"-modded";
@@ -38,7 +38,7 @@ void CheckModdedLaunchFlag(){
 	}
 }
 
-DWORD WINAPI ProcessAttach(_In_ LPVOID Parameter){
+DWORD WINAPI ProcessAttach(_In_ LPVOID Parameter) {
 
 	if (Parameter == NULL)
 		return FALSE;
@@ -49,7 +49,7 @@ DWORD WINAPI ProcessAttach(_In_ LPVOID Parameter){
 	return TRUE;
 }
 
-DWORD WINAPI ProcessDetach(_In_ LPVOID Parameter){
+DWORD WINAPI ProcessDetach(_In_ LPVOID Parameter) {
 
 	if (Parameter == NULL)
 		return FALSE;
@@ -65,11 +65,11 @@ BOOL APIENTRY DllMain(
 {
 	switch (Reason)
 	{
-	case DLL_PROCESS_ATTACH:
-		DisableThreadLibraryCalls(Instance); // Disable DLL_THREAD_ATTACH and DLL_THREAD_DETACH notifications
-		return ProcessAttach(Instance);
-	case DLL_PROCESS_DETACH:
-		return ProcessDetach(Instance);
+		case DLL_PROCESS_ATTACH:
+			DisableThreadLibraryCalls(Instance); // Disable DLL_THREAD_ATTACH and DLL_THREAD_DETACH notifications
+			return ProcessAttach(Instance);
+		case DLL_PROCESS_DETACH:
+			return ProcessDetach(Instance);
 	}
 
 	return TRUE;
