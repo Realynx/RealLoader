@@ -79,9 +79,9 @@ namespace CLR
 		hostfxr_handle cxt = nullptr; //the context for the CLR Host
 
 		//the function pointer handles
-		hostfxr_initialize_for_runtime_config_fn hostfxr_funcPtr_initConfig; //initalizes the runtime and it's config data
+		hostfxr_initialize_for_runtime_config_fn hostfxr_funcPtr_initConfig; //initializes the runtime and it's config data
 
-		hostfxr_set_runtime_property_value_fn hostfxr_funcPtr_SetRuntimePropery; //sets the runtime property
+		hostfxr_set_runtime_property_value_fn hostfxr_funcPtr_SetRuntimeProperty; //sets the runtime property
 		hostfxr_get_runtime_delegate_fn hostfxr_funcPtr_GetRuntimeDelegate; //gets a function from managed C# land
 
 		hostfxr_close_fn hostfxr_funcPtr_Close; //closes the CLR, we don't use it as far as this comment knows (dated 01-29-24)
@@ -105,15 +105,15 @@ namespace CLR
 			void* hostfxr_lib = Util::LoadDLLibrary(buffer);
 
 			//gets the desired functions from the Hostfxr DLL
-			hostfxr_funcPtr_SetRuntimePropery = (hostfxr_set_runtime_property_value_fn)Util::GetDLLExportedFunction(hostfxr_lib, "hostfxr_set_runtime_property_value");
+			hostfxr_funcPtr_SetRuntimeProperty = (hostfxr_set_runtime_property_value_fn)Util::GetDLLExportedFunction(hostfxr_lib, "hostfxr_set_runtime_property_value");
 
 			hostfxr_funcPtr_initConfig = (hostfxr_initialize_for_runtime_config_fn)Util::GetDLLExportedFunction(hostfxr_lib, "hostfxr_initialize_for_runtime_config");
 			hostfxr_funcPtr_GetRuntimeDelegate = (hostfxr_get_runtime_delegate_fn)Util::GetDLLExportedFunction(hostfxr_lib, "hostfxr_get_runtime_delegate");
 
 			hostfxr_funcPtr_Close = (hostfxr_close_fn)Util::GetDLLExportedFunction(hostfxr_lib, "hostfxr_close");
 
-			//initalizes the config
-			auto runtimeConfig = PalMM::Util::ConvertThickStringToCString(config_Path);
+			//initializes the config
+			const auto runtimeConfig = PalMM::Util::ConvertThickStringToCString(config_Path);
 			std::cout << "Using config: " << runtimeConfig << std::endl;
 			int rc = hostfxr_funcPtr_initConfig(config_Path, nullptr, &cxt);
 			if (cxt == nullptr || rc != 0)
@@ -125,28 +125,28 @@ namespace CLR
 			//sets the app base config
 			SetAppContextBase(config_Path);
 
-			return (hostfxr_funcPtr_SetRuntimePropery && hostfxr_funcPtr_initConfig && hostfxr_funcPtr_GetRuntimeDelegate && hostfxr_funcPtr_Close);
+			return (hostfxr_funcPtr_SetRuntimeProperty && hostfxr_funcPtr_initConfig && hostfxr_funcPtr_GetRuntimeDelegate && hostfxr_funcPtr_Close);
 		}
 
 #if defined(_WIN32)
 		//sets a property in the CLR
 		inline void SetCLRProperty(const wchar_t* propertyStr, const wchar_t* newValue, bool ignoreLogging = false)
-		
+
 #else
 		//sets a property in the CLR
 		inline void SetCLRProperty(const char* propertyStr, const char* newValue, bool ignoreLogging = false)
 #endif
 		{
-			if (!hostfxr_funcPtr_SetRuntimePropery)
+			if (!hostfxr_funcPtr_SetRuntimeProperty)
 			{
 				if (!ignoreLogging)
-					std::cout << "Pal World Modding Framework Error: CLR || Func: \"SetCLRProperty\" || Failed to set \"" << propertyStr << "\" to Value \"" << newValue << "\" due to hostfxr_funcPtr_SetRuntimePropery being NULL. Please check that HostFXR hasen't failed at being found on your system. And any other previous CLR initalize states are running as expected.\n";
+					std::cout << "RealLoader Error: CLR || Func: \"SetCLRProperty\" || Failed to set \"" << propertyStr << "\" to Value \"" << newValue << "\" due to hostfxr_funcPtr_SetRuntimeProperty being NULL. Please check that HostFXR hasn't failed at being found on your system. And any other previous CLR initialize states are running as expected.\n";
 
 				return;
 			}
 
 			std::cout << "OwO Property Setting: \"" << PalMM::Util::ConvertThickStringToCString(propertyStr) << "\" || \"" << PalMM::Util::ConvertThickStringToCString(newValue) << "\"\n";
-			hostfxr_funcPtr_SetRuntimePropery(cxt, propertyStr, newValue);
+			hostfxr_funcPtr_SetRuntimeProperty(cxt, propertyStr, newValue);
 		}
 
 		//sets the base app context || takes in a file to the config path, we strip out the file name and just use the directory
@@ -154,7 +154,7 @@ namespace CLR
 		{
 			//calculate and set up the base directory for the app context
 			std::string baseAppContextDir = PalMM::Util::ConvertThickStringToCString(configPath);
-			
+
 #if defined(_WIN32)
 			auto pos = baseAppContextDir.find_last_of("\\");
 #else
@@ -180,7 +180,7 @@ namespace CLR
 				return;
 			}
 
-			std::cout << "Initalizing...starting the process of loading a Assembly" << std::endl;
+			std::cout << "Initializing...starting the process of loading a Assembly" << std::endl;
 
 			//loads a Assembly
 			LoadAssembly loadAssembly = nullptr;

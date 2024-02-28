@@ -17,7 +17,7 @@ PalMM::Util::String FindDotnetDependencyFolderPath_Relative(const char* folderNa
 			return p.path().string();
 	}
 
-	printf("Pal World Modding Framework Error: Failed to find %s at the current directory!\n", folderName);
+	printf("RealLoader Error: Failed to find %s at the current directory!\n", folderName);
 	return "";
 }
 
@@ -76,7 +76,7 @@ void SpawnClrThread() {
 	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
 #endif
 
-	//starts thread and detachtes it
+	//starts thread and detaches it
 	std::thread worker(RUNCLR);
 	worker.detach();
 }
