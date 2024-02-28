@@ -10,7 +10,9 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices.Windows {
         public nint PGUObjectArray { get; set; }
 
         // https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/CoreUObject/Private/UObject/ScriptCore.cpp#L1963
+        //  // 40 ? ? ? 41 ? 41 ? 41 ? 41 ? 48 81 EC 10 01 ? ? 48 8D 6C ? ? 48 89 9D 38 01
         // https://github.com/EpicGames/UnrealEngine/blob/4.27/Engine/Source/Runtime/CoreUObject/Private/UObject/ScriptCore.cpp#L1848
+        //  // 48 89 ? ? 48 ? ? 48 8B ? ? 48 ? ? 48 89 ? ? 4C 89 ? ? 4C 8D 3D 1A 37
         public string ProcessEventPattern { get; } = "40 ? ? ? 41 ? 41 ? 41 ? 41 ? 48 81 EC 10 01 ? ? 48 8D 6C ? ? 48 89 9D 38 01";
 
         public string UObject_PostInitPropertiesPattern { get; } = "48 83 ? ? 48 ? ? 48 C7 44 24 20 00 00 ? ? 48 8B ? ? 45 ? ? 41 ? ?";
