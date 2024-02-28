@@ -37,8 +37,8 @@ void RUNCLR()
 {
 	PalMM::Util::String appPath;
 	PalMM::Util::String configPath;
-	//gets the Managed Mod Framework folder
-	PalMM::Util::String modFrameworkDir = FindDotnetDependencyFolderPath_Absolute("ManagedModFramework");
+	//gets the RealLoader Framework folder
+	PalMM::Util::String modFrameworkDir = FindDotnetDependencyFolderPath_Absolute("RealLoaderFramework");
 
 	//sets the paths for the CLR runtime
 #if defined(_WIN32)

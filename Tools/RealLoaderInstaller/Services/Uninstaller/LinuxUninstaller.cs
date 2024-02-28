@@ -19,7 +19,7 @@ namespace RealLoaderInstaller.Services.Uninstaller {
             Directory.Delete(modsFolder, true);
 
             AnsiConsole.WriteLine($"Removing Dependencies Folder...");
-            var dotnetDependenciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "ManagedModFramework");
+            var dotnetDependenciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "RealLoaderFramework");
             Directory.Delete(dotnetDependenciesFolder, true);
 
             AnsiConsole.WriteLine($"Restoring launchs script...");

@@ -27,8 +27,8 @@ namespace RealLoaderInstaller.Tests.Services.LinuxInstallerTests {
         [Fact]
         public void Was_Framework_Install_Dir_Created() {
             try {
-                var managedModFrameworkFolder = Path.Combine(_palLinuxFolder, "ManagedModFramework");
-                Assert.True(Path.Exists(managedModFrameworkFolder));
+                var realLoaderFrameworkFolder = Path.Combine(_palLinuxFolder, "RealLoaderFramework");
+                Assert.True(Path.Exists(realLoaderFrameworkFolder));
             }
             finally {
                 Dispose();

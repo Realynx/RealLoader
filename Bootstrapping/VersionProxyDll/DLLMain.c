@@ -34,7 +34,7 @@ void CheckModdedLaunchFlag()
 	LPWSTR lpwCmdLine = GetCommandLineW();
 	LPWSTR moddedFlag = L"-modded";
 	if (wcsstr(lpwCmdLine, moddedFlag) != NULL) {
-		LoadLibraryA("ManagedModFramework\\CLRHost.Dll");
+		LoadLibraryA("RealLoaderFramework\\CLRHost.Dll");
 	}
 }
 
@@ -56,10 +56,10 @@ DWORD WINAPI ProcessDetach(_In_ LPVOID Parameter)
 
 	return TRUE;
 }
-BOOL APIENTRY DllMain( 
+BOOL APIENTRY DllMain(
 	_In_ HINSTANCE Instance,
 	_In_ DWORD     Reason,
-	_In_ LPVOID    Reserved 
+	_In_ LPVOID    Reserved
 )
 {
 	switch ( Reason )

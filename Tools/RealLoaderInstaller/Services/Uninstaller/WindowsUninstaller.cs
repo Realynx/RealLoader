@@ -13,7 +13,7 @@ namespace RealLoaderInstaller.Services.Uninstaller {
 
         public async Task UninstallFiles(InstallerOptions installerOptions) {
             var win64Folder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Win64");
-            var dotnetDependenciesFolder = Path.Combine(win64Folder, "ManagedModFramework");
+            var dotnetDependenciesFolder = Path.Combine(win64Folder, "RealLoaderFramework");
 
             AnsiConsole.WriteLine($"Removing nethost.dll...");
             var netHostLib = Path.Combine(win64Folder, "nethost.dll");

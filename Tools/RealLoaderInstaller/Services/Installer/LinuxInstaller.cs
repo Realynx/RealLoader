@@ -22,8 +22,8 @@ namespace RealLoaderInstaller.Services.Installer {
             var modsFolder = Path.Combine(installerOptions.InstallLocation, "ClrMods");
             _modFileService.CheckClrModsFolder(modsFolder);
 
-            AnsiConsole.WriteLine("Checking Dependancies Folder...");
-            var dotnetDependenciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "ManagedModFramework");
+            AnsiConsole.WriteLine("Checking Dependencies Folder...");
+            var dotnetDependenciesFolder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Linux", "RealLoaderFramework");
             _modFileService.CheckFrameworkInstallFolder(dotnetDependenciesFolder);
 
 
@@ -55,7 +55,7 @@ chmod +x ""$UE_PROJECT_ROOT/Pal/Binaries/Linux/PalServer-Linux-Test""
 ""$UE_PROJECT_ROOT/Pal/Binaries/Linux/PalServer-Linux-Test"" Pal ""$@"" 
 
 # Run PalServer-Linux-Test with LD_PRELOAD set only for this command
-LD_PRELOAD=""$UE_PROJECT_ROOT/Pal/Binaries/Linux/ManagedModFramework/CLRHost.so"" ""$UE_PROJECT_ROOT/Pal/Binaries/Linux/PalServer-Linux-Test"" Pal ""$@""
+LD_PRELOAD=""$UE_PROJECT_ROOT/Pal/Binaries/Linux/RealLoaderFramework/CLRHost.so"" ""$UE_PROJECT_ROOT/Pal/Binaries/Linux/PalServer-Linux-Test"" Pal ""$@""
 ");
         }
     }

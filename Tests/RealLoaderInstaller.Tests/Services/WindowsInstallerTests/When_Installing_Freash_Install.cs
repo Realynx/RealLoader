@@ -36,8 +36,8 @@ namespace RealLoaderInstaller.Tests.Services.WindowsInstallerTests {
         [Fact]
         public void Was_Framework_Install_Dir_Created() {
             try {
-                var managedModFrameworkFolder = Path.Combine(_palWin64Folder, "ManagedModFramework");
-                Assert.True(Path.Exists(managedModFrameworkFolder));
+                var realLoaderFrameworkFolder = Path.Combine(_palWin64Folder, "RealLoaderFramework");
+                Assert.True(Path.Exists(realLoaderFrameworkFolder));
 
             }
             finally {

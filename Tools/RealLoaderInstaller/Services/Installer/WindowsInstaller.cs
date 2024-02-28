@@ -27,7 +27,7 @@ namespace RealLoaderInstaller.Services.Installer {
 
             AnsiConsole.WriteLine("Checking Dependencies Folder...");
             var win64Folder = GetWin64Folder(installerOptions.InstallLocation);
-            var dotnetDependenciesFolder = Path.Combine(win64Folder, "ManagedModFramework");
+            var dotnetDependenciesFolder = Path.Combine(win64Folder, "RealLoaderFramework");
             _modFileService.CheckFrameworkInstallFolder(dotnetDependenciesFolder);
 
             if (!installerOptions.CheckUpdates) {
