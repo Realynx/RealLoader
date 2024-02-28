@@ -37,22 +37,13 @@ namespace PalworldManagedModFramework.Sdk.Services.EngineServices {
             if (nameEntry->header.BIsWide) {
                 return Encoding.Unicode.GetString(&nameEntry->stringContents, nameEntry->header.Len);
             }
-            else {
-                return Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len);
-            }
+
+            return Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len);
         }
 
-        public unsafe string GetSanitizedNameString(FNameEntryId fnameEntryId) {
-            var nameEntry = GetName(fnameEntryId);
-
-            if (nameEntry->header.BIsWide) {
-                var decoded = Encoding.Unicode.GetString(&nameEntry->stringContents, nameEntry->header.Len);
-                return RemoveInvalidChars(decoded);
-            }
-            else {
-                var decoded = Encoding.UTF8.GetString(&nameEntry->stringContents, nameEntry->header.Len);
-                return RemoveInvalidChars(decoded);
-            }
+        public string GetSanitizedNameString(FNameEntryId fnameEntryId) {
+            var nameString = GetNameString(fnameEntryId);
+            return RemoveInvalidChars(nameString);
         }
 
         private static string RemoveInvalidChars(string str) {
