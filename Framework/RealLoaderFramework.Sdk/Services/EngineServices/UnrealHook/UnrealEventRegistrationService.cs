@@ -25,7 +25,8 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices.UnrealHook {
         }
 
         public IUnrealEventRegistrationService FindAndRegisterEvents<TType>(object parentInstance) {
-            var parentType = parentInstance.GetType();
+            var parentType = typeof(TType);
+            Debug.Assert(parentType == parentInstance.GetType());
 
             var eventMethods = FindValidEventMethods<EngineEventAttribute>(parentType);
             foreach (var eventMethod in eventMethods) {
