@@ -76,6 +76,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Compile {
         }
 
         public void Compile() {
+            _logger.Debug("Starting proxy SDK compilation...");
+
             var solutionPath = Path.Combine(_sourceLocation, $"{CodeGenConstants.CODE_SOLUTION_NAME}.sln");
             var startInfo = new ProcessStartInfo {
                 FileName = "dotnet",
