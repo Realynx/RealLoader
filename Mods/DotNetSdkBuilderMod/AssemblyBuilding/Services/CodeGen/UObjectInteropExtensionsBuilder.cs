@@ -169,10 +169,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             yield return "using var arguments = MemoryPool<nint>.Shared.Rent(ARGS_SIZE);";
             yield return "var span = arguments.Memory.Span;";
             if (fillAll) {
-                yield return "span.Fill(0);";
+                yield return "span.Clear();";
             }
             else {
-                yield return "span[ARGS_SIZE..].Fill(0);";
+                yield return "span[ARGS_SIZE..].Clear();";
             }
         }
 
