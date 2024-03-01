@@ -15,4 +15,13 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Api\" />
+    <Folder Include="Services\CoreEngineApi\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\RealLoader.UnrealEngine\RealLoader.UnrealEngine.csproj" />
+  </ItemGroup>
+
 </Project>

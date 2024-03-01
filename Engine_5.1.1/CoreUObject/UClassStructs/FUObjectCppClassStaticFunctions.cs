@@ -1,0 +1,14 @@
+﻿using System.Runtime.InteropServices;
+
+namespace Engine_5._1._1.CoreUObject.UClassStructs {
+    /// <summary>
+    /// <see href="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h#L1902"/>
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe struct FUObjectCppClassStaticFunctions {
+        /// <summary>
+        /// <see href="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/CoreUObject/Public/UObject/ObjectMacros.h#L1992"/>
+        /// </summary>
+        public void* addReferencedObjects;
+    }
+}

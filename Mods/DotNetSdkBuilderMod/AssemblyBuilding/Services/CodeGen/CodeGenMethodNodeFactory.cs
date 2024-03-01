@@ -27,7 +27,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             _attributeNodeFactory = attributeNodeFactory;
         }
 
-        public unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method, Index methodIndex) {
+        public unsafe CodeGenMethodNode GenerateCodeGenMethodNode(TUFunction* method, Index methodIndex) where TUFunction : IUFunction<IUField> {
             var modifiers = $"{PUBLIC}{WHITE_SPACE}{VIRTUAL}";
 
             var nonSanitizedMethodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);

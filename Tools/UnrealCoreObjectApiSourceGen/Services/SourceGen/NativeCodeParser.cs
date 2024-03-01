@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 using ClangSharp.Interop;
@@ -17,20 +18,24 @@ namespace UnrealCoreObjectApiSourceGen.Services.SourceGen {
             var index = clang.createIndex(0, 1);
 
             var managedCommandLineArgs = new List<string>();
-            foreach (var folder in Directory.GetDirectories(Environment.CurrentDirectory)) {
+            var includeFolders = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "MakeFileIncludes.txt");
+            managedCommandLineArgs.AddRange(File.ReadAllLines(includeFolders));
+
+            var moreIncludeFolder = new List<string>();
+            foreach (var folder in Directory.GetDirectories(Path.Combine(Environment.CurrentDirectory, "Source", "Runtime"))) {
                 var subFolders = Directory.GetDirectories(folder);
                 if (subFolders.FirstOrDefault(i => i.EndsWith("Public")) is string publicFolder) {
-                    managedCommandLineArgs.Add($"-I{publicFolder}");
+                    moreIncludeFolder.Add($"-I{publicFolder}");
                 }
             }
-
+            managedCommandLineArgs.AddRange(moreIncludeFolder);
             managedCommandLineArgs.AddRange([
                 "-DUE_BUILD_DEVELOPMENT=1",
                 "-DUE_BUILD_MINIMAL=1",
                 "-DWITH_EDITOR=0",
                 "-DWITH_EDITORONLY_DATA=1",
-                "-DWITH_SERVER_CODE=1",
-                "-DWITH_ENGINE=0",
+                "-DWITH_SERVER_CODE=0",
+                "-DWITH_ENGINE=1",
                 "-DWITH_UNREAL_DEVELOPER_TOOLS=0",
                 "-DWITH_PLUGIN_SUPPORT=0",
                 "-DIS_MONOLITHIC=1",
@@ -54,7 +59,9 @@ namespace UnrealCoreObjectApiSourceGen.Services.SourceGen {
             }
             var argumentString = Marshal.StringToCoTaskMemUTF8(file);
 
-            CXTranslationUnitImpl* translationUnit = clang.parseTranslationUnit(index, (sbyte*)argumentString, (sbyte**)ppCommandLineArgs, managedCommandLineArgs.Count, null, 0, (uint)CXTranslationUnit_Flags.CXTranslationUnit_SingleFileParse);
+            CXTranslationUnitImpl* translationUnit = clang.parseTranslationUnit(index, (sbyte*)argumentString, (sbyte**)ppCommandLineArgs,
+                managedCommandLineArgs.Count, null, 0, (uint)(CXTranslationUnit_Flags.CXTranslationUnit_SingleFileParse | CXTranslationUnit_Flags.CXTranslationUnit_KeepGoing));
+
             Marshal.FreeCoTaskMem(argumentString);
 
             for (var x = 0; x < managedCommandLineArgs.Count; x++) {
@@ -110,7 +117,7 @@ namespace UnrealCoreObjectApiSourceGen.Services.SourceGen {
 
             //Console.WriteLine($"({cursor.NominatedBaseClass}){cursor.DisplayName}");
             // Console.WriteLine($"    children: {cursor.NumChildren}");
-            return CXChildVisitResult.CXChildVisit_Recurse;
+            return CXChildVisitResult.CXChildVisit_Continue;
         }
     }
 }
