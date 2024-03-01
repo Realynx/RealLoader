@@ -18,8 +18,8 @@ namespace UnrealCoreObjectApiSourceGen.Services.SourceGen {
             var index = clang.createIndex(0, 1);
 
             var managedCommandLineArgs = new List<string>();
-            var includeFolders = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "MakeFileIncludes.txt");
-            managedCommandLineArgs.AddRange(File.ReadAllLines(includeFolders));
+            //var includeFolders = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "MakeFileIncludes.txt");
+            //managedCommandLineArgs.AddRange(File.ReadAllLines(includeFolders));
 
             var moreIncludeFolder = new List<string>();
             foreach (var folder in Directory.GetDirectories(Path.Combine(Environment.CurrentDirectory, "Source", "Runtime"))) {
@@ -30,25 +30,36 @@ namespace UnrealCoreObjectApiSourceGen.Services.SourceGen {
             }
             managedCommandLineArgs.AddRange(moreIncludeFolder);
             managedCommandLineArgs.AddRange([
+                "-xc++",
+                "-E",
+                "--comments",
+                "-Wmacro-redefined",
+                "-frelaxed-template-template-args",
+                "-fms-compatibility",
+                "-ferror-limit=1",
+                "-Wunused-command-line-argument",
+
                 "-DUE_BUILD_DEVELOPMENT=1",
                 "-DUE_BUILD_MINIMAL=1",
                 "-DWITH_EDITOR=0",
                 "-DWITH_EDITORONLY_DATA=1",
-                "-DWITH_SERVER_CODE=0",
-                "-DWITH_ENGINE=1",
+                "-DWITH_SERVER_CODE=1",
+                "-DWITH_ENGINE=0",
                 "-DWITH_UNREAL_DEVELOPER_TOOLS=0",
                 "-DWITH_PLUGIN_SUPPORT=0",
                 "-DIS_MONOLITHIC=1",
                 "-DIS_PROGRAM=1",
                 "-DPLATFORM_WINDOWS=1",
-                "-DCORE_API=DLLIMPORT",
-                "-DCOREUOBJECT_API=DLLIMPORT",
-                "-DDATASMITHEXPORTER_API=DLLIMPORT",
-                "-DDATASMITHCORE_API=DLLIMPORT",
-                "-DDIRECTLINK_API=DLLIMPORT",
+                "-DCORE_API=",
+                "-DCOREUOBJECT_API=",
+                "-DDATASMITHEXPORTER_API=",
+                "-DDATASMITHCORE_API=",
+                "-DDIRECTLINK_API=",
                 "-DWIN32=1",
                 "-D_WIN32_WINNT=0x0601",
                 "-DWINVER=0x0601",
+                "-DUNICODE",
+                "-D_UNICODE",
                 "-DUE_BUILD_DEVELOPMENT_WITH_DEBUGGAME=0",
                 "-DUBT_COMPILED_PLATFORM=Windows"
             ]);
@@ -60,7 +71,7 @@ namespace UnrealCoreObjectApiSourceGen.Services.SourceGen {
             var argumentString = Marshal.StringToCoTaskMemUTF8(file);
 
             CXTranslationUnitImpl* translationUnit = clang.parseTranslationUnit(index, (sbyte*)argumentString, (sbyte**)ppCommandLineArgs,
-                managedCommandLineArgs.Count, null, 0, (uint)(CXTranslationUnit_Flags.CXTranslationUnit_SingleFileParse | CXTranslationUnit_Flags.CXTranslationUnit_KeepGoing));
+                managedCommandLineArgs.Count, null, 0, (uint)(CXTranslationUnit_Flags.CXTranslationUnit_CXXChainedPCH | CXTranslationUnit_Flags.CXTranslationUnit_KeepGoing));
 
             Marshal.FreeCoTaskMem(argumentString);
 
@@ -87,36 +98,38 @@ namespace UnrealCoreObjectApiSourceGen.Services.SourceGen {
 
         [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
         private static CXChildVisitResult NodeVisit(CXCursor cursor, CXCursor parent, void* clientData) {
+
+            if (cursor.Kind is not CXCursorKind.CXCursor_ClassDecl and not CXCursorKind.CXCursor_StructDecl and not CXCursorKind.CXCursor_FieldDecl and not CXCursorKind.CXCursor_EnumDecl) {
+                return CXChildVisitResult.CXChildVisit_Continue;
+            }
+
             var displayName = clang.getCursorDisplayName(cursor).ToString();
 
+            if (cursor.Kind == CXCursorKind.CXCursor_ClassDecl) {
+                for (var x = 0u; x < cursor.NumBases; x++) {
+                    var classBase = cursor.GetBase(x);
+                    if (classBase.DisplayName.CString != "UObject") {
+                        return CXChildVisitResult.CXChildVisit_Continue;
+                    }
+                }
+            }
 
-            //if (displayName != "COREUOBJECT_API") {
-            //    return CXChildVisitResult.CXChildVisit_Continue;
-            //}
-
-            //if (cursor.Kind != CXCursorKind.CXCursor_ClassTemplate) {
-            //    return CXChildVisitResult.CXChildVisit_Continue;
-            //}
-
-            //if (cursor.DeclKind is CX_DeclKind.CX_DeclKind_Var) {
-            //    Console.WriteLine();
-            //    Console.WriteLine($"Node: {spelling}: Node Type: {cursor.DeclKind}");
-            //    return CXChildVisitResult.CXChildVisit_Recurse;
-            //}
-            var location = clang.getCursorLocation(cursor);
-            location.GetFileLocation(out var file, out var line, out var column, out var _);
-
-            var printingPolicy = clang.getCursorPrintingPolicy(cursor);
-            var prettyPrint = clang.getCursorPrettyPrinted(cursor, printingPolicy);
-            Console.WriteLine(prettyPrint);
-            // Console.WriteLine(USR);
-
-            var spelling = clang.getCursorSpelling(cursor).ToString();
+            //var location = clang.getCursorLocation(cursor);
+            //location.GetFileLocation(out var file, out var line, out var column, out var _);
+            // var spelling = clang.getCursorSpelling(cursor).ToString();
             //Console.WriteLine($"Node: {spelling}: Node Type: {cursor.Kind}, Display Name: {displayName}");
             //Console.WriteLine($"{Path.GetFileName(file.Name.CString)}::{spelling} - ({line},{column}), {cursor.Kind}");
 
             //Console.WriteLine($"({cursor.NominatedBaseClass}){cursor.DisplayName}");
             // Console.WriteLine($"    children: {cursor.NumChildren}");
+
+
+            var printingPolicy = clang.getCursorPrintingPolicy(cursor);
+            var prettyPrint = clang.getCursorPrettyPrinted(cursor, printingPolicy);
+            Console.WriteLine(prettyPrint);
+
+
+            // Console.WriteLine(cursor.DisplayName);
             return CXChildVisitResult.CXChildVisit_Continue;
         }
     }

@@ -38,7 +38,8 @@ namespace RealLoaderFramework {
             modLoader.LoadMods();
 
             loggerInstance.Debug("Mods running, fully loaded.");
-            for (;;)
+
+            for (; ; )
                 Console.ReadLine();
         }
     }
