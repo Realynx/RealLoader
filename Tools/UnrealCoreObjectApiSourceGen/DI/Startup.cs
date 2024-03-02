@@ -15,6 +15,8 @@ using UnrealCoreObjectApiSourceGen.Models;
 using UnrealCoreObjectApiSourceGen.Services;
 using UnrealCoreObjectApiSourceGen.Services.Interfaces;
 using UnrealCoreObjectApiSourceGen.Services.SourceGen;
+using UnrealCoreObjectApiSourceGen.Services.SourceGen.Converters.CSharpConverter;
+using UnrealCoreObjectApiSourceGen.Services.SourceGen.Converters.CSharpConverter.Interfaces;
 
 namespace UnrealCoreObjectApiSourceGen.DI {
     internal static class Startup {
@@ -56,7 +58,12 @@ namespace UnrealCoreObjectApiSourceGen.DI {
             services
                 .AddSingleton(Log.Logger)
                 .AddSingleton<IPrivateGithubReader, PrivateGithubReader>()
-                .AddSingleton<NativeCodeParser>();
+                .AddSingleton<INativeCodeParser, NativeCodeParser>()
+                .AddSingleton<ILanguageConverter, LanguageConverter>()
+                .AddSingleton<ICSharpConverter, CSharpConverter>()
+                .AddSingleton<IDeclaredClassConverter, DeclaredClassConverter>()
+                .AddSingleton<IDeclaredStructConverter, DeclaredStructConverter>()
+                .AddSingleton<IFieldConverter, FieldConverter>();
         }
 
 

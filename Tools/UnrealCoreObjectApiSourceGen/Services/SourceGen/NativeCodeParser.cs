@@ -1,26 +1,37 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 using ClangSharp.Interop;
 
 using Serilog;
 
+using UnrealCoreObjectApiSourceGen.Models;
+
 namespace UnrealCoreObjectApiSourceGen.Services.SourceGen {
-    public unsafe class NativeCodeParser {
+    public unsafe class NativeCodeParser : INativeCodeParser {
         private readonly ILogger _logger;
 
         public NativeCodeParser(ILogger logger) {
             _logger = logger;
         }
 
-        public unsafe bool ParseSourceFile(string file) {
+        public unsafe bool ParseSourceFile(string file, out LibClangTranslationRecord? libClangTranslationRecord) {
+            libClangTranslationRecord = null!;
+
             var index = clang.createIndex(0, 1);
+            var pTranslationUnit = CreateTranslationUnit(file, index);
 
+            if (pTranslationUnit is null) {
+                _logger.Error("Could not parse the file!");
+                return false;
+            }
+
+            var cursor = clang.getTranslationUnitCursor(pTranslationUnit);
+            libClangTranslationRecord = new(cursor, pTranslationUnit, index);
+            return true;
+        }
+
+        private static CXTranslationUnitImpl* CreateTranslationUnit(string file, void* index) {
             var managedCommandLineArgs = new List<string>();
-            //var includeFolders = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "MakeFileIncludes.txt");
-            //managedCommandLineArgs.AddRange(File.ReadAllLines(includeFolders));
-
             var moreIncludeFolder = new List<string>();
             foreach (var folder in Directory.GetDirectories(Path.Combine(Environment.CurrentDirectory, "Source", "Runtime"))) {
                 var subFolders = Directory.GetDirectories(folder);
@@ -64,73 +75,29 @@ namespace UnrealCoreObjectApiSourceGen.Services.SourceGen {
                 "-DUBT_COMPILED_PLATFORM=Windows"
             ]);
 
-            var ppCommandLineArgs = (nint**)Marshal.AllocCoTaskMem(sizeof(nint) * managedCommandLineArgs.Count);
-            for (var x = 0; x < managedCommandLineArgs.Count; x++) {
-                ppCommandLineArgs[x] = (nint*)Marshal.StringToCoTaskMemUTF8(managedCommandLineArgs[x]);
-            }
-            var argumentString = Marshal.StringToCoTaskMemUTF8(file);
+            AllocateNativeArguments(file, managedCommandLineArgs, out var ppCommandLineArgs, out var pArgumentString);
 
-            CXTranslationUnitImpl* translationUnit = clang.parseTranslationUnit(index, (sbyte*)argumentString, (sbyte**)ppCommandLineArgs,
+            var pTranslationUnit = clang.parseTranslationUnit(index, pArgumentString, ppCommandLineArgs,
                 managedCommandLineArgs.Count, null, 0, (uint)(CXTranslationUnit_Flags.CXTranslationUnit_CXXChainedPCH | CXTranslationUnit_Flags.CXTranslationUnit_KeepGoing));
 
-            Marshal.FreeCoTaskMem(argumentString);
+            FreeArguments(managedCommandLineArgs, ppCommandLineArgs, pArgumentString);
+            return pTranslationUnit;
+        }
 
+        private static void AllocateNativeArguments(string file, List<string> managedCommandLineArgs, out sbyte** ppCommandLineArgs, out sbyte* argumentString) {
+            ppCommandLineArgs = (sbyte**)Marshal.AllocCoTaskMem(sizeof(nint) * managedCommandLineArgs.Count);
+            for (var x = 0; x < managedCommandLineArgs.Count; x++) {
+                ppCommandLineArgs[x] = (sbyte*)Marshal.StringToCoTaskMemUTF8(managedCommandLineArgs[x]);
+            }
+            argumentString = (sbyte*)Marshal.StringToCoTaskMemUTF8(file);
+        }
+
+        private static void FreeArguments(List<string> managedCommandLineArgs, sbyte** ppCommandLineArgs, sbyte* argumentString) {
+            Marshal.FreeCoTaskMem((nint)argumentString);
             for (var x = 0; x < managedCommandLineArgs.Count; x++) {
                 Marshal.FreeCoTaskMem((nint)ppCommandLineArgs[x]);
             }
             Marshal.FreeCoTaskMem((nint)ppCommandLineArgs);
-
-            if (translationUnit is null) {
-                _logger.Error("Could not parse the file!");
-                return false;
-            }
-
-            var cursor = clang.getTranslationUnitCursor(translationUnit);
-
-            var nodeVisitFuncPtr = (delegate* unmanaged[Cdecl]<CXCursor, CXCursor, void*, CXChildVisitResult>)&NodeVisit;
-            _ = clang.visitChildren(cursor, nodeVisitFuncPtr, null);
-
-            clang.disposeTranslationUnit(translationUnit);
-            clang.disposeIndex(index);
-            return true;
-        }
-
-
-        [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
-        private static CXChildVisitResult NodeVisit(CXCursor cursor, CXCursor parent, void* clientData) {
-
-            if (cursor.Kind is not CXCursorKind.CXCursor_ClassDecl and not CXCursorKind.CXCursor_StructDecl and not CXCursorKind.CXCursor_FieldDecl and not CXCursorKind.CXCursor_EnumDecl) {
-                return CXChildVisitResult.CXChildVisit_Continue;
-            }
-
-            var displayName = clang.getCursorDisplayName(cursor).ToString();
-
-            if (cursor.Kind == CXCursorKind.CXCursor_ClassDecl) {
-                for (var x = 0u; x < cursor.NumBases; x++) {
-                    var classBase = cursor.GetBase(x);
-                    if (classBase.DisplayName.CString != "UObject") {
-                        return CXChildVisitResult.CXChildVisit_Continue;
-                    }
-                }
-            }
-
-            //var location = clang.getCursorLocation(cursor);
-            //location.GetFileLocation(out var file, out var line, out var column, out var _);
-            // var spelling = clang.getCursorSpelling(cursor).ToString();
-            //Console.WriteLine($"Node: {spelling}: Node Type: {cursor.Kind}, Display Name: {displayName}");
-            //Console.WriteLine($"{Path.GetFileName(file.Name.CString)}::{spelling} - ({line},{column}), {cursor.Kind}");
-
-            //Console.WriteLine($"({cursor.NominatedBaseClass}){cursor.DisplayName}");
-            // Console.WriteLine($"    children: {cursor.NumChildren}");
-
-
-            var printingPolicy = clang.getCursorPrintingPolicy(cursor);
-            var prettyPrint = clang.getCursorPrettyPrinted(cursor, printingPolicy);
-            Console.WriteLine(prettyPrint);
-
-
-            // Console.WriteLine(cursor.DisplayName);
-            return CXChildVisitResult.CXChildVisit_Continue;
         }
     }
 }
