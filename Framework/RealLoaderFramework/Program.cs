@@ -37,7 +37,7 @@ namespace RealLoaderFramework {
             var modLoader = host.Services.GetRequiredService<IModLoader>();
             modLoader.LoadMods();
 
-            loggerInstance.Debug("Mods running, fully loaded.");
+            loggerInstance.Info("Mods running, fully loaded.");
             for (;;)
                 Console.ReadLine();
         }
