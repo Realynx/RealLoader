@@ -36,10 +36,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             };
         }
 
-        public string GetNonCollidingName(string name, HashSet<string> existingNames) {
-            if (IsDigitOrKeyword(name)) {
-                name = $"_{name}";
-            }
+        public string GetNonCollidingName(string name, ISet<string> existingNames) {
+            name = GetNonCollidingName(name);
 
             var nonCollidingName = name;
             var i = 1;
@@ -49,6 +47,16 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services {
             }
 
             return nonCollidingName;
+        }
+
+        public string GetNonCollidingName(string name, string existingName) {
+            name = GetNonCollidingName(name);
+
+            if (string.Equals(name, existingName, StringComparison.Ordinal)) {
+                return $"{name}_1";
+            }
+
+            return name;
         }
 
         public string GetNonCollidingName(string name) {

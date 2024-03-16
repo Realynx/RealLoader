@@ -63,7 +63,7 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices {
             var returnValueAddress = uFunction->baseUstruct.childProperties + uFunction->returnValueOffset;
 
             returnValue = (FField*)nint.Zero;
-            returnValueIndex = 0;
+            returnValueIndex = int.MaxValue;
 
             var i = 0;
             var childProps = new List<nint>();

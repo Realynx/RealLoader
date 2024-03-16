@@ -37,7 +37,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             };
 
-            extensionsNamespaceNode.imports = new [] {
+            extensionsNamespaceNode.imports = new[] {
                 $"{nameof(System)}{DOT}{nameof(System.Buffers)}",
                 $"{nameof(System)}{DOT}{nameof(System.Runtime)}",
                 $"{nameof(System)}{DOT}{nameof(System.Runtime)}{DOT}{nameof(System.Runtime.CompilerServices)}",

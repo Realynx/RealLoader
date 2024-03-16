@@ -236,8 +236,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
         }
 
         private unsafe void CountFunctionArguments(ClassNode currentNode, HashSet<int> argCounts) {
-            foreach (var function in currentNode.functions) {
-                var functionSignature = _unrealReflection.GetFunctionSignature(function, out var returnValue, out _);
+            foreach (var functionNode in currentNode.functions) {
+                var functionSignature = _unrealReflection.GetFunctionSignature(functionNode.nodeFunction, out var returnValue, out _);
                 var argumentsCount = functionSignature.Length + (returnValue is not null ? 1 : 0);
                 argCounts.Add(argumentsCount);
             }
