@@ -5,44 +5,45 @@ using RealLoaderFramework.Sdk.Services.Memory.Models;
 
 namespace RealLoaderFramework.Sdk.Services.Memory.Linux {
     [SupportedOSPlatform("linux")]
-    public static class NativeFunctions {
-        [DllImport("libc.so.6", SetLastError = true, EntryPoint = "mmap")]
-        public static extern nint MemoryMap(nint addr, nuint length, MProtectProtect protect, MMapFlags flags, int fileDescriptor, int offset);
+    internal static partial class NativeFunctions {
+        [LibraryImport("libc.so.6", EntryPoint = "mmap", SetLastError = true)]
+        public static partial nint MemoryMap(nint addr, nuint length, MProtectProtection protect, MMapFlags flags, int fileDescriptor, int offset);
 
-        [DllImport("libc.so.6", SetLastError = true, EntryPoint = "munmap")]
-        public static extern int MemoryUnmap(nint addr, nuint length);
+        [LibraryImport("libc.so.6", EntryPoint = "munmap", SetLastError = true)]
+        public static partial int MemoryUnmap(nint addr, nuint length);
 
-        [DllImport("libc.so.6", SetLastError = true, EntryPoint = "mprotect")]
-        public static extern int MemoryProtect(nint addr, nuint length, MProtectProtect protect);
+        [LibraryImport("libc.so.6", EntryPoint = "mprotect", SetLastError = true)]
+        public static partial int MemoryProtect(nint addr, nuint length, MProtectProtection protect);
 
-        public static MProtectProtect ConvertToMProtection(SimpleMemoryProtection memoryProtection) {
+        public static MProtectProtection ToMProtection(this SimpleMemoryProtection memoryProtection) {
             var hasRead = memoryProtection.HasFlag(SimpleMemoryProtection.Read);
             var hasWrite = memoryProtection.HasFlag(SimpleMemoryProtection.Write);
             var hasExecute = memoryProtection.HasFlag(SimpleMemoryProtection.Execute);
 
-            var linuxMProtectFlags = MProtectProtect.PROT_NONE;
+            var linuxMProtectFlags = MProtectProtection.PROT_NONE;
 
             if (hasRead) {
-                linuxMProtectFlags |= MProtectProtect.PROT_READ;
+                linuxMProtectFlags |= MProtectProtection.PROT_READ;
             }
 
             if (hasWrite) {
-                linuxMProtectFlags |= MProtectProtect.PROT_WRITE;
+                linuxMProtectFlags |= MProtectProtection.PROT_WRITE;
             }
 
             if (hasExecute) {
-                linuxMProtectFlags |= MProtectProtect.PROT_EXEC;
+                linuxMProtectFlags |= MProtectProtection.PROT_EXEC;
             }
 
             return linuxMProtectFlags;
         }
 
-        public static SimpleMemoryProtection ConvertToMemoryProtection(MProtectProtect protection) {
-            var hasRead = protection.HasFlag(MProtectProtect.PROT_READ);
-            var hasWrite = protection.HasFlag(MProtectProtect.PROT_WRITE);
-            var hasExecute = protection.HasFlag(MProtectProtect.PROT_EXEC);
+        public static SimpleMemoryProtection ToSimpleMemoryProtection(this MProtectProtection protection) {
+            var hasRead = protection.HasFlag(MProtectProtection.PROT_READ);
+            var hasWrite = protection.HasFlag(MProtectProtection.PROT_WRITE);
+            var hasExecute = protection.HasFlag(MProtectProtection.PROT_EXEC);
 
             var genericMemoryProtection = SimpleMemoryProtection.None;
+
             if (hasRead) {
                 genericMemoryProtection |= SimpleMemoryProtection.Read;
             }
@@ -59,7 +60,7 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Linux {
         }
 
         [Flags]
-        public enum MProtectProtect {
+        public enum MProtectProtection {
             PROT_NONE = 0,  // The memory cannot be accessed at all.
             PROT_READ = 1 << 0,  // The memory can be read.
             PROT_WRITE = 1 << 1, // The memory can be modified.

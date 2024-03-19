@@ -23,21 +23,20 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Linux {
         }
 
         public nint Allocate(SimpleMemoryProtection protection, uint length) {
-            var linuxProtection = ConvertToMProtection(protection);
+            var linuxProtection = protection.ToMProtection();
             var allocatedMemory = MemoryMap(nint.Zero, length, linuxProtection, MMapFlags.MAP_SHARED | MMapFlags.MAP_ANONYMOUS, -1, 0);
 
             if (allocatedMemory == -1) {
                 _logger.Error($"Failed to allocate memory. Length: {length}, Protection: {linuxProtection}");
                 return nint.Zero;
             }
-            else {
-                if (!_mappedAddresses.TryAdd(allocatedMemory, length)) {
-                    throw new UnreachableException($"Failed to record 0x{allocatedMemory:X} as a mapped address. Already exists: {_mappedAddresses.ContainsKey(allocatedMemory)}.");
-                }
 
-                _logger.Info($"Memory allocated. Address: 0x{allocatedMemory:X}, Length: {length}, Protection: {linuxProtection}");
-                return allocatedMemory;
+            if (!_mappedAddresses.TryAdd(allocatedMemory, length)) {
+                throw new UnreachableException($"Failed to record 0x{allocatedMemory:X} as a mapped address. Already exists: {_mappedAddresses.ContainsKey(allocatedMemory)}.");
             }
+
+            _logger.Info($"Memory allocated. Address: 0x{allocatedMemory:X}, Length: {length}, Protection: {linuxProtection}");
+            return allocatedMemory;
         }
 
         public bool Free(nint address) {
@@ -52,19 +51,19 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Linux {
                 _logger.Error($"Failed to free memory at address: 0x{address:X}");
                 return false;
             }
-            else if (result == 0) {
+
+            if (result == 0) {
                 _logger.Info($"Memory freed at address: 0x{address:X}");
                 return true;
             }
-            else {
-                _logger.Warning($"Unexpected result from munmap when freeing 0x{address:X}: {result}. Assuming success.");
-                return true;
-            }
+
+            _logger.Warning($"Unexpected result from munmap when freeing 0x{address:X}: {result}. Assuming success.");
+            return true;
         }
 
         public bool SetProtection(nint address, uint length, SimpleMemoryProtection protection, out SimpleMemoryProtection previousProtection) {
             var pageAlignedAddress = address & ~0xfff;
-            var linuxProtection = ConvertToMProtection(protection);
+            var linuxProtection = protection.ToMProtection();
 
             var previousMProtect = GetProtection(address);
 
@@ -75,34 +74,34 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Linux {
                 previousProtection = SimpleMemoryProtection.None;
                 return false;
             }
-            else if (result == 0) {
+
+            if (result == 0) {
                 _logger.Info($"Set protection of 0x{pageAlignedAddress:X} to {protection}.");
-                previousProtection = ConvertToMemoryProtection(previousMProtect);
+                previousProtection = previousMProtect.ToSimpleMemoryProtection();
                 return true;
             }
-            else {
-                _logger.Warning($"Unexpected result from mmap when setting protection for 0x{pageAlignedAddress:X}: {result}. Assuming success.");
-                previousProtection = ConvertToMemoryProtection(previousMProtect);
-                return true;
-            }
+
+            _logger.Warning($"Unexpected result from mmap when setting protection for 0x{pageAlignedAddress:X}: {result}. Assuming success.");
+            previousProtection = previousMProtect.ToSimpleMemoryProtection();
+            return true;
         }
 
-        private MProtectProtect GetProtection(nint address) {
+        private MProtectProtection GetProtection(nint address) {
             var memoryRegion = _memoryMapper.FindMemoryRegions()
                 .FirstOrDefault(i => i.StartAddress <= (ulong)address && i.EndAddress >= (ulong)address);
 
-            var memoryProtection = MProtectProtect.PROT_NONE;
+            var memoryProtection = MProtectProtection.PROT_NONE;
 
             if (memoryRegion.ReadFlag) {
-                memoryProtection |= MProtectProtect.PROT_READ;
+                memoryProtection |= MProtectProtection.PROT_READ;
             }
 
             if (memoryRegion.WriteFlag) {
-                memoryProtection |= MProtectProtect.PROT_WRITE;
+                memoryProtection |= MProtectProtection.PROT_WRITE;
             }
 
             if (memoryRegion.ExecuteFlag) {
-                memoryProtection |= MProtectProtect.PROT_EXEC;
+                memoryProtection |= MProtectProtection.PROT_EXEC;
             }
 
             return memoryProtection;

@@ -22,10 +22,10 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Windows {
                     continue;
                 }
 
-                suspendThread(thread);
+                SuspendThread(thread);
             }
 
-            static void suspendThread(ProcessThread thread, int retry = 0) {
+            static void SuspendThread(ProcessThread thread, int retry = 0) {
                 if (retry > 5) {
                     throw new Exception($"Unable to suspend thread: {thread.Id}");
                 }
@@ -41,7 +41,7 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Windows {
                     return;
                 }
 
-                suspendThread(thread, retry++);
+                SuspendThread(thread, retry + 1);
             }
         }
 
@@ -54,10 +54,10 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Windows {
                     continue;
                 }
 
-                resumeThread(thread);
+                ResumeThread(thread);
             }
 
-            static void resumeThread(ProcessThread thread, int retry = 0) {
+            static void ResumeThread(ProcessThread thread, int retry = 0) {
                 if (retry > 5) {
                     throw new Exception($"Unable to resume thread: {thread.Id}");
                 }
@@ -73,7 +73,7 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Windows {
                     return;
                 }
 
-                resumeThread(thread, retry++);
+                ResumeThread(thread, retry + 1);
             }
         }
     }
