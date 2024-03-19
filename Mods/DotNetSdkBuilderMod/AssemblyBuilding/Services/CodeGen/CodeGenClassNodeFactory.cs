@@ -53,21 +53,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             List<CodeGenPropertyNode>? properties = null;
             if (classNode.properties.Length > 0) {
                 properties = new List<CodeGenPropertyNode>(classNode.properties.Length);
-                var propertyNames = new HashSet<string> { className };
-
                 for (var i = 0; i < classNode.properties.Length; i++) {
                     var currentProperty = classNode.properties[i];
 
-                    CodeGenPropertyNode propertyNode;
                     if (currentProperty.inheritedFrom is null) {
-                        propertyNode = _propertyNodeFactory.GenerateOwnedPropertyNode(currentProperty);
+                        properties.Add(_propertyNodeFactory.GenerateOwnedPropertyNode(currentProperty));
                     }
                     else {
-                        propertyNode = _propertyNodeFactory.GenerateInheritedPropertyNode(currentProperty);
+                        properties.Add(_propertyNodeFactory.GenerateInheritedPropertyNode(currentProperty));
                     }
-
-                    propertyNode.name = _nameCollisionService.GetNonCollidingName(propertyNode.name, propertyNames);
-                    properties.Add(propertyNode);
                 }
             }
 
@@ -78,16 +72,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 for (var i = 0; i < classNode.functions.Length; i++) {
                     var currentFunction = classNode.functions[i];
 
-                    CodeGenMethodNode methodNode;
                     if (currentFunction.inheritedFrom is null) {
-                        methodNode = _methodNodeFactory.GenerateOwnedMethodNode(currentFunction, i);
+                        methods.Add(_methodNodeFactory.GenerateOwnedMethodNode(currentFunction, i));
                     }
                     else {
-                        methodNode = _methodNodeFactory.GenerateInheritedMethodNode(currentFunction);
+                        methods.Add(_methodNodeFactory.GenerateInheritedMethodNode(currentFunction));
                     }
-
-                    methodNode.name = _nameCollisionService.GetNonCollidingName(methodNode.name, className);
-                    methods.Add(methodNode);
                 }
             }
 
