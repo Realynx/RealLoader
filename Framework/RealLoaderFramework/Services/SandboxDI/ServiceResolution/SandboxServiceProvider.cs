@@ -19,39 +19,41 @@ namespace RealLoaderFramework.Services.SandboxDI.ServiceResolution {
             service ??= _rootServiceProvider.GetService(serviceType);
 
             if (service is null) {
-                throw new Exception($"Could not resolve dependency {serviceType.Name}.");
+                throw new Exception($"Could not resolve dependency {serviceType.FullName}.");
             }
 
             return service;
         }
 
         private object? GetOrActivateService(Type serviceType) {
-            if (!_serviceSingletons.ContainsKey(serviceType)) {
-                var existingType = _sandboxServiceProvider.FirstOrDefault(i => i.ServiceType == serviceType);
-                if (existingType is null) {
-                    return null;
-                }
-
-                if (existingType.ImplementationType is null) {
-                    _serviceSingletons[serviceType] = existingType.ImplementationInstance;
-                    return existingType.ImplementationInstance;
-                }
-
-                var implementationType = existingType.ImplementationType;
-                var constructors = implementationType.GetConstructors();
-                var DICtor = constructors.MaxBy(i => i.GetParameters().Length);
-
-                if (DICtor is null) {
-                    var service = Activator.CreateInstance(implementationType);
-                    _serviceSingletons[serviceType] = service;
-                    return service;
-                }
-
-                var arguments = GetConstructorArguments(DICtor);
-                _serviceSingletons[serviceType] = DICtor.Invoke(arguments);
+            if (_serviceSingletons.TryGetValue(serviceType, out var service)) {
+                return service;
             }
 
-            return _serviceSingletons[serviceType];
+            var existingType = _sandboxServiceProvider.FirstOrDefault(i => i.ServiceType == serviceType);
+            if (existingType is null) {
+                return null;
+            }
+
+            var implementationType = existingType.ImplementationType;
+            if (implementationType is null) {
+                _serviceSingletons[serviceType] = existingType.ImplementationInstance;
+                return existingType.ImplementationInstance;
+            }
+
+            var constructors = implementationType.GetConstructors();
+            var DICtor = constructors.MaxBy(i => i.GetParameters().Length);
+
+            if (DICtor is null) {
+                service = Activator.CreateInstance(implementationType);
+                _serviceSingletons[serviceType] = service;
+                return service;
+            }
+
+            var arguments = GetConstructorArguments(DICtor);
+            service = DICtor.Invoke(arguments);
+            _serviceSingletons[serviceType] = service;
+            return service;
         }
 
         private object[] GetConstructorArguments(ConstructorInfo DICtor) {
