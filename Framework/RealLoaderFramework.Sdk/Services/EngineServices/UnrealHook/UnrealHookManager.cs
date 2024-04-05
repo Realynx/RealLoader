@@ -46,6 +46,7 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices.UnrealHook {
             if (!hookMethods!.Add(hookEngineEventMethod)) {
                 _logger.Warning($"Attempted to register {hookEngineEventMethod.DeclaringType?.Name ?? "Private class"}.{hookEngineEventMethod.Name} for the same hook more than once.");
             }
+
             return this;
         }
 
@@ -103,7 +104,7 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices.UnrealHook {
         /// <see href="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/CoreUObject/Private/UObject/ScriptCore.cpp#L1963"/>
         /// </summary>
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, UFunction*, void*, void> ProcessEvent_Original;
-        [EngineDetour(EngineFunction.ProccessEvent, DetourType.Stack)]
+        [EngineDetour(EngineFunction.ProcessEvent, DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void ProcessEvent(UObject* instance, UFunction* uFunction, void* parameters) {
             if (_singleInstance is null || uFunction is null || instance is null) {

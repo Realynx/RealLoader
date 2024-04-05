@@ -50,7 +50,7 @@ namespace RealLoaderFramework.Sdk.Services.Detour {
         }
 
         private string? GetEnginePattern(EngineDetourAttribute engineDetourAttribute) => engineDetourAttribute.EngineFunction switch {
-            EngineFunction.ProccessEvent => _enginePattern.ProcessEventPattern,
+            EngineFunction.ProcessEvent => _enginePattern.ProcessEventPattern,
             EngineFunction.UObject_PostInitProperties => _enginePattern.UObject_PostInitPropertiesPattern,
             EngineFunction.UObject_BeginDestroy => _enginePattern.UObject_BeginDestroyPattern,
             EngineFunction.UObject_FinishDestroy => _enginePattern.UObject_FinishDestroyPattern,
