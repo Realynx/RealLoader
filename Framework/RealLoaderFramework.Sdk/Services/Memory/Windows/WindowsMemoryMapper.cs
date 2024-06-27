@@ -21,10 +21,6 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Windows {
             return Process.GetCurrentProcess().MainModule!.BaseAddress;
         }
 
-        public SimpleMemoryProtection GetProtection(nint address) {
-            throw new NotImplementedException("This is a linux function. Windows has native function for getting memory protection!");
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private unsafe ICollection<MemoryRegion> EnumerateMemoryRegions(nint hProcess, nint baseAddress) {
             var sizeOfStruct = sizeof(MEMORY_BASIC_INFORMATION64);
