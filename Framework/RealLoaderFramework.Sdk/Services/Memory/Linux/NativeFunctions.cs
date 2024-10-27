@@ -7,7 +7,8 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Linux {
     [SupportedOSPlatform("linux")]
     internal static partial class NativeFunctions {
         [LibraryImport("libc.so.6", EntryPoint = "mmap", SetLastError = true)]
-        public static partial nint MemoryMap(nint addr, nuint length, MProtectProtection protect, MMapFlags flags, int fileDescriptor, int offset);
+        public static partial nint MemoryMap(nint addr, nuint length, MProtectProtection protect, MMapFlags flags,
+            int fileDescriptor, int offset);
 
         [LibraryImport("libc.so.6", EntryPoint = "munmap", SetLastError = true)]
         public static partial int MemoryUnmap(nint addr, nuint length);

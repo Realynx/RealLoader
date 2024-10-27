@@ -1,5 +1,5 @@
-﻿using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.Versioning;
 
 using RealLoaderFramework.Sdk.Services.Memory.Models;
@@ -14,23 +14,27 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Windows {
         public static unsafe partial int VirtualQuery(nint hProcess, nint lpAddress,
             MEMORY_BASIC_INFORMATION64* lpBuffer, uint dwLength);
 
-        [DllImport("kernel32.dll")]
-        public static extern int SuspendThread(Handle hThread);
+        [LibraryImport("kernel32.dll", EntryPoint = "SuspendThread")]
+        public static partial int SuspendThread([MarshalUsing(typeof(HandleMarshaller))] Handle hThread);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern int ResumeThread(Handle hThread);
+        [LibraryImport("kernel32.dll", SetLastError = true)]
+        public static partial int ResumeThread([MarshalUsing(typeof(HandleMarshaller))] Handle hThread);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern Handle OpenThread(ThreadAccess dwDesiredAccess,  bool bInheritHandle, int dwThreadId);
+        [LibraryImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalUsing(typeof(HandleMarshaller))]
+        public static partial Handle OpenThread(ThreadAccess dwDesiredAccess,
+            [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwThreadId);
 
-        [DllImport("kernel32", SetLastError = true)]
-        public static extern bool CloseHandle(Handle handle);
+        [LibraryImport("kernel32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static partial bool CloseHandle([MarshalUsing(typeof(HandleMarshaller))] Handle handle);
 
         [LibraryImport("kernel32.dll")]
         public static partial uint GetCurrentThreadId();
 
         [LibraryImport("kernel32.dll")]
-        public static partial nint VirtualAlloc(nint lpStartAddr, uint size, PageState flAllocationType, MemoryProtection flProtect);
+        public static partial nint VirtualAlloc(nint lpStartAddr, uint size, PageState flAllocationType,
+            MemoryProtection flProtect);
 
         [LibraryImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -38,7 +42,8 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Windows {
 
         [LibraryImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool VirtualProtect(nint lpAddress, uint dwSize, MemoryProtection flNewProtect, out MemoryProtection lpflOldProtect);
+        public static partial bool VirtualProtect(nint lpAddress, uint dwSize, MemoryProtection flNewProtect,
+            out MemoryProtection lpflOldProtect);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct MEMORY_BASIC_INFORMATION64 {

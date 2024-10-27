@@ -5,7 +5,8 @@ namespace RealLoaderFramework.Services {
 
         [LibraryImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool SetWindowPos(nint handle, nint handleRelativeTo, int x, int y, int with, int height, SetWindowsPosFlags flags);
+        public static partial bool SetWindowPos(nint handle, nint handleRelativeTo, int x, int y, int with, int height,
+            SetWindowsPosFlags flags);
 
         /// <summary> Places the window at the bottom of the Z order. If the hWnd parameter identifies a topmost window, the window loses its topmost status and is placed at the bottom of all other windows. </summary>
         public const int SET_WINDOW_POS_HWND_BOTTOM = 1;
