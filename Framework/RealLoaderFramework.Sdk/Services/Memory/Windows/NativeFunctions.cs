@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.Versioning;
 
 using RealLoaderFramework.Sdk.Services.Memory.Models;
@@ -15,19 +14,18 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Windows {
             MEMORY_BASIC_INFORMATION64* lpBuffer, uint dwLength);
 
         [LibraryImport("kernel32.dll", EntryPoint = "SuspendThread")]
-        public static partial int SuspendThread([MarshalUsing(typeof(HandleMarshaller))] Handle hThread);
+        public static partial int SuspendThread(Handle hThread);
 
         [LibraryImport("kernel32.dll", SetLastError = true)]
-        public static partial int ResumeThread([MarshalUsing(typeof(HandleMarshaller))] Handle hThread);
+        public static partial int ResumeThread(Handle hThread);
 
         [LibraryImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalUsing(typeof(HandleMarshaller))]
         public static partial Handle OpenThread(ThreadAccess dwDesiredAccess,
             [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwThreadId);
 
         [LibraryImport("kernel32", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static partial bool CloseHandle([MarshalUsing(typeof(HandleMarshaller))] Handle handle);
+        public static partial bool CloseHandle(Handle handle);
 
         [LibraryImport("kernel32.dll")]
         public static partial uint GetCurrentThreadId();

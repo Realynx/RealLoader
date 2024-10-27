@@ -1,5 +1,8 @@
-﻿namespace RealLoaderFramework.Sdk.Services.Memory.Models;
+﻿using System.Runtime.InteropServices.Marshalling;
 
+namespace RealLoaderFramework.Sdk.Services.Memory.Models;
+
+[NativeMarshalling(typeof(HandleMarshaller))]
 internal readonly record struct Handle {
     public Handle(nuint pointer) {
         Pointer = pointer;
