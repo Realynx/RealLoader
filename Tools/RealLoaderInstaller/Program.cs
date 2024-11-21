@@ -53,7 +53,7 @@ namespace RealLoaderInstaller {
             serviceDescriptors
                 .AddHttpClient<IGithubArtifactDownloader, GithubArtifactDownloader>(client => {
                     client.DefaultRequestHeaders.UserAgent.Clear();
-                    client.DefaultRequestHeaders.UserAgent.ParseAdd("ManagedModWorks_Installer/1.0 (Windows; Linux; https://github.com/PoofImaFox/RealLoader)");
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("ManagedModWorks_Installer/1.0 (Windows; Linux; https://github.com/Realynx/RealLoader)");
                 })
                 .AddPolicyHandler(GetRetryPolicy());
         }

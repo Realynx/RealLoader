@@ -140,7 +140,7 @@ stages:
         inputs:
           action: 'create'
           gitHubConnection: 'PoofimafoxPAT'
-          repository: 'PoofImaFox/RealLoader'
+          repository: 'Realynx/RealLoader'
           tagSource: 'gitTag'
           tagPattern: 'v[0-9]+.[0-9]+.[0-9]+'
           title: 'Release $(version)-ci'
