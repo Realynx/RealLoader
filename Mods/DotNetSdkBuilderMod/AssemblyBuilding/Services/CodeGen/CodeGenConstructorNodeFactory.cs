@@ -38,14 +38,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             };
 
-            const string BASE_CONSTRUCTOR = $"base({CONSTRUCTOR_ADDRESS_NAME}, {CONSTRUCTOR_UNREAL_REFLECTION_NAME}, {CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME})";
+            var baseConstructor = $"base({CONSTRUCTOR_ADDRESS_NAME}, {CONSTRUCTOR_UNREAL_REFLECTION_NAME}, {CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME})";
 
             return new CodeGenConstructorNode {
                 modifier = modifiers,
                 name = className,
                 attributes = attributes,
                 arguments = arguments,
-                baseConstructor = BASE_CONSTRUCTOR,
+                baseConstructor = baseConstructor,
             };
         }
 
