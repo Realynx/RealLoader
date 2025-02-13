@@ -36,8 +36,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
-            codeBuilder.AppendIndented(classNode.modifier, 1);
-            codeBuilder.Append($" class {classNode.name}");
+            codeBuilder.AppendIndent(1);
+            codeBuilder.Append($"{classNode.modifier} class {classNode.name}");
 
             var baseClass = classNode.baseType;
             if (baseClass is not null) {

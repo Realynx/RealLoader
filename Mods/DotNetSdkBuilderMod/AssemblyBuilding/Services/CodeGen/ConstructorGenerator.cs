@@ -26,8 +26,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
-            codeBuilder.AppendIndented(constructorNode.modifier, 2);
-            codeBuilder.Append($" {constructorNode.name}(");
+            codeBuilder.AppendIndent(2);
+            codeBuilder.Append($"{constructorNode.modifier} {constructorNode.name}(");
 
             if (constructorNode.arguments is not null) {
                 _argumentGenerator.GenerateArguments(codeBuilder, constructorNode.arguments);

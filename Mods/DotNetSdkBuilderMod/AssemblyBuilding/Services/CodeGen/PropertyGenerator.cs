@@ -23,9 +23,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
-            codeBuilder.AppendIndented(propertyNode.modifier, 2);
-
-            codeBuilder.Append($" {propertyNode.returnType} {propertyNode.name}");
+            codeBuilder.AppendIndent(2);
+            codeBuilder.Append($"{propertyNode.modifier} {propertyNode.returnType} {propertyNode.name}");
 
             var hasGetter = propertyNode.get is not null;
             var hasSetter = propertyNode.set is not null;

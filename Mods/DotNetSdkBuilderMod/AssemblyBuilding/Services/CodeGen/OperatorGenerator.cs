@@ -17,9 +17,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public void GenerateOperator(StringBuilder codeBuilder, CodeGenOperatorNode operatorNode) {
-            codeBuilder.AppendIndented(operatorNode.modifier, 2);
-
-            codeBuilder.Append($" {operatorNode.returnType}({operatorNode.name} {OPERATOR_THIS_CLASS_NAME}) => {operatorNode.result};");
+            codeBuilder.AppendIndent(2);
+            codeBuilder.Append($"{operatorNode.modifier} {operatorNode.returnType}({operatorNode.name} {OPERATOR_THIS_CLASS_NAME}) => {operatorNode.result};");
         }
     }
 }

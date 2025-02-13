@@ -15,8 +15,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe void GenerateAttribute(StringBuilder codeBuilder, CodeGenAttributeNode attributeNode, int indent) {
-            codeBuilder.AppendIndented("[", indent);
-            codeBuilder.Append(attributeNode.name);
+            codeBuilder.AppendIndent(indent);
+            codeBuilder.Append($"[{attributeNode.name}");
 
             if (attributeNode.value is not null) {
                 codeBuilder.Append($"({attributeNode.value})");

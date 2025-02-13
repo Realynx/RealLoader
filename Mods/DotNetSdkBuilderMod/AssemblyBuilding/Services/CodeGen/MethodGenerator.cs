@@ -28,9 +28,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
-            codeBuilder.AppendIndented(methodNode.modifier, 2);
-
-            codeBuilder.Append($" {methodNode.returnType} {methodNode.name}");
+            codeBuilder.AppendIndent(2);
+            codeBuilder.Append($"{methodNode.modifier} {methodNode.returnType} {methodNode.name}");
 
             if (methodNode.genericTypes is not null) {
                 _genericGenerator.GenerateGenerics(codeBuilder, methodNode.genericTypes);

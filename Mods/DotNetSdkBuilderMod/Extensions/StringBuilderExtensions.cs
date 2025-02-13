@@ -10,12 +10,6 @@ namespace DotNetSdkBuilderMod.Extensions {
                 .AppendLine(str);
         }
 
-        public static StringBuilder AppendIndented(this StringBuilder sb, string str, int indentSize) {
-            return sb
-                .Append(CodeGenConstants.INDENT, indentSize * CodeGenConstants.INDENT_SIZE)
-                .Append(str);
-        }
-
         public static StringBuilder AppendIndent(this StringBuilder sb, int indentSize) {
             return sb
                 .Append(CodeGenConstants.INDENT, indentSize * CodeGenConstants.INDENT_SIZE);
