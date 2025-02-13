@@ -36,7 +36,7 @@ namespace RealLoaderInstaller.Services.Installer {
 
             AnsiConsole.WriteLine("Checking for updates...");
             var realLoaderFramework = Path.Combine(dotnetDependenciesFolder, "RealLoaderFramework.dll");
-            if (!await _githubArtifactDownloader.IsOutOfDate(realLoaderFramework)) {
+            if (File.Exists(realLoaderFramework) && !await _githubArtifactDownloader.IsOutOfDate(realLoaderFramework)) {
                 AnsiConsole.WriteLine("the newest release is already installed.");
                 return;
             }
@@ -54,23 +54,12 @@ namespace RealLoaderInstaller.Services.Installer {
         }
 
         private string GetWin64Folder(string rootFolder) {
-            foreach (var directory in Directory.EnumerateDirectories(rootFolder)) {
-                foreach (var subDirectory in Directory.EnumerateDirectories(directory)) {
-                    if (!subDirectory.EndsWith("Binaries")) {
-                        continue;
-                    }
+            var win64directory = Directory.EnumerateDirectories(rootFolder, "*", SearchOption.AllDirectories)
+                .SingleOrDefault(i => i.EndsWith(Path.Combine("Binaries", "Win64")));
 
-                    foreach (var subSubDirectory in Directory.EnumerateDirectories(subDirectory)) {
-                        if (!subSubDirectory.EndsWith("Win64")) {
-                            continue;
-                        }
-
-                        return Path.Combine(subSubDirectory, "Win64");
-                    }
-                }
-            }
-
-            throw new DirectoryNotFoundException("Could not find Win64 folder.");
+            return win64directory is null
+                ? throw new DirectoryNotFoundException("Could not find Win64 folder.")
+                : win64directory;
         }
 
         private void CopyNethost(string win64Folder) {

@@ -14,7 +14,7 @@ stages:
   - job: DotnetTesting
     displayName: 'Test the .NET code'
     pool:
-      name: 'PoofyHost'
+      name: 'Linux'
     steps:
     - task: DotNetCoreCLI@2
       displayName: 'Restoring nuget packages'
@@ -78,7 +78,7 @@ stages:
     - job: BuildLinux
       displayName: 'Build on Linux'
       pool:
-        name: 'PoofyHost'
+        name: 'Linux'
       steps:
       - task: DotNetCoreCLI@2
         displayName: 'Restoring nuget packages'
@@ -111,7 +111,7 @@ stages:
     - job: DeployJob
       displayName: 'Deploy Artifacts'
       pool:
-        name: 'PoofyHost'
+        name: 'Linux'
       steps:
       - task: DownloadBuildArtifacts@0
         displayName: 'Download Windows Artifacts'

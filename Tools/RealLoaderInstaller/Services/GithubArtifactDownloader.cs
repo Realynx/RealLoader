@@ -8,7 +8,7 @@ using Spectre.Console;
 
 namespace RealLoaderInstaller.Services {
     public class GithubArtifactDownloader : IGithubArtifactDownloader {
-        internal const string FRAMEWORK_ZIP = "RealLoaderFramework.zip";
+        internal const string FRAMEWORK_ZIP = "ManagedModFramework.zip";
         internal const string WINHTTP_PROXY = "winhttp.dll";
         internal const string CLR_HOST_WINDOWS = "CLRHost.dll";
         internal const string CLR_HOST_LINUX = "libCLRHost.so";
@@ -24,7 +24,10 @@ namespace RealLoaderInstaller.Services {
         }
 
         public async Task<byte[]> DownloadGithubReleaseAsync(string githubFileName) {
-            var httpFileResponse = await _httpClient.GetAsync(githubFileName);
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Get, githubFileName);
+            var httpFileResponse = await _httpClient.SendAsync(httpRequest);
+
             if (!httpFileResponse.IsSuccessStatusCode) {
                 AnsiConsole.WriteLine($"Failed to download '{githubFileName}'...");
             }
@@ -37,11 +40,15 @@ namespace RealLoaderInstaller.Services {
             var zipFileBytes = await DownloadGithubReleaseAsync(FRAMEWORK_ZIP);
             await File.WriteAllBytesAsync(FRAMEWORK_ZIP, zipFileBytes);
 
+            var tempdir = Directory.CreateTempSubdirectory();
+
             using var archive = ZipFile.OpenRead(FRAMEWORK_ZIP);
-            foreach (var entry in archive.Entries) {
-                var destinationPath = Path.Combine(extractPath, entry.FullName);
-                entry.ExtractToFile(destinationPath, overwrite: true);
-            }
+            archive.ExtractToDirectory(tempdir.FullName, true);
+
+            Directory.Delete(extractPath, true);
+            Directory.Move(Path.Combine(tempdir.FullName, "Release", "net8.0"), extractPath);
+
+            tempdir.Delete(true);
         }
 
         public async Task<bool> IsOutOfDate(string assemblyImage) {
