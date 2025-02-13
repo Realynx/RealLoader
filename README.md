@@ -29,11 +29,11 @@
 
 ## Dependencies
 
-- ### [.NET 8+ Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)
+- ### [.NET 9+ Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)
 
 ## How to Build
 
-1. Install the [.NET 8+ SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
+1. Install the [.NET 9+ SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
 
 2. Install [CMake 3.22+](https://cmake.org/download/)
  
