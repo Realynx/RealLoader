@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 
 using RealLoaderFramework.Sdk.Logging;
 using RealLoaderFramework.Sdk.Services.Detour.Interfaces;
@@ -15,32 +16,37 @@ namespace RealLoaderFramework.Sdk.Services.Detour {
             _memoryAllocate = memoryAllocate;
         }
 
-        public unsafe byte[] PatchInstructions(nint address, ReadOnlySpan<byte> instructionBytes) {
+        public unsafe byte[] PatchLiveInstructions(nint address, ReadOnlySpan<byte> instructionBytes) {
             var length = instructionBytes.Length;
 
             var destinationInstructions = new Span<byte>((byte*)address, length);
             var overwrittenInstructions = new byte[length];
 
-            _memoryAllocate.SetProtection(address, (uint)instructionBytes.Length, SimpleMemoryProtection.Read | SimpleMemoryProtection.Write | SimpleMemoryProtection.Execute, out var previousProtection);
+            const SimpleMemoryProtection RWE = SimpleMemoryProtection.Read | SimpleMemoryProtection.Write | SimpleMemoryProtection.Execute;
+            _memoryAllocate.SetProtection(address, (uint)instructionBytes.Length, RWE, out var previousProtection);
 
             var i = 0;
 
-            // TODO: Use ulong instead of Vector
-            var vectorSize = Vector<byte>.Count;
-            for (; i <= length - vectorSize; i += vectorSize) {
-                var destinationOffset = destinationInstructions.Slice(i);
-                var instructionBytesOffset = instructionBytes.Slice(i);
+            if (Vector.IsHardwareAccelerated) {
+                var vectorSize = Vector<byte>.Count;
+                for (; i <= length - vectorSize; i += vectorSize) {
+                    var destinationOffset = destinationInstructions[i..];
+                    var instructionBytesOffset = instructionBytes[i..];
 
-                new Vector<byte>(destinationOffset).CopyTo(overwrittenInstructions, i);
-                new Vector<byte>(instructionBytesOffset).CopyTo(destinationOffset);
+                    new Vector<byte>(destinationOffset).CopyTo(overwrittenInstructions, i);
+                    new Vector<byte>(instructionBytesOffset).CopyTo(destinationOffset);
+                }
             }
+
+            // TODO: Add ulong copy method before resorting to individual bytes
 
             for (; i < length; i++) {
                 overwrittenInstructions[i] = destinationInstructions[i];
                 destinationInstructions[i] = instructionBytes[i];
             }
 
-            _memoryAllocate.SetProtection(address, (uint)instructionBytes.Length, previousProtection, out _);
+            _memoryAllocate.SetProtection(address, (uint)instructionBytes.Length, previousProtection, out var writtenProtection);
+            Debug.Assert(writtenProtection == RWE);
 
             return overwrittenInstructions;
         }

@@ -19,3 +19,4 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("RealLoaderFramework.Sdk.Tests")]
 [assembly: InternalsVisibleTo("DotnetSdkBuilderMod")]
 [assembly: InternalsVisibleTo("GeneratedSdk")]
+[assembly: DisableRuntimeMarshalling]

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 
 using RealLoaderFramework.Sdk.Interfaces;
 using RealLoaderFramework.Sdk.Logging;
+using RealLoaderFramework.Sdk.Services;
 using RealLoaderFramework.Services.SandboxDI.Hosting;
 using RealLoaderFramework.Services.SandboxDI.Interfaces;
 using RealLoaderFramework.Services.SandboxDI.ServiceResolution;
@@ -47,7 +48,7 @@ namespace RealLoaderFramework.Services.SandboxDI {
 
         public void DestroyProvider(ISbStartup serviceContainerMod) {
             if (_modContainers.ContainsKey(serviceContainerMod)) {
-                _logger.Error($"Tried to destory an {nameof(IHost)} instance that did not exist anymore.");
+                _logger.Error($"Tried to destroy an {nameof(IHost)} instance that did not exist anymore.");
                 return;
             }
 
@@ -59,8 +60,8 @@ namespace RealLoaderFramework.Services.SandboxDI {
         public object ResolveService(Type serviceType, ISbStartup sbStartupMod = null) {
             object resolvedService = null;
 
-            if (sbStartupMod is not null && _modContainers.ContainsKey(sbStartupMod)) {
-                resolvedService = _modContainers[sbStartupMod].Services.GetService(serviceType);
+            if (sbStartupMod is not null && _modContainers.TryGetValue(sbStartupMod, out var modContainer)) {
+                resolvedService = modContainer.Services.GetService(serviceType);
             }
             else {
                 resolvedService = _rootServiceProvider.GetService(serviceType);

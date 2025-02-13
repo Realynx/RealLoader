@@ -2,7 +2,8 @@
 using System.Runtime.InteropServices;
 
 using RealLoaderFramework.Sdk.Logging;
-using RealLoaderFramework.Sdk.Services.Memory.Windows;
+
+using static RealLoaderFramework.Services.NativeFunctions;
 
 namespace RealLoaderFramework {
     public static class ConsoleExtensions {
@@ -15,11 +16,11 @@ namespace RealLoaderFramework {
             logger.Debug("Enabling console always on top...");
 
             var consoleHandle = Process.GetCurrentProcess().MainWindowHandle;
-            var result = NativeFunctions.SetWindowPos(consoleHandle, NativeFunctions.SET_WINDOW_POS_HWND_TOPMOST, 0, 0, 0, 0,
-                NativeFunctions.SetWindowsPosFlags.SWP_NOMOVE | NativeFunctions.SetWindowsPosFlags.SWP_NOSIZE);
+            const SetWindowsPosFlags FLAGS = SetWindowsPosFlags.SWP_NOMOVE | SetWindowsPosFlags.SWP_NOSIZE;
+            var success = SetWindowPos(consoleHandle, SET_WINDOW_POS_HWND_TOPMOST, 0, 0, 0, 0, FLAGS);
 
-            if (!result) {
-                var error = NativeFunctions.GetLastError();
+            if (!success) {
+                var error = Marshal.GetLastPInvokeError();
                 logger.Debug($"Unable to enable console always on top, error code: 0x{error:X}");
             }
         }

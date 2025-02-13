@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 
 using RealLoaderFramework.Sdk.Attributes;
 using RealLoaderFramework.Sdk.Logging;
@@ -24,7 +25,8 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices.UnrealHook {
         }
 
         public IUnrealEventRegistrationService FindAndRegisterEvents<TType>(object parentInstance) {
-            var parentType = parentInstance.GetType();
+            var parentType = typeof(TType);
+            Debug.Assert(parentType.IsInstanceOfType(parentInstance));
 
             var eventMethods = FindValidEventMethods<EngineEventAttribute>(parentType);
             foreach (var eventMethod in eventMethods) {
@@ -41,7 +43,8 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices.UnrealHook {
         }
 
         public IUnrealEventRegistrationService FindAndRegisterEventHooks<TType>(object parentInstance) {
-            var parentType = parentInstance.GetType();
+            var parentType = typeof(TType);
+            Debug.Assert(parentType.IsInstanceOfType(parentInstance));
 
             var eventMethods = FindValidEventMethods<HookEngineEventAttribute>(parentType);
             foreach (var eventMethod in eventMethods) {

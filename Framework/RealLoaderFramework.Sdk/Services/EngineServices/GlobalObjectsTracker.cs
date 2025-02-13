@@ -36,7 +36,7 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices {
         /// </summary>
         /// <param name="unrealEvent"></param>
         [EngineEvent("^WBP_TItle_C::OnInitialized")]
-        public unsafe void OnInitialized(UnrealEvent _) {
+        public unsafe void OnInitialized(UnrealEvent unrealEvent) {
             _synchronized = true;
             if (_synchronized) {
                 return;
@@ -51,7 +51,7 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices {
         /// </summary>
         /// <param name="unrealEvent"></param>
         [EngineEvent("^PalStaticLogCollector::OnEndedWorldAutoSave")]
-        public unsafe void OnEndedWorldAutoSave(UnrealEvent _) {
+        public unsafe void OnEndedWorldAutoSave(UnrealEvent unrealEvent) {
             _synchronized = true;
             if (_synchronized) {
                 return;

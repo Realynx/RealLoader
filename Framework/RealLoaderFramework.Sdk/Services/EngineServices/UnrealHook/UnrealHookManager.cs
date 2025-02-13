@@ -21,8 +21,8 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices.UnrealHook {
         private readonly INamePoolService _namePoolService;
         private readonly IStackWalker _stackWalker;
 
-        private readonly Dictionary<string, MethodInfo> _hookEvents = new();
-        private readonly Dictionary<Regex, MethodInfo> _eventImpulses = new();
+        private readonly Dictionary<string, HashSet<MethodInfo>> _hookEvents = new();
+        private readonly Dictionary<Regex, HashSet<MethodInfo>> _eventImpulses = new();
         private readonly Dictionary<MethodInfo, object> _methodInstances = new();
 
         public UnrealHookManager(ILogger logger, INamePoolService namePoolService, IStackWalker stackWalker) {
@@ -37,8 +37,16 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices.UnrealHook {
             var hookEngineEventAttribute = hookEngineEventMethod.GetCustomAttribute<HookEngineEventAttribute>()
                 ?? throw new Exception($"Engine Hook Was Invalid! '{hookEngineEventMethod.Name}'");
 
+            ref var hookMethods = ref CollectionsMarshal.GetValueRefOrAddDefault(_hookEvents, hookEngineEventAttribute.FullyQualifiedName, out var previouslyExisted);
+            if (!previouslyExisted) {
+                hookMethods = new HashSet<MethodInfo>();
+            }
+
             _methodInstances.Add(hookEngineEventMethod, instance);
-            _hookEvents.Add(hookEngineEventAttribute.FullyQualifiedName, hookEngineEventMethod);
+            if (!hookMethods!.Add(hookEngineEventMethod)) {
+                _logger.Warning($"Attempted to register {hookEngineEventMethod.DeclaringType?.Name ?? "Private class"}.{hookEngineEventMethod.Name} for the same hook more than once.");
+            }
+
             return this;
         }
 
@@ -46,27 +54,45 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices.UnrealHook {
             var hookEngineEventAttribute = engineEventMethod.GetCustomAttribute<EngineEventAttribute>()
                 ?? throw new Exception($"Engine Event Was Invalid! '{engineEventMethod.Name}'");
 
+            ref var impulseMethods = ref CollectionsMarshal.GetValueRefOrAddDefault(_eventImpulses, hookEngineEventAttribute.EventMask, out var previouslyExisted);
+            if (!previouslyExisted) {
+                impulseMethods = new HashSet<MethodInfo>();
+            }
+
             _methodInstances.Add(engineEventMethod, instance);
-            _eventImpulses.Add(hookEngineEventAttribute.EventMask, engineEventMethod);
+            if (!impulseMethods!.Add(engineEventMethod)) {
+                _logger.Warning($"Attempted to register {engineEventMethod.DeclaringType?.Name ?? "Private class"}.{engineEventMethod.Name} for the same pattern more than once.");
+            }
+
             return this;
         }
 
+        // TODO: We might want to create delegates instead of invoking via MethodInfo to reduce overhead
         private unsafe void OnUnrealEvent(UnrealEvent unrealEvent, ExecuteOriginalCallback executeOriginalCallback) {
             Task.Factory.StartNew(() => {
-                var eventMasks = _eventImpulses.Keys.ToArray();
-                var eventsToImpulse = eventMasks.Where(i => i.IsMatch(unrealEvent.EventName));
+                object[]? parameterizedUnrealEvent = null;
 
-                foreach (var eventToImpulse in eventsToImpulse) {
-                    var methodInfo = _eventImpulses[eventToImpulse];
-                    var methodInstance = _methodInstances[methodInfo];
-                    methodInfo.Invoke(methodInstance, [unrealEvent]);
+                foreach (var (eventMask, methodInfos) in _eventImpulses) {
+                    if (!eventMask.IsMatch(unrealEvent.EventName)) {
+                        continue;
+                    }
+
+                    foreach (var methodInfo in methodInfos) {
+                        parameterizedUnrealEvent ??= [unrealEvent];
+                        var methodInstance = _methodInstances[methodInfo];
+                        methodInfo.Invoke(methodInstance, parameterizedUnrealEvent);
+                    }
                 }
             });
 
-            if (_hookEvents.TryGetValue(unrealEvent.EventName, out var methodInfo1)) {
-                var methodInstance = _methodInstances[methodInfo1];
+            if (_hookEvents.TryGetValue(unrealEvent.EventName, out var methodInfos1)) {
+                object[]? parameters = null;
 
-                methodInfo1.Invoke(methodInstance, [unrealEvent, executeOriginalCallback]);
+                foreach (var methodInfo in methodInfos1) {
+                    parameters ??= [unrealEvent, executeOriginalCallback];
+                    var methodInstance = _methodInstances[methodInfo];
+                    methodInfo.Invoke(methodInstance, parameters);
+                }
             }
 
             if (unrealEvent.ContinueExecute) {
@@ -74,8 +100,11 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices.UnrealHook {
             }
         }
 
+        /// <summary>
+        /// <see href="https://github.com/EpicGames/UnrealEngine/blob/5.1/Engine/Source/Runtime/CoreUObject/Private/UObject/ScriptCore.cpp#L1963"/>
+        /// </summary>
         public static unsafe delegate* unmanaged[Thiscall]<UObject*, UFunction*, void*, void> ProcessEvent_Original;
-        [EngineDetour(EngineFunction.ProccessEvent, DetourType.Stack)]
+        [EngineDetour(EngineFunction.ProcessEvent, DetourType.Stack)]
         [UnmanagedCallConv(CallConvs = [typeof(CallConvThiscall)])]
         public static unsafe void ProcessEvent(UObject* instance, UFunction* uFunction, void* parameters) {
             if (_singleInstance is null || uFunction is null || instance is null) {
@@ -92,7 +121,7 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices.UnrealHook {
             var executingEvent = new UnrealEvent(eventName, instance, uFunction, parameters);
 
             _singleInstance.OnUnrealEvent(executingEvent, (pInstance, pUFunction, pParams)
-                    => ProcessEvent_Original(pInstance, pUFunction, pParams));
+                => ProcessEvent_Original(pInstance, pUFunction, pParams));
         }
     }
 }

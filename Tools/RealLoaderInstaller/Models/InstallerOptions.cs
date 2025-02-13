@@ -7,7 +7,7 @@ using Spectre.Console.Cli;
 namespace RealLoaderInstaller.Models {
     public class InstallerOptions : CommandSettings {
         [CommandOption("-r|--remote")]
-        [DefaultValue("https://github.com/PoofImaFox/RealLoader")]
+        [DefaultValue("https://github.com/Realynx/RealLoader")]
         [Description("The remote repository to find update artifacts.")]
         public string RemoteSource { get; set; }
 

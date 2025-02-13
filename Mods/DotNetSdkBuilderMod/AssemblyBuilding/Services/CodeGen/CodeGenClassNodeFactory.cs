@@ -50,50 +50,35 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 classConstructors = constructors.ToArray();
             }
 
-            var classProperties = classNode.properties;
-            CodeGenPropertyNode[]? properties = null;
-            if (classProperties.Length > 0) {
-                var propertyNames = new HashSet<string> { className };
+            List<CodeGenPropertyNode>? properties = null;
+            if (classNode.properties.Length > 0) {
+                properties = new List<CodeGenPropertyNode>(classNode.properties.Length);
+                for (var i = 0; i < classNode.properties.Length; i++) {
+                    var currentProperty = classNode.properties[i];
 
-                properties = new CodeGenPropertyNode[classProperties.Length];
-                for (var i = 0; i < classProperties.Length; i++) {
-                    var propertyNode = _propertyNodeFactory.GenerateCodeGenPropertyNode(classProperties[i]);
-                    propertyNode.name = _nameCollisionService.GetNonCollidingName(propertyNode.name, propertyNames);
-                    properties[i] = propertyNode;
-                }
-            }
-
-            CodeGenMethodNode[]? methods = null;
-            var methodNames = new HashSet<string> { className };
-            var classMethods = classNode.functions;
-            if (classMethods.Length > 0) {
-
-                methods = new CodeGenMethodNode[classMethods.Length];
-                for (var i = 0; i < classMethods.Length; i++) {
-                    var methodNode = _methodNodeFactory.GenerateCodeGenMethodNode(classMethods[i], i);
-                    methodNode.name = _nameCollisionService.GetNonCollidingName(methodNode.name, methodNames);
-                    methods[i] = methodNode;
-                    // methodNames.Add($"{methodNode.name}{methodNode.returnType}{string.Concat(methodNode.arguments?.Select(x => x.type) ?? Enumerable.Empty<string>())}");
-                }
-            }
-
-            var baseClassMethods = new List<CodeGenMethodNode>();
-            for (var baseStruct = classNode.nodeClass->baseUStruct.superStruct; false && baseStruct is not null; baseStruct = baseStruct->superStruct) {
-                var functions = _unrealReflection.GetTypeFunctions(baseStruct);
-                foreach (var uFunction in functions) {
-                    var methodNode = _methodNodeFactory.GenerateInheritedMethod(uFunction);
-                    if (methodNames.Add($"{methodNode.name}{string.Concat(methodNode.arguments?.Select(x => x.type) ?? Enumerable.Empty<string>())}")) {
-                        baseClassMethods.Add(methodNode);
+                    if (currentProperty.inheritedFrom is null) {
+                        properties.Add(_propertyNodeFactory.GenerateOwnedPropertyNode(currentProperty));
+                    }
+                    else {
+                        properties.Add(_propertyNodeFactory.GenerateInheritedPropertyNode(currentProperty));
                     }
                 }
             }
 
-            if (baseClassMethods.Count > 0) {
-                if (methods != null) {
-                    baseClassMethods.InsertRange(0, methods);
-                }
+            List<CodeGenMethodNode>? methods = null;
+            if (classNode.functions.Length > 0) {
+                methods = new List<CodeGenMethodNode>(classNode.functions.Length);
 
-                methods = baseClassMethods.ToArray();
+                for (var i = 0; i < classNode.functions.Length; i++) {
+                    var currentFunction = classNode.functions[i];
+
+                    if (currentFunction.inheritedFrom is null) {
+                        methods.Add(_methodNodeFactory.GenerateOwnedMethodNode(currentFunction, i));
+                    }
+                    else {
+                        methods.Add(_methodNodeFactory.GenerateInheritedMethodNode(currentFunction));
+                    }
+                }
             }
 
             var modifiers = new StringBuilder(PUBLIC);
@@ -153,8 +138,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             return new CodeGenClassNode {
                 constructorNodes = classConstructors,
-                propertyNodes = properties,
-                methodNodes = methods,
+                propertyNodes = properties?.ToArray(),
+                methodNodes = methods?.ToArray(),
                 modifier = modifiers.ToString(),
                 name = className,
                 attributes = attributes.ToArray(),

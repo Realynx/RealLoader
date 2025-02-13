@@ -63,7 +63,7 @@ namespace RealLoaderFramework.Sdk.Services.Detour {
                 return false;
             }
 
-            var overWrittenCodes = _instructionPatcher.PatchInstructions(detourRecord.PFunction, detourRecord.DetourCodes);
+            var overWrittenCodes = _instructionPatcher.PatchLiveInstructions(detourRecord.PFunction, detourRecord.DetourCodes);
             var correctPatch = AreEqual(detourRecord.OriginalCodes, overWrittenCodes);
             return correctPatch;
         }
@@ -74,14 +74,14 @@ namespace RealLoaderFramework.Sdk.Services.Detour {
                 return false;
             }
 
-            var overWrittenCodes = _instructionPatcher.PatchInstructions(detourRecord.PFunction, detourRecord.OriginalCodes);
+            var overWrittenCodes = _instructionPatcher.PatchLiveInstructions(detourRecord.PFunction, detourRecord.OriginalCodes);
             var correctPatch = AreEqual(detourRecord.DetourCodes, overWrittenCodes);
             return correctPatch;
         }
 
-        private static bool AreEqual(byte[] codes, byte[] overWrittenInstructions) {
-            if (overWrittenInstructions.Length <= codes.Length) {
-                return overWrittenInstructions.AsSpan(0, overWrittenInstructions.Length).SequenceEqual(codes);
+        private static bool AreEqual(byte[] codes, byte[] overWrittenCodes) {
+            if (overWrittenCodes.Length >= codes.Length) {
+                return overWrittenCodes.AsSpan(0, codes.Length).SequenceEqual(codes);
             }
 
             return false;

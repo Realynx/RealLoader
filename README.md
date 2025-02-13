@@ -1,7 +1,7 @@
 # RealLoader 🎷🐛
 
-[![Github License](https://img.shields.io/github/license/PoofImaFox/RealLoader.svg)](LICENSE.md)
-[![CodeFactor](https://www.codefactor.io/repository/github/PoofImaFox/RealLoader/badge)](https://www.codefactor.io/repository/github/PoofImaFox/RealLoader)
+[![Github License](https://img.shields.io/github/license/Realynx/RealLoader.svg)](LICENSE.md)
+[![CodeFactor](https://www.codefactor.io/repository/github/Realynx/RealLoader/badge)](https://www.codefactor.io/repository/github/Realynx/RealLoader)
 
 ### Unreal Engine modding tools, framework, and mod orchestration.
 
@@ -9,11 +9,11 @@
 
 ## Branch Build Status
 
-| Branch                                                                                | Status                                                                                                                                                                                                                                                                                                   |
-|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Master](https://github.com/PoofImaFox/RealLoader/tree/master)       | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FPoofImaFox.PalworldManagedModFramework?branchName=master)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=master)       |
-| [Testing](https://github.com/PoofImaFox/RealLoader/tree/testing)     | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FPoofImaFox.PalworldManagedModFramework?branchName=testing)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=testing)     |
-| [Developer](https://github.com/PoofImaFox/RealLoader/tree/developer) | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FPoofImaFox.PalworldManagedModFramework?branchName=developer)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=developer) |
+| Branch                                                                                | Status                                                                                                                                                                                                                                                 |
+|---------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Master](https://github.com/Realynx/RealLoader/tree/master)       | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=master)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=master)       |
+| [Testing](https://github.com/Realynx/RealLoader/tree/testing)     | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=testing)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=testing)     |
+| [Developer](https://github.com/Realynx/RealLoader/tree/developer) | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=developer)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=developer) |
 
 # Building from Source
 
@@ -41,7 +41,7 @@
 
 4. Clone the repo
     ```bash
-    git clone https://github.com/PoofImaFox/RealLoader
+    git clone https://github.com/Realynx/RealLoader
     ```
 5. Change directory to `Build`
     ```sh

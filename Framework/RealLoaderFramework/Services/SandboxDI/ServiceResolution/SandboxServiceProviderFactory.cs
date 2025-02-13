@@ -17,8 +17,7 @@ namespace RealLoaderFramework.Services.SandboxDI.ServiceResolution {
         }
 
         public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder) {
-            var serviceDescripters = containerBuilder.ToArray();
-            _serviceDescriptors.Add(serviceDescripters);
+            _serviceDescriptors.Add(containerBuilder);
 
             return new SandboxServiceProvider(_parentServiceProvider, _serviceDescriptors);
         }

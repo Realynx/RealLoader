@@ -1,5 +1,4 @@
-﻿using RealLoaderFramework.Sdk.Models.CoreUObject.Flags;
-using RealLoaderFramework.Sdk.Models.CoreUObject.UClassStructs;
+﻿using RealLoaderFramework.Sdk.Models.CoreUObject.UClassStructs;
 
 namespace RealLoaderFramework.Sdk.Services.EngineServices.Interfaces {
     public interface IUObjectFuncs {

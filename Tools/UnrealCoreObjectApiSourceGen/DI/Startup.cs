@@ -41,7 +41,7 @@ namespace UnrealCoreObjectApiSourceGen.DI {
                     client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
 
                     client.DefaultRequestHeaders.UserAgent.Clear();
-                    client.DefaultRequestHeaders.UserAgent.ParseAdd("ManagedModWorks_SourceGen/1.0 (Windows; Linux; https://github.com/PoofImaFox/RealLoader)");
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("ManagedModWorks_SourceGen/1.0 (Windows; Linux; https://github.com/Realynx/RealLoader)");
                 })
                 .AddPolicyHandler(GetRetryPolicy());
 

@@ -36,8 +36,8 @@ namespace RealLoaderFramework.Sdk.Services.Detour {
             var reEntryAddress = originalAddress + originalCodes.Length;
             var trampolineAddress = _memoryAllocate.Allocate(SimpleMemoryProtection.Read | SimpleMemoryProtection.Write, (uint)originalCodes.Length + 0x10);
 
-            var fixedcodes = _shellCodeReader.FixRelativeOffsets(originalAddress, trampolineAddress, originalCodes, 64);
-            var trampolineCodes = _shellCodeFactory.BuildTrampoline64(fixedcodes, reEntryAddress);
+            var fixedCodes = _shellCodeReader.FixRelativeOffsets(originalAddress, trampolineAddress, originalCodes, 64);
+            var trampolineCodes = _shellCodeFactory.BuildTrampoline64(fixedCodes, reEntryAddress);
 
             Marshal.Copy(trampolineCodes, 0, trampolineAddress, trampolineCodes.Length);
 

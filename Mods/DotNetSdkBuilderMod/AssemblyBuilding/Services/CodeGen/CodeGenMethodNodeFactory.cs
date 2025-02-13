@@ -27,20 +27,18 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             _attributeNodeFactory = attributeNodeFactory;
         }
 
-        public unsafe CodeGenMethodNode GenerateCodeGenMethodNode(UFunction* method, Index methodIndex) {
+        public unsafe CodeGenMethodNode GenerateOwnedMethodNode(FunctionNode functionNode, Index functionIndex) {
             var modifiers = $"{PUBLIC}{WHITE_SPACE}{VIRTUAL}";
 
-            var nonSanitizedMethodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
-            var methodName = _namePoolService.GetSanitizedNameString(method->baseUstruct.ObjectName);
-            if (char.IsDigit(methodName[0])) {
-                methodName = $"_{methodName}";
-            }
+            var nonSanitizedMethodName = _namePoolService.GetNameString(functionNode.FunctionName);
+            var methodName = _namePoolService.GetSanitizedNameString(functionNode.FunctionName);
+            methodName = _nameCollisionService.GetNonCollidingName(methodName);
 
-            var attributes = new [] {
+            var attributes = new[] {
                 _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedMethodName}{QUOTE}")
             };
 
-            var parameters = _unrealReflection.GetFunctionSignature(method, out var returnValue, out var returnValueIndex);
+            var parameters = _unrealReflection.GetFunctionSignature(functionNode.nodeFunction, out var returnValue, out var returnValueIndex);
             string returnType;
             if (returnValue is not null) {
                 var signatureName = returnValue->classPrivate->ObjectName;
@@ -73,12 +71,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             if (methodArgs is not null) {
                 if (returnValue is null) {
                     body = new[] {
-                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{string.Join($"{COMMA}{WHITE_SPACE}", methodArgs.Select(x => x.name))}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
+                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{functionIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{string.Join($"{COMMA}{WHITE_SPACE}", methodArgs.Select(x => x.name))}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
                     };
                 }
                 else {
                     // TODO: Return values will cause NullReferenceException
-                    var sb = new StringBuilder($"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}");
+                    var sb = new StringBuilder($"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{functionIndex}{CLOSED_ROUND_BRACKET}");
                     var argsBeforeReturnValue = methodArgs.Take(returnValueIndex.Value).Select(x => x.name).ToArray();
                     if (argsBeforeReturnValue.Length > 0) {
                         sb.Append($"{COMMA}{WHITE_SPACE}");
@@ -106,14 +104,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             else {
                 if (returnValue is null) {
                     body = new[] {
-                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
+                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{functionIndex}{CLOSED_ROUND_BRACKET}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
                     };
                 }
                 else {
                     // TODO: Return values will cause NullReferenceException
                     body = new[] {
                         $"{returnType}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{DEFAULT}{SEMICOLON}",
-                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{methodIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
+                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{functionIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
                         $"{RETURN}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{SEMICOLON}",
                     };
                 }
@@ -134,22 +132,19 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             };
         }
 
-        public unsafe CodeGenMethodNode GenerateInheritedMethod(UFunction* method) {
+        public unsafe CodeGenMethodNode GenerateInheritedMethodNode(FunctionNode functionNode) {
             var modifiers = $"{PUBLIC}{WHITE_SPACE}{OVERRIDE}";
 
-            var nonSanitizedMethodName = _namePoolService.GetNameString(method->baseUstruct.ObjectName);
-            var methodName = _namePoolService.GetSanitizedNameString(method->baseUstruct.ObjectName);
+            var nonSanitizedMethodName = _namePoolService.GetNameString(functionNode.FunctionName);
+            var methodName = _namePoolService.GetSanitizedNameString(functionNode.FunctionName);
             methodName = _nameCollisionService.GetNonCollidingName(methodName);
-            if (char.IsDigit(methodName[0])) {
-                methodName = $"_{methodName}";
-            }
 
             var attributes = new[] {
                 _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedMethodName}{QUOTE}"),
                 _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)
             };
 
-            var parameters = _unrealReflection.GetFunctionSignature(method, out var returnValue, out _);
+            var parameters = _unrealReflection.GetFunctionSignature(functionNode.nodeFunction, out var returnValue, out _);
             string returnType;
             if (returnValue is not null) {
                 var signatureName = returnValue->classPrivate->ObjectName;

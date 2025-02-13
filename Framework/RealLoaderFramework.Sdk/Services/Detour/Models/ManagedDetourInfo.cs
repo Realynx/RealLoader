@@ -12,7 +12,7 @@ namespace RealLoaderFramework.Sdk.Services.Detour.Models {
 
             GetDetourDelegate = DetourMethod.CreateDelegate(Expression.GetDelegateType(
                 (from parameter in DetourMethod.GetParameters() select parameter.ParameterType)
-                .Concat([DetourMethod.ReturnType])
+                .Append(DetourMethod.ReturnType)
                 .ToArray()));
         }
 

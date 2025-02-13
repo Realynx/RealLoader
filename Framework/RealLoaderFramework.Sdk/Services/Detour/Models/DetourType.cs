@@ -6,7 +6,7 @@
     }
 
     public enum EngineFunction {
-        ProccessEvent,
+        ProcessEvent,
         UObject_PostInitProperties,
         UObject_BeginDestroy,
         UObject_FinishDestroy

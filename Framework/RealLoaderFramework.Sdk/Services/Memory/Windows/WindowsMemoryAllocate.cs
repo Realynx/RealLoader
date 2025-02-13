@@ -16,16 +16,15 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Windows {
         }
 
         public nint Allocate(SimpleMemoryProtection protection, uint length) {
-            var winProtection = ConvertToProtection(protection);
+            var winProtection = protection.ToMemoryProtection();
             var allocatedMemory = VirtualAlloc(nint.Zero, length, PageState.MEM_COMMIT, winProtection);
 
             if (allocatedMemory == nint.Zero) {
                 _logger.Error($"Failed to allocate memory. Length: {length}, Protection: {winProtection}");
-            }
-            else {
-                _logger.Debug($"Memory allocated. Address: 0x{allocatedMemory:X}, Length: {length}, Protection: {winProtection}");
+                return nint.Zero;
             }
 
+            _logger.Debug($"Memory allocated. Address: 0x{allocatedMemory:X}, Length: {length}, Protection: {winProtection}");
             return allocatedMemory;
         }
 
@@ -42,7 +41,7 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Windows {
         }
 
         public unsafe bool SetProtection(nint address, uint length, SimpleMemoryProtection protection, out SimpleMemoryProtection previousProtection) {
-            var winProtection = ConvertToProtection(protection);
+            var winProtection = protection.ToMemoryProtection();
             var result = VirtualProtect(address, length, winProtection, out var oldProtection);
 
             if (!result || oldProtection == 0) {
@@ -52,7 +51,7 @@ namespace RealLoaderFramework.Sdk.Services.Memory.Windows {
             }
 
             _logger.Debug($"Set memory protection to {protection} at address: 0x{address:X}");
-            previousProtection = ConvertToMemoryProtection((Protection)oldProtection);
+            previousProtection = oldProtection.ToSimpleMemoryProtection();
             return true;
         }
     }

@@ -1,9 +1,8 @@
 using DotNetSdkBuilderMod.AssemblyBuilding.Models;
 
-using RealLoaderFramework.Sdk.Models.CoreUObject.UClassStructs;
-
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces {
-    public unsafe interface ICodeGenPropertyNodeFactory {
-        CodeGenPropertyNode GenerateCodeGenPropertyNode(FProperty* property);
+    public interface ICodeGenPropertyNodeFactory {
+        CodeGenPropertyNode GenerateOwnedPropertyNode(PropertyNode propertyNode);
+        CodeGenPropertyNode GenerateInheritedPropertyNode(PropertyNode propertyNode);
     }
 }
