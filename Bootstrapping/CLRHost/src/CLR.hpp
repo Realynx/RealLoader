@@ -10,17 +10,19 @@
 
 #endif
 
-//assert and output
+//util
+#include <Util/String.hpp>
+#include <Util/Logger.hpp>
+
+//assert, output, and filesystem
 #include <assert.h>
 #include <iostream>
+#include <filesystem>
 
 //Host CLR
 #include <nethost.h>
 #include <coreclr_delegates.h>
 #include <hostfxr.h>
-
-//custom string for thick and C char arrays
-#include <String.hpp>
 
 //since GetLastError doesn't exit on Linux we define it
 #if defined(__linux__)
@@ -60,7 +62,7 @@ namespace CLR::Util {
 		assert(h != nullptr);
 		return h;
 	}
-	static inline void* GetDLLExportedFunction(void* h, const char* name){
+	static inline void* GetDLLExportedFunction(void* h, const char_t* name){
 
 		void* f = dlsym(h, name);
 		assert(f != nullptr);
@@ -95,9 +97,10 @@ namespace CLR {
 			get_hostfxr_parameters params{ sizeof(get_hostfxr_parameters), nullptr, nullptr };
 			char_t buffer[999];
 			size_t buffer_size = sizeof(buffer) / sizeof(char_t);
-			if (get_hostfxr_path(buffer, &buffer_size, &params) != 0){
-
-				std::cout << "Failed to find HostFXR on your system! Please make sure you have the Dot Net SDK or Runtime installed. Thank you.\n";
+			if (get_hostfxr_path(buffer, &buffer_size, &params) != 0)
+			{
+				RealLoader::Util::LogFatalError(STR("Missing Dotnet"),
+					STR("Failed to find HostFXR on your system! Please make sure you have the Dot Net SDK or Runtime installed. Thank you."));
 				return false;
 			}
 
@@ -113,8 +116,9 @@ namespace CLR {
 			hostfxr_funcPtr_Close = (hostfxr_close_fn)Util::GetDLLExportedFunction(hostfxr_lib, "hostfxr_close");
 
 			//initializes the config
-			const auto runtimeConfig = PalMM::Util::ConvertThickStringToCString(config_Path);
-			std::cout << "Using config: " << runtimeConfig << std::endl;
+			RealLoader::Util::RealString usingConfigMsg = STR("Using config: ");
+			usingConfigMsg += config_Path;
+			RealLoader::Util::LogMessage(usingConfigMsg);
 			int rc = hostfxr_funcPtr_initConfig(config_Path, nullptr, &cxt);
 			if (cxt == nullptr || rc != 0){
 
@@ -128,41 +132,29 @@ namespace CLR {
 			return (hostfxr_funcPtr_SetRuntimeProperty && hostfxr_funcPtr_initConfig && hostfxr_funcPtr_GetRuntimeDelegate && hostfxr_funcPtr_Close);
 		}
 
-#if defined(_WIN32)
 		//sets a property in the CLR
-		inline void SetCLRProperty(const wchar_t* propertyStr, const wchar_t* newValue, bool ignoreLogging = false) {
-
-#else
-		//sets a property in the CLR
-		inline void SetCLRProperty(const char* propertyStr, const char* newValue, bool ignoreLogging = false) {
-#endif 
+		inline void SetCLRProperty(const RealLoader::Util::RealString& propertyStr, RealLoader::Util::RealString& newValue, bool ignoreLogging = false) {
 		
-			if (!hostfxr_funcPtr_SetRuntimeProperty) {
-				if (!ignoreLogging) {
-					std::cout << "RealLoader Error: CLR || Func: \"SetCLRProperty\" || Failed to set \"" << propertyStr << "\" to Value \"" << newValue << "\" due to hostfxr_funcPtr_SetRuntimeProperty being NULL. Please check that HostFXR hasn't failed at being found on your system. And any other previous CLR initialize states are running as expected.\n";
+			if (!hostfxr_funcPtr_SetRuntimeProperty)
+			{
+				if (!ignoreLogging)
+				{
+					RealLoader::Util::LogError(STR("CLR"), STR("hostfxr_funcPtr_SetRuntimeProperty is NULL, could not set a property of the CLR. Check that the HostFXR is on your system and that the CLR initalized properly."));
 				}
 
 				return;
 			}
 
-			std::cout << "OwO Property Setting: \"" << PalMM::Util::ConvertThickStringToCString(propertyStr) << "\" || \"" << PalMM::Util::ConvertThickStringToCString(newValue) << "\"\n";
-			hostfxr_funcPtr_SetRuntimeProperty(cxt, propertyStr, newValue);
+			//std::cout << "OwO Property Setting: \"" << PalMM::Util::ConvertThickStringToCString(propertyStr) << "\" || \"" << PalMM::Util::ConvertThickStringToCString(newValue) << "\"\n";
+			hostfxr_funcPtr_SetRuntimeProperty(cxt, propertyStr.data.c_str(), newValue.data.c_str());
 		}
 
 		//sets the base app context || takes in a file to the config path, we strip out the file name and just use the directory
 		inline void SetAppContextBase(const char_t* configPath) {
+
 			//calculate and set up the base directory for the app context
-			std::string baseAppContextDir = PalMM::Util::ConvertThickStringToCString(configPath);
-
-#if defined(_WIN32)
-			auto pos = baseAppContextDir.find_last_of("\\");
-#else
-			auto pos = baseAppContextDir.find_last_of("/");
-#endif
-
-			baseAppContextDir = baseAppContextDir.substr(0, pos + 1);
-
-			SetCLRProperty(STR("APP_CONTEXT_BASE_DIRECTORY"), PalMM::Util::ConvertCStringToThickString(baseAppContextDir).c_str());
+			RealLoader::Util::RealString baseAppContextDir = std::filesystem::path(configPath).parent_path().string();
+			SetCLRProperty(STR("APP_CONTEXT_BASE_DIRECTORY"), baseAppContextDir);
 		}
 
 		//function pointer types for handling DLLs and their managed code

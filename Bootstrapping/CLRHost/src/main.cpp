@@ -7,55 +7,42 @@ DLL entry point for running C#
 #include <thread>
 #include <filesystem>
 
-//finds the desired folder and returns the relative path
-static inline PalMM::Util::String FindDotnetDependencyFolderPath_Relative(const char* folderName) {
-	for (auto& p : std::filesystem::recursive_directory_iterator(".")) {
-		//if the folder is found, return the path
-		if (p.is_directory() && !strcmp(p.path().filename().string().c_str(), folderName))
+//gets the dotnet dependency folder path
+static inline RealLoader::Util::RealString FindDotnetDependencyFolderPath(const char_t* folderName)
+{
+	for (auto& p : std::filesystem::recursive_directory_iterator("."))
+	{
+		if (p.is_directory() && RealLoader::Util::IsSameString((char_t*)p.path().filename().string().c_str(), folderName))
 			return p.path().string();
 	}
 
-	printf("RealLoader Error: Failed to find %s at the current directory!\n", folderName);
-	return "";
+	RealLoader::Util::RealString msg = STR("Failed to find Dotnet folder at \"");
+	msg += RealLoader::Util::RealString(folderName) + STR("\"");
+	RealLoader::Util::LogError(STR("Failed To Find Dotnet Folder"), msg);
+	return RealLoader::Util::RealString();
 }
-
-//finds the desired folder and returns the absolute path
-static inline PalMM::Util::String FindDotnetDependencyFolderPath_Absolute(const char* folderName) {
-	PalMM::Util::String path = FindDotnetDependencyFolderPath_Relative(folderName);
-	if (path.charData.empty()) //if it failed
-		return "";
-
-	return std::filesystem::absolute(path.GetCharArray()).string();
-}
-
 
 //runs the CLR thread and DLL
 static inline void RUNCLR() {
-	PalMM::Util::String appPath;
-	PalMM::Util::String configPath;
+
 	//gets the RealLoader Framework folder
-	PalMM::Util::String modFrameworkDir = FindDotnetDependencyFolderPath_Absolute("RealLoaderFramework");
+	RealLoader::Util::RealString modFrameworkDir = FindDotnetDependencyFolderPath(STR("RealLoaderFramework"));
 
 	//sets the paths for the CLR runtime
-#if defined(_WIN32)
-	appPath.SetThickCharData(std::string(modFrameworkDir.charData + "\\RealLoaderFramework.dll").c_str());
-	configPath.SetThickCharData(std::string(modFrameworkDir.charData + "\\RealLoaderFramework.runtimeconfig.json").c_str());
-#elif defined(__linux__)
-	appPath.SetThickCharData(std::string(modFrameworkDir.charData + "/RealLoaderFramework.dll").c_str());
-	configPath.SetThickCharData(std::string(modFrameworkDir.charData + "/RealLoaderFramework.runtimeconfig.json").c_str());
-#endif
+	RealLoader::Util::RealString appPath = modFrameworkDir.data + DIR + STR("RealLoaderFramework.dll");
+	RealLoader::Util::RealString configPath = modFrameworkDir.data + + DIR + STR("RealLoaderFramework.runtimeconfig.json");
 
 	//init the CLR
 	CLR::CLRHost host;
-	if (!host.Init(configPath.GetWideCharArray())) {
-		std::cout << "Failed To Init Host" << std::endl;
+	if (!host.Init(configPath.data.c_str())) {
+		RealLoader::Util::LogFatalError(STR("CLR Init"), STR("Failed to initalize CLR Host!!!"));
 		return;
 	}
 
-	std::cout << "Finished Initializing CLR" << std::endl;
+	RealLoader::Util::LogMessage(STR("Finished initalizing CLR!"));
 
 	//starts the main Assembly
-	host.StartAssembly(appPath.GetWideCharArray());
+	host.StartAssembly(appPath.data.c_str());
 }
 
 

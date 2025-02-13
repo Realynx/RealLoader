@@ -97,7 +97,7 @@
 set "PROP_FILE=$(ProjectDir)dotnet_path.props"
 
 :: Find the latest version directory
-for /f "delims=" %%i in ('dir /b /ad "C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x64" ^| sort /r') do (
+for /f "delims=" %%i in ('dir /b /ad "C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x64" ^| "C:/Windows/System32/sort.exe" /r') do (
     set "NET_VERSION=%%i"
     goto :found
 )
@@ -170,7 +170,9 @@ exit /b 0
     <ClInclude Include="src\CLR.hpp" />
     <ClInclude Include="src\coreclr_delegates.h" />
     <ClInclude Include="src\hostfxr.h" />
+    <ClInclude Include="src\Util\Logger.hpp" />
     <ClInclude Include="src\nethost.h" />
+    <ClInclude Include="src\Util\String.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
