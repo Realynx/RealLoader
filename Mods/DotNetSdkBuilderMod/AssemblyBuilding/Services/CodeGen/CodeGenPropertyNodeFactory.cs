@@ -29,10 +29,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             var propertyName = _namePoolService.GetSanitizedNameString(propertyNode.PropertyName);
             propertyName = _nameCollisionService.GetNonCollidingName(propertyName);
 
-            var modifiers = $"{PUBLIC}{WHITE_SPACE}{VIRTUAL}";
+            var modifiers = "public virtual";
 
             var attributes = new List<CodeGenAttributeNode> {
-                _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedPropertyName}{QUOTE}")
+                _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"\"{nonSanitizedPropertyName}\"")
             };
             if (propertyNode.nodeProperty->propertyFlags.HasFlag(EPropertyFlags.CPF_Deprecated)) {
                 attributes.Add(_attributeNodeFactory.GenerateAttribute(DEPRECATED_ATTRIBUTE));
@@ -42,8 +42,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             var fieldOffset = propertyNode.nodeProperty->offset_Internal;
 
-            var getter = $"{GET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{STAR}{OPEN_ROUND_BRACKET}{returnType}{STAR}{CLOSED_ROUND_BRACKET}{OPEN_ROUND_BRACKET}{ADDRESS_FIELD_NAME}{WHITE_SPACE}{PLUS}{WHITE_SPACE}{fieldOffset}{CLOSED_ROUND_BRACKET}{SEMICOLON}";
-            var setter = $"{SET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{nameof(Unsafe)}{DOT}{nameof(Unsafe.Write)}{OPEN_ROUND_BRACKET}{ADDRESS_FIELD_NAME}{WHITE_SPACE}{PLUS}{WHITE_SPACE}{fieldOffset}{COMMA}{WHITE_SPACE}{OPEN_ROUND_BRACKET}{INT_PTR}{CLOSED_ROUND_BRACKET}{VALUE}{DOT}{ADDRESS_FIELD_NAME}{CLOSED_ROUND_BRACKET}{SEMICOLON}";
+            var getter = $"get => *({returnType}*)({ADDRESS_FIELD_NAME} + {fieldOffset});";
+            var setter = $"set => {nameof(Unsafe)}.{nameof(Unsafe.Write)}({ADDRESS_FIELD_NAME} + {fieldOffset}, (nint)value.{ADDRESS_FIELD_NAME});";
 
             return new CodeGenPropertyNode {
                 modifier = modifiers,
@@ -60,10 +60,10 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             var propertyName = _namePoolService.GetSanitizedNameString(propertyNode.PropertyName);
             propertyName = _nameCollisionService.GetNonCollidingName(propertyName);
 
-            var modifiers = $"{PUBLIC}{WHITE_SPACE}{OVERRIDE}";
+            var modifiers = "public override";
 
             var attributes = new List<CodeGenAttributeNode> {
-                _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedPropertyName}{QUOTE}")
+                _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"\"{nonSanitizedPropertyName}\"")
             };
             if (propertyNode.nodeProperty->propertyFlags.HasFlag(EPropertyFlags.CPF_Deprecated)) {
                 attributes.Add(_attributeNodeFactory.GenerateAttribute(DEPRECATED_ATTRIBUTE));
@@ -74,8 +74,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             var fieldOffset = propertyNode.nodeProperty->offset_Internal;
 
             // TODO: Does this work?
-            var getter = $"{GET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{BASE}{DOT}{propertyName}{SEMICOLON}";
-            var setter = $"{SET}{WHITE_SPACE}{LAMBDA}{WHITE_SPACE}{BASE}{DOT}{propertyName}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{VALUE}{SEMICOLON}";
+            var getter = $"get => base.{propertyName};";
+            var setter = $"set => base.{propertyName} = value;";
 
             return new CodeGenPropertyNode {
                 modifier = modifiers,

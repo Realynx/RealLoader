@@ -6,8 +6,6 @@ using DotNetSdkBuilderMod.Extensions;
 
 using RealLoaderFramework.Sdk.Logging;
 
-using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
-
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class ArgumentGenerator : IArgumentGenerator {
         private readonly ILogger _logger;
@@ -23,31 +21,24 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 return;
             }
 
+            const string ARGUMENT_SEPARATOR = ", ";
             foreach (var argumentNode in argumentNodes) {
                 if (argumentNode.attributes is not null) {
                     foreach (var attributeNode in argumentNode.attributes) {
                         _attributeGenerator.GenerateAttribute(codeBuilder, attributeNode, 0);
-
-                        // GenerateAttribute ends with a new line. We need to remove that.
-                        codeBuilder.RemoveNewLine();
-                        codeBuilder.Append(WHITE_SPACE);
+                        codeBuilder.Append(' ');
                     }
                 }
 
                 if (argumentNode.modifier is not null) {
-                    codeBuilder.Append(argumentNode.modifier);
-                    codeBuilder.Append(WHITE_SPACE);
+                    codeBuilder.Append($"{argumentNode.modifier} ");
                 }
 
-                codeBuilder.Append(argumentNode.type);
-                codeBuilder.Append(WHITE_SPACE);
-                codeBuilder.Append(argumentNode.name);
-                codeBuilder.Append(COMMA);
-                codeBuilder.Append(WHITE_SPACE);
+                codeBuilder.Append($"{argumentNode.type} {argumentNode.name}{ARGUMENT_SEPARATOR}");
             }
 
             // Remove the trailing comma and whitespace
-            var separatorWidth = COMMA.Length + WHITE_SPACE.Length;
+            var separatorWidth = ARGUMENT_SEPARATOR.Length;
             codeBuilder.Remove(codeBuilder.Length - separatorWidth, separatorWidth);
         }
     }

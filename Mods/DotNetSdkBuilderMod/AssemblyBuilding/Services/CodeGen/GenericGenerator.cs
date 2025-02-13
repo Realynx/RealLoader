@@ -4,8 +4,6 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using RealLoaderFramework.Sdk.Logging;
 
-using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
-
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class GenericGenerator : IGenericGenerator {
         private readonly ILogger _logger;
@@ -19,19 +17,19 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 return;
             }
 
-            codeBuilder.Append(OPEN_ANGLE_BRACKET);
+            codeBuilder.Append('<');
 
+            const string GENERIC_SEPARATOR = ", ";
             foreach (var generic in genericTypes) {
                 codeBuilder.Append(generic);
-                codeBuilder.Append(COMMA);
-                codeBuilder.Append(WHITE_SPACE);
+                codeBuilder.Append(GENERIC_SEPARATOR);
             }
 
             // Remove the trailing comma and whitespace
-            var separatorWidth = COMMA.Length + WHITE_SPACE.Length;
+            var separatorWidth = GENERIC_SEPARATOR.Length;
             codeBuilder.Remove(codeBuilder.Length - separatorWidth, separatorWidth);
 
-            codeBuilder.Append(CLOSED_ANGLE_BRACKET);
+            codeBuilder.Append('>');
         }
     }
 }

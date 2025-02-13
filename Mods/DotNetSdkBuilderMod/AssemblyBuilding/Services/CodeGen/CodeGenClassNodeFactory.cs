@@ -81,17 +81,17 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             }
 
-            var modifiers = new StringBuilder(PUBLIC);
+            var modifiers = new StringBuilder("public");
             if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Abstract)) {
-                modifiers.Append($"{WHITE_SPACE}{ABSTRACT}");
+                modifiers.Append(" abstract");
             }
 
             // Preserve modifier order
-            modifiers.Append($"{WHITE_SPACE}{UNSAFE}");
+            modifiers.Append(" unsafe");
 
             var attributes = new List<CodeGenAttributeNode> {
-                _attributeNodeFactory.GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"{QUOTE}{classNode.packageName}/{className}{QUOTE}"),
-                _attributeNodeFactory.GenerateAttribute(ORIGINAL_TYPE_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedClassName}{QUOTE}")
+                _attributeNodeFactory.GenerateAttribute(FULLY_QUALIFIED_TYPE_PATH_ATTRIBUTE, $"\"{classNode.packageName}/{className}\""),
+                _attributeNodeFactory.GenerateAttribute(ORIGINAL_TYPE_NAME_ATTRIBUTE, $"\"{nonSanitizedClassName}\"")
             };
             if (classNode.nodeClass->ClassFlags.HasFlag(EClassFlags.CLASS_Deprecated)) {
                 attributes.Add(_attributeNodeFactory.GenerateAttribute(DEPRECATED_ATTRIBUTE));
@@ -168,7 +168,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 _constructorNodeFactory.GenerateDefaultConstructor(name)
             };
 
-            var modifiers = $"{PUBLIC}{WHITE_SPACE}{UNSAFE}";
+            var modifiers = "public unsafe";
 
             var attributes = new[] {
                 _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)

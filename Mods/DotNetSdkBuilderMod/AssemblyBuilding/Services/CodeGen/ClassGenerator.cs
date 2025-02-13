@@ -6,8 +6,6 @@ using DotNetSdkBuilderMod.Extensions;
 
 using RealLoaderFramework.Sdk.Logging;
 
-using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
-
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class ClassGenerator : IClassGenerator {
         private readonly ILogger _logger;
@@ -34,44 +32,35 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             if (classNode.attributes is not null) {
                 foreach (var attribute in classNode.attributes) {
                     _attributeGenerator.GenerateAttribute(codeBuilder, attribute, 1);
+                    codeBuilder.AppendLine();
                 }
             }
 
-            codeBuilder.AppendIndented(classNode.modifier, 1);
-            codeBuilder.Append(WHITE_SPACE);
-
-            codeBuilder.Append(CLASS);
-            codeBuilder.Append(WHITE_SPACE);
-
-            codeBuilder.Append(classNode.name);
+            codeBuilder.AppendIndent(1);
+            codeBuilder.Append($"{classNode.modifier} class {classNode.name}");
 
             var baseClass = classNode.baseType;
             if (baseClass is not null) {
-                codeBuilder.Append(WHITE_SPACE);
-                codeBuilder.Append(COLON);
-                codeBuilder.Append(WHITE_SPACE);
-                codeBuilder.Append(baseClass);
+                codeBuilder.Append($" : {baseClass}");
             }
 
             if (classNode.interfaces is { Length: > 0 }) {
                 if (baseClass is not null) {
-                    codeBuilder.Append(COMMA);
+                    codeBuilder.Append(',');
                 }
 
-                codeBuilder.Append(WHITE_SPACE);
+                codeBuilder.Append(' ');
                 _interfaceGenerator.GenerateInterfaces(codeBuilder, classNode.interfaces);
             }
 
-            codeBuilder.Append(WHITE_SPACE);
+            codeBuilder.Append(' ');
 
             if (classNode.constructorNodes is null && classNode.propertyNodes is null && classNode.methodNodes is null && classNode.operatorNodes is null) {
-                codeBuilder.Append(OPEN_CURLY_BRACKET);
-                codeBuilder.Append(WHITE_SPACE);
-                codeBuilder.AppendLine(CLOSED_CURLY_BRACKET);
+                codeBuilder.AppendLine("{ }");
                 return;
             }
 
-            codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
+            codeBuilder.AppendLine("{");
             if (classNode.constructorNodes is not null) {
                 foreach (var constructor in classNode.constructorNodes) {
                     _constructorGenerator.GenerateConstructor(codeBuilder, constructor);
@@ -114,7 +103,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 codeBuilder.RemoveNewLine();
             }
 
-            codeBuilder.AppendIndentedLine(CLOSED_CURLY_BRACKET, 1);
+            codeBuilder.AppendIndentedLine("}", 1);
         }
     }
 }

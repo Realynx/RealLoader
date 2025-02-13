@@ -13,8 +13,8 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public CodeGenOperatorNode GenerateCastOperator(string castableClassName, string className) {
-            var modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}{WHITE_SPACE}{EXPLICIT}{WHITE_SPACE}{OPERATOR}";
-            var result = $"{NEW}{WHITE_SPACE}{castableClassName}{OPEN_ROUND_BRACKET}{OPERATOR_THIS_CLASS_NAME}{DOT}{ADDRESS_FIELD_NAME}{CLOSED_ROUND_BRACKET}";
+            var modifiers = "public static explicit operator";
+            var result = $"new {castableClassName}({OPERATOR_THIS_CLASS_NAME}.{ADDRESS_FIELD_NAME})";
 
             return new CodeGenOperatorNode {
                 name = className,

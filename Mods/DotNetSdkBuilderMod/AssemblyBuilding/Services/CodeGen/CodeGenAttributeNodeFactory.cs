@@ -5,8 +5,6 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using RealLoaderFramework.Sdk.Logging;
 
-using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
-
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class CodeGenAttributeNodeFactory : ICodeGenAttributeNodeFactory {
         private readonly ILogger _logger;
@@ -16,7 +14,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
         public CodeGenAttributeNode GenerateAssemblyAttribute([ConstantExpected] string attributeName, string attributeValue) {
             return new CodeGenAttributeNode {
-                name = $"{ASSEMBLY}{COLON}{WHITE_SPACE}{attributeName}",
+                name = $"assembly: {attributeName}",
                 value = attributeValue,
             };
         }
