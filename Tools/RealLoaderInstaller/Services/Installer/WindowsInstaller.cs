@@ -48,6 +48,7 @@ namespace RealLoaderInstaller.Services.Installer {
             var clrHostLocation = Path.Combine(dotnetDependenciesFolder, "CLRHost.dll");
             await _modFileService.InstallNewFiles(dotnetDependenciesFolder, clrHostLocation);
 
+
             AnsiConsole.WriteLine("Installing proxy dll...");
             var proxyDllLocation = Path.Combine(win64Folder, installerOptions.ProxyDll);
             await _modFileService.WriteGithubFile(proxyDllLocation, installerOptions.ProxyDll);
