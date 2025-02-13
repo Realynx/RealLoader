@@ -6,8 +6,6 @@ using DotNetSdkBuilderMod.Extensions;
 
 using RealLoaderFramework.Sdk.Logging;
 
-using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
-
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class PropertyGenerator : IPropertyGenerator {
         private readonly ILogger _logger;
@@ -26,22 +24,17 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             }
 
             codeBuilder.AppendIndented(propertyNode.modifier, 2);
-            codeBuilder.Append(WHITE_SPACE);
 
-            codeBuilder.Append(propertyNode.returnType);
-            codeBuilder.Append(WHITE_SPACE);
-
-            codeBuilder.Append(propertyNode.name);
+            codeBuilder.Append($" {propertyNode.returnType} {propertyNode.name}");
 
             var hasGetter = propertyNode.get is not null;
             var hasSetter = propertyNode.set is not null;
 
             if (!hasGetter && !hasSetter) {
-                codeBuilder.AppendLine(COLON);
+                codeBuilder.AppendLine(";");
             }
             else {
-                codeBuilder.Append(WHITE_SPACE);
-                codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
+                codeBuilder.AppendLine(" {");
 
                 if (hasGetter) {
                     codeBuilder.AppendIndentedLine(propertyNode.get!, 3);
@@ -51,7 +44,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                     codeBuilder.AppendIndentedLine(propertyNode.set!, 3);
                 }
 
-                codeBuilder.AppendIndentedLine(CLOSED_CURLY_BRACKET, 2);
+                codeBuilder.AppendIndentedLine("}", 2);
             }
         }
     }

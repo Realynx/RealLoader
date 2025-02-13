@@ -30,13 +30,13 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)
             };
 
-            var methodModifier = STATIC;
+            var methodModifiers = "static";
 
-            var methodName = $"{name}{OPEN_ANGLE_BRACKET}{string.Join($"{COMMA}{WHITE_SPACE}", genericTypes)}{CLOSED_ANGLE_BRACKET}{DOT}{nameof(ICreatableUObject<UObjectInterop>.Create)}";
+            var methodName = $"{name}<{string.Join(", ", genericTypes)}>.{nameof(ICreatableUObject<UObjectInterop>.Create)}";
 
             var methodArgs = new[] {
                 new CodeGenArgumentNode {
-                    type = $"{nameof(UObject)}{STAR}",
+                    type = $"{nameof(UObject)}*",
                     name = CONSTRUCTOR_ADDRESS_NAME,
                 },
                 new CodeGenArgumentNode {
@@ -50,11 +50,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             };
 
             var methodBody = new[] {
-                $"{RETURN}{WHITE_SPACE}{NEW}{WHITE_SPACE}{className}{OPEN_ROUND_BRACKET}{OPEN_ROUND_BRACKET}{INT_PTR}{CLOSED_ROUND_BRACKET}{CONSTRUCTOR_ADDRESS_NAME}{COMMA}{WHITE_SPACE}{CONSTRUCTOR_UNREAL_REFLECTION_NAME}{COMMA}{WHITE_SPACE}{CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME}{CLOSED_ROUND_BRACKET}{SEMICOLON}"
+                $"return new {className}((nint){CONSTRUCTOR_ADDRESS_NAME}, {CONSTRUCTOR_UNREAL_REFLECTION_NAME}, {CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME});"
             };
 
             var bodyTypes = new[] {
-                $"{nameof(UObject)}{STAR}",
+                $"{nameof(UObject)}*",
                 nameof(IUnrealReflection),
                 nameof(IGlobalObjectsTracker),
             };
@@ -62,7 +62,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             var methodNode = new[] {
                 new CodeGenMethodNode {
                     attributes = methodAttributes,
-                    modifier = methodModifier,
+                    modifier = methodModifiers,
                     returnType = className,
                     name = methodName,
                     arguments = methodArgs,

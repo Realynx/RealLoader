@@ -28,14 +28,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe CodeGenMethodNode GenerateOwnedMethodNode(FunctionNode functionNode, Index functionIndex) {
-            var modifiers = $"{PUBLIC}{WHITE_SPACE}{VIRTUAL}";
+            var modifiers = "public virtual";
 
             var nonSanitizedMethodName = _namePoolService.GetNameString(functionNode.FunctionName);
             var methodName = _namePoolService.GetSanitizedNameString(functionNode.FunctionName);
             methodName = _nameCollisionService.GetNonCollidingName(methodName);
 
             var attributes = new[] {
-                _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedMethodName}{QUOTE}")
+                _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"\"{nonSanitizedMethodName}\"")
             };
 
             var parameters = _unrealReflection.GetFunctionSignature(functionNode.nodeFunction, out var returnValue, out var returnValueIndex);
@@ -71,48 +71,47 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             if (methodArgs is not null) {
                 if (returnValue is null) {
                     body = new[] {
-                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{functionIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{string.Join($"{COMMA}{WHITE_SPACE}", methodArgs.Select(x => x.name))}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
+                        $"this.{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}({nameof(UObjectInterop.GetFunctionStructPointer)}({functionIndex}), {string.Join(", ", methodArgs.Select(x => x.name))});",
                     };
                 }
                 else {
                     // TODO: Return values will cause NullReferenceException
-                    var sb = new StringBuilder($"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{functionIndex}{CLOSED_ROUND_BRACKET}");
+                    var sb = new StringBuilder($"this.{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}({nameof(UObjectInterop.GetFunctionStructPointer)}({functionIndex})");
                     var argsBeforeReturnValue = methodArgs.Take(returnValueIndex.Value).Select(x => x.name).ToArray();
                     if (argsBeforeReturnValue.Length > 0) {
-                        sb.Append($"{COMMA}{WHITE_SPACE}");
-                        sb.Append(string.Join($"{COMMA}{WHITE_SPACE}", argsBeforeReturnValue));
+                        sb.Append(", ");
+                        sb.Append(string.Join(", ", argsBeforeReturnValue));
                     }
 
-                    sb.Append($"{COMMA}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}");
+                    sb.Append($", {CODE_GEN_INTEROP_RETURN_VALUE_NAME}");
 
                     var argsAfterReturnValue = methodArgs.Skip(returnValueIndex.Value).Select(x => x.name).ToArray();
                     if (argsAfterReturnValue.Length > 0) {
-                        sb.Append($"{COMMA}{WHITE_SPACE}");
-                        sb.Append(string.Join($"{COMMA}{WHITE_SPACE}", argsAfterReturnValue));
+                        sb.Append(", ");
+                        sb.Append(string.Join(", ", argsAfterReturnValue));
                     }
 
-                    sb.Append(CLOSED_ROUND_BRACKET);
-                    sb.Append(SEMICOLON);
+                    sb.Append(");");
 
                     body = new[] {
-                        $"{returnType}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{DEFAULT}{SEMICOLON}",
+                        $"{returnType} {CODE_GEN_INTEROP_RETURN_VALUE_NAME} = default;",
                         sb.ToString(),
-                        $"{RETURN}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{SEMICOLON}",
+                        $"return {CODE_GEN_INTEROP_RETURN_VALUE_NAME};",
                     };
                 }
             }
             else {
                 if (returnValue is null) {
                     body = new[] {
-                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{functionIndex}{CLOSED_ROUND_BRACKET}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
+                        $"this.{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}({nameof(UObjectInterop.GetFunctionStructPointer)}({functionIndex}));",
                     };
                 }
                 else {
                     // TODO: Return values will cause NullReferenceException
                     body = new[] {
-                        $"{returnType}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{DEFAULT}{SEMICOLON}",
-                        $"{THIS}{DOT}{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}{OPEN_ROUND_BRACKET}{nameof(UObjectInterop.GetFunctionStructPointer)}{OPEN_ROUND_BRACKET}{functionIndex}{CLOSED_ROUND_BRACKET}{COMMA}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{CLOSED_ROUND_BRACKET}{SEMICOLON}",
-                        $"{RETURN}{WHITE_SPACE}{CODE_GEN_INTEROP_RETURN_VALUE_NAME}{SEMICOLON}",
+                        $"{returnType} {CODE_GEN_INTEROP_RETURN_VALUE_NAME} = default;",
+                        $"this.{CODE_GEN_INTEROP_INVOKE_METHOD_NAME}({nameof(UObjectInterop.GetFunctionStructPointer)}({functionIndex}), {CODE_GEN_INTEROP_RETURN_VALUE_NAME});",
+                        $"return {CODE_GEN_INTEROP_RETURN_VALUE_NAME};",
                     };
                 }
             }
@@ -133,14 +132,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe CodeGenMethodNode GenerateInheritedMethodNode(FunctionNode functionNode) {
-            var modifiers = $"{PUBLIC}{WHITE_SPACE}{OVERRIDE}";
+            var modifiers = "public override";
 
             var nonSanitizedMethodName = _namePoolService.GetNameString(functionNode.FunctionName);
             var methodName = _namePoolService.GetSanitizedNameString(functionNode.FunctionName);
             methodName = _nameCollisionService.GetNonCollidingName(methodName);
 
             var attributes = new[] {
-                _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"{QUOTE}{nonSanitizedMethodName}{QUOTE}"),
+                _attributeNodeFactory.GenerateAttribute(ORIGINAL_MEMBER_NAME_ATTRIBUTE, $"\"{nonSanitizedMethodName}\""),
                 _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)
             };
 
@@ -176,14 +175,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             string[] body;
             if (returnValue is not null) {
                 body = new[] {
-                    $"{EXECUTING_ADDRESS_FIELD_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{EXECUTING_ADDRESS_FIELD_NAME}{ARROW}{nameof(UStruct.superStruct)}{SEMICOLON}",
-                    $"{RETURN}{WHITE_SPACE}{BASE}{DOT}{methodName}{OPEN_ROUND_BRACKET}{string.Join($"{COMMA}{WHITE_SPACE}", methodArgs?.Select(x => x.name) ?? Enumerable.Empty<string>())}{CLOSED_ROUND_BRACKET}{SEMICOLON}"
+                    $"{EXECUTING_ADDRESS_FIELD_NAME} = {EXECUTING_ADDRESS_FIELD_NAME}->{nameof(UStruct.superStruct)};",
+                    $"return base.{methodName}({string.Join(", ", methodArgs?.Select(x => x.name) ?? [])});"
                 };
             }
             else {
                 body = new[] {
-                    $"{EXECUTING_ADDRESS_FIELD_NAME}{WHITE_SPACE}{EQUALS}{WHITE_SPACE}{EXECUTING_ADDRESS_FIELD_NAME}{ARROW}{nameof(UStruct.superStruct)}{SEMICOLON}",
-                    $"{BASE}{DOT}{methodName}{OPEN_ROUND_BRACKET}{string.Join($"{COMMA}{WHITE_SPACE}", methodArgs?.Select(x => x.name) ?? Enumerable.Empty<string>())}{CLOSED_ROUND_BRACKET}{SEMICOLON}"
+                    $"{EXECUTING_ADDRESS_FIELD_NAME} = {EXECUTING_ADDRESS_FIELD_NAME}->{nameof(UStruct.superStruct)};",
+                    $"base.{methodName}({string.Join(", ", methodArgs?.Select(x => x.name) ?? [])});"
                 };
             }
 

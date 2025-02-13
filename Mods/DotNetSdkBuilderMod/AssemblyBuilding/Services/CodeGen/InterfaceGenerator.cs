@@ -5,8 +5,6 @@ using DotNetSdkBuilderMod.AssemblyBuilding.Services.Interfaces;
 
 using RealLoaderFramework.Sdk.Logging;
 
-using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
-
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class InterfaceGenerator : IInterfaceGenerator {
         private readonly ILogger _logger;
@@ -22,6 +20,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 return;
             }
 
+            const string INTERFACE_SEPARATOR = ", ";
             foreach (var interfaceNode in interfaceNodes) {
                 codeBuilder.Append(interfaceNode.name);
 
@@ -29,12 +28,11 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                     _genericGenerator.GenerateGenerics(codeBuilder, interfaceNode.genericTypes);
                 }
 
-                codeBuilder.Append(COMMA);
-                codeBuilder.Append(WHITE_SPACE);
+                codeBuilder.Append(INTERFACE_SEPARATOR);
             }
 
             // Remove the trailing comma and whitespace
-            var separatorWidth = COMMA.Length + WHITE_SPACE.Length;
+            var separatorWidth = INTERFACE_SEPARATOR.Length;
             codeBuilder.Remove(codeBuilder.Length - separatorWidth, separatorWidth);
         }
     }

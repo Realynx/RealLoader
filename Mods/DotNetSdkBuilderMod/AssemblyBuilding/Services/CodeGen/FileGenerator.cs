@@ -23,35 +23,19 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 return;
             }
 
-            codeBuilder.Append(POUND);
-            codeBuilder.Append(PRAGMA);
-            codeBuilder.Append(WHITE_SPACE);
-            codeBuilder.Append(WARNING);
-            codeBuilder.Append(WHITE_SPACE);
-            codeBuilder.Append(DISABLE);
-            codeBuilder.Append(WHITE_SPACE);
-            codeBuilder.AppendLine(ADDRESS_OF_MANAGED_TYPE_WARNING_CODE);
+            codeBuilder.AppendLine($"#pragma warning disable {ADDRESS_OF_MANAGED_TYPE_WARNING_CODE}");
             codeBuilder.AppendLine();
 
             if (namespaceNode.imports is not null) {
                 foreach (var import in namespaceNode.imports) {
-                    codeBuilder.Append(USING);
-                    codeBuilder.Append(WHITE_SPACE);
-                    codeBuilder.Append(import);
-                    codeBuilder.AppendLine(SEMICOLON);
+                    codeBuilder.AppendLine($"using {import};");
                 }
 
                 codeBuilder.AppendLine();
             }
 
-            codeBuilder.Append(NAMESPACE);
-            codeBuilder.Append(WHITE_SPACE);
-
             var fullyQualifiedNamespace = namespaceNode.fullNamespace;
-            codeBuilder.Append(fullyQualifiedNamespace);
-
-            codeBuilder.Append(WHITE_SPACE);
-            codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
+            codeBuilder.AppendLine($$"""namespace {{fullyQualifiedNamespace}} {""");
 
             foreach (var classNode in namespaceNode.classes) {
                 _classGenerator.GenerateClass(codeBuilder, classNode);
@@ -61,7 +45,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             // Remove trailing newline between classes end and namespace closing bracket
             codeBuilder.RemoveNewLine();
 
-            codeBuilder.Append(CLOSED_CURLY_BRACKET);
+            codeBuilder.Append('}');
         }
     }
 }

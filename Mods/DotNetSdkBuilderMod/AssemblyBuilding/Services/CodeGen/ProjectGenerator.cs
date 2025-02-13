@@ -21,7 +21,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         public StringBuilder GenerateProject(CodeGenAssemblyNode assemblyNode) {
             var codeBuilder = new StringBuilder();
 
-            const string PROJECT_TAG_VALUE = $"{SDK}{EQUALS}{QUOTE}{SDK_VALUE}{QUOTE}";
+            const string PROJECT_TAG_VALUE = "Sdk=\"Microsoft.NET.Sdk\"";
             _xmlTagGenerator.GenerateOpenTag(codeBuilder, PROJECT, PROJECT_TAG_VALUE);
             codeBuilder.AppendLine();
 
@@ -36,12 +36,12 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
 
             codeBuilder.AppendIndent(2);
             _xmlTagGenerator.GenerateOpenTag(codeBuilder, ALLOW_UNSAFE_BLOCKS, newLine: false);
-            codeBuilder.Append(TRUE);
+            codeBuilder.Append("true");
             _xmlTagGenerator.GenerateCloseTag(codeBuilder, ALLOW_UNSAFE_BLOCKS);
 
             codeBuilder.AppendIndent(2);
             _xmlTagGenerator.GenerateOpenTag(codeBuilder, IMPLICIT_USINGS, newLine: false);
-            codeBuilder.Append(TRUE);
+            codeBuilder.Append("true");
             _xmlTagGenerator.GenerateCloseTag(codeBuilder, IMPLICIT_USINGS);
 
             codeBuilder.AppendIndent(1);
@@ -56,14 +56,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             if (assemblyNode.references is not null) {
                 foreach (var reference in assemblyNode.references) {
                     if (reference.EndsWith(".dll")) {
-                         var referenceValue = $"{INCLUDE}{EQUALS}{QUOTE}{reference}{QUOTE}";
+                         var referenceValue = $"Include=\"{reference}\"";
                         codeBuilder.AppendIndent(2);
-                        _xmlTagGenerator.GenerateSingleLineTag(codeBuilder, REFERENCE, referenceValue);
+                        _xmlTagGenerator.GenerateSingleLineTag(codeBuilder, "Reference", referenceValue);
                     }
                     else {
-                        var referenceValue = $"{INCLUDE}{EQUALS}{QUOTE}{DOT}{DOT}{BACK_SLASH}{reference}{BACK_SLASH}{reference}{DOT}{CSPROJ}{QUOTE}";
+                        var referenceValue = $"Include=\"..\\{reference}\\{reference}.csproj\"";
                         codeBuilder.AppendIndent(2);
-                        _xmlTagGenerator.GenerateSingleLineTag(codeBuilder, PROJECT_REFERENCE, referenceValue);
+                        _xmlTagGenerator.GenerateSingleLineTag(codeBuilder, "ProjectReference", referenceValue);
                     }
                 }
             }
@@ -77,7 +77,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             _xmlTagGenerator.GenerateOpenTag(codeBuilder, TARGET, targetTagValue);
             codeBuilder.AppendIndent(2);
             _xmlTagGenerator.GenerateOpenTag(codeBuilder,  ITEM_GROUP);
-            var copyItemsTagValue = $"{INCLUDE}=\"$(TargetDir)\\*.*\"";
+            var copyItemsTagValue = $"Include=\"$(TargetDir)\\*.*\"";
             codeBuilder.AppendIndent(3);
             _xmlTagGenerator.GenerateSingleLineTag(codeBuilder,  COPY_ITEMS, copyItemsTagValue);
             codeBuilder.AppendIndent(2);

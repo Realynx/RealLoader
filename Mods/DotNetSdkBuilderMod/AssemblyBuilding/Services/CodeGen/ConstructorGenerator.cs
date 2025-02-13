@@ -6,8 +6,6 @@ using DotNetSdkBuilderMod.Extensions;
 
 using RealLoaderFramework.Sdk.Logging;
 
-using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
-
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class ConstructorGenerator : IConstructorGenerator {
         private readonly ILogger _logger;
@@ -24,37 +22,28 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             if (constructorNode.attributes is not null) {
                 foreach (var attributeNode in constructorNode.attributes) {
                     _attributeGenerator.GenerateAttribute(codeBuilder, attributeNode, 2);
+                    codeBuilder.AppendLine();
                 }
             }
 
             codeBuilder.AppendIndented(constructorNode.modifier, 2);
-            codeBuilder.Append(WHITE_SPACE);
-
-            codeBuilder.Append(constructorNode.name);
-            codeBuilder.Append(OPEN_ROUND_BRACKET);
+            codeBuilder.Append($" {constructorNode.name}(");
 
             if (constructorNode.arguments is not null) {
                 _argumentGenerator.GenerateArguments(codeBuilder, constructorNode.arguments);
             }
 
-            codeBuilder.Append(CLOSED_ROUND_BRACKET);
-            codeBuilder.Append(WHITE_SPACE);
+            codeBuilder.Append(") ");
 
             if (constructorNode.baseConstructor is not null) {
-                codeBuilder.Append(COLON);
-                codeBuilder.Append(WHITE_SPACE);
-
-                codeBuilder.Append(constructorNode.baseConstructor);
-                codeBuilder.Append(WHITE_SPACE);
+                codeBuilder.Append($": {constructorNode.baseConstructor} ");
             }
 
             if (constructorNode.body is null) {
-                codeBuilder.Append(OPEN_CURLY_BRACKET);
-                codeBuilder.Append(WHITE_SPACE);
-                codeBuilder.AppendLine(CLOSED_CURLY_BRACKET);
+                codeBuilder.AppendLine("{ }");
             }
             else {
-                codeBuilder.AppendLine(OPEN_CURLY_BRACKET);
+                codeBuilder.AppendLine("{");
 
                 foreach (var line in constructorNode.body) {
                     if (string.IsNullOrWhiteSpace(line)) {
@@ -65,7 +54,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                     }
                 }
 
-                codeBuilder.AppendIndentedLine(CLOSED_CURLY_BRACKET, 2);
+                codeBuilder.AppendIndentedLine("}", 2);
             }
         }
     }

@@ -25,7 +25,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 methods[i] = GetExtensionMethod(functionArgCounts[i]);
             }
 
-            var modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}";
+            var modifiers = "public static";
 
             var className = U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME;
 
@@ -38,9 +38,9 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             };
 
             extensionsNamespaceNode.imports = new[] {
-                $"{nameof(System)}{DOT}{nameof(System.Buffers)}",
-                $"{nameof(System)}{DOT}{nameof(System.Runtime)}",
-                $"{nameof(System)}{DOT}{nameof(System.Runtime)}{DOT}{nameof(System.Runtime.CompilerServices)}",
+                $"{nameof(System)}.{nameof(System.Buffers)}",
+                $"{nameof(System)}.{nameof(System.Runtime)}",
+                $"{nameof(System)}.{nameof(System.Runtime)}.{nameof(System.Runtime.CompilerServices)}",
             };
         }
 
@@ -53,7 +53,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         private CodeGenMethodNode GetDefaultExtensionMethod() {
-            var modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}{WHITE_SPACE}{UNSAFE}";
+            var modifiers = "public static unsafe";
 
             var methodName = CODE_GEN_INTEROP_INVOKE_METHOD_NAME;
 
@@ -93,7 +93,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         private CodeGenMethodNode GetGenericExtensionMethod(int genericArgCount) {
-            var modifiers = $"{PUBLIC}{WHITE_SPACE}{STATIC}{WHITE_SPACE}{UNSAFE}";
+            var modifiers = "public static unsafe";
 
             var methodName = CODE_GEN_INTEROP_INVOKE_METHOD_NAME;
 
@@ -151,7 +151,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private static CodeGenArgumentNode GetExtensionArgument() {
             return new CodeGenArgumentNode
             {
-                modifier = THIS,
+                modifier = "this",
                 type = nameof(UObjectInterop),
                 name = "objectInterop",
             };
@@ -160,7 +160,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         private static CodeGenArgumentNode GetFunctionAddressArgument() {
             return new CodeGenArgumentNode
             {
-                type = $"{nameof(UFunction)}{STAR}",
+                type = $"{nameof(UFunction)}*",
                 name = "functionStruct",
             };
         }

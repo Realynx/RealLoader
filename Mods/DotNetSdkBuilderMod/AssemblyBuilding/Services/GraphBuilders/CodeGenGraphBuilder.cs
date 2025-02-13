@@ -131,7 +131,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.GraphBuilders {
             var time = _functionTimingService.Execute(() => {
                 _nameSpaceService.MemoizeTypeNamespaces(rootNode, memoizedClassesAndNamespaces);
 
-                memoizedClassesAndNamespaces.Add(U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME, $"{CODE_NAMESPACE}{DOT}{U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE}");
+                memoizedClassesAndNamespaces.Add(U_OBJECT_INTEROP_EXTENSIONS_CLASS_NAME, $"{CODE_NAMESPACE}.{U_OBJECT_INTEROP_EXTENSIONS_NAMESPACE}");
             });
 
             _logger.Debug($"Memoized classes and namespaces; {time.TotalMilliseconds:F1} ms to build.");

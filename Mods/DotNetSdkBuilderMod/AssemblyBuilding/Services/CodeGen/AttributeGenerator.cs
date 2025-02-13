@@ -6,8 +6,6 @@ using DotNetSdkBuilderMod.Extensions;
 
 using RealLoaderFramework.Sdk.Logging;
 
-using static DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen.CodeGenConstants;
-
 namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
     public class AttributeGenerator : IAttributeGenerator {
         private readonly ILogger _logger;
@@ -17,16 +15,14 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public unsafe void GenerateAttribute(StringBuilder codeBuilder, CodeGenAttributeNode attributeNode, int indent) {
-            codeBuilder.AppendIndented(OPEN_SQUARE_BRACKET, indent);
+            codeBuilder.AppendIndented("[", indent);
             codeBuilder.Append(attributeNode.name);
 
             if (attributeNode.value is not null) {
-                codeBuilder.Append(OPEN_ROUND_BRACKET);
-                codeBuilder.Append(attributeNode.value);
-                codeBuilder.Append(CLOSED_ROUND_BRACKET);
+                codeBuilder.Append($"({attributeNode.value})");
             }
 
-            codeBuilder.AppendLine(CLOSED_SQUARE_BRACKET);
+            codeBuilder.Append(']');
         }
     }
 }

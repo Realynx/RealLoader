@@ -17,15 +17,15 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
         }
 
         public CodeGenConstructorNode GenerateDefaultConstructor(string className) {
-            var modifiers = PROTECTED;
+            var modifiers = "protected";
 
             var attributes = new[] {
-                _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE)
+                _attributeNodeFactory.GenerateAttribute(COMPILER_GENERATED_ATTRIBUTE),
             };
 
             var arguments = new[] {
                 new CodeGenArgumentNode {
-                    type = INT_PTR,
+                    type = "nint",
                     name = CONSTRUCTOR_ADDRESS_NAME,
                 },
                 new CodeGenArgumentNode {
@@ -38,19 +38,21 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
                 }
             };
 
-            var baseConstructor = $"{BASE}{OPEN_ROUND_BRACKET}{CONSTRUCTOR_ADDRESS_NAME}{COMMA}{WHITE_SPACE}{CONSTRUCTOR_UNREAL_REFLECTION_NAME}{COMMA}{WHITE_SPACE}{CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME}{CLOSED_ROUND_BRACKET}";
+            const string BASE_CONSTRUCTOR = $"base({CONSTRUCTOR_ADDRESS_NAME}, {CONSTRUCTOR_UNREAL_REFLECTION_NAME}, {CONSTRUCTOR_GLOBAL_OBJECTS_TRACKER_NAME})";
 
             return new CodeGenConstructorNode {
                 modifier = modifiers,
                 name = className,
                 attributes = attributes,
                 arguments = arguments,
-                baseConstructor = baseConstructor,
+                baseConstructor = BASE_CONSTRUCTOR,
             };
         }
 
         public unsafe CodeGenConstructorNode GenerateCodeGenConstructorNode() {
             // TODO
+            var modifiers = "public";
+
             string name = null!;
 
             CodeGenAttributeNode[]? attributes = null;
@@ -62,7 +64,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             string[]? body = null;
 
             return new CodeGenConstructorNode {
-                modifier = PUBLIC,
+                modifier = modifiers,
                 name = name,
                 attributes = attributes,
                 arguments = arguments,
