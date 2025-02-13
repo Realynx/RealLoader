@@ -20,6 +20,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             if (propertyNode.attributes is not null) {
                 foreach (var attribute in propertyNode.attributes) {
                     _attributeGenerator.GenerateAttribute(codeBuilder, attribute, 2);
+                    codeBuilder.AppendLine();
                 }
             }
 

@@ -25,6 +25,7 @@ namespace DotNetSdkBuilderMod.AssemblyBuilding.Services.CodeGen {
             if (methodNode.attributes is not null) {
                 foreach (var attribute in methodNode.attributes) {
                     _attributeGenerator.GenerateAttribute(codeBuilder, attribute, 2);
+                    codeBuilder.AppendLine();
                 }
             }
 
