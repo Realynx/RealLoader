@@ -184,7 +184,7 @@ publish/
 *.azurePubxml
 # Note: Comment the next line if you want to checkin your web deploy settings,
 # but database connection strings (with potential passwords) will be unencrypted
-*.pubxml
+#*.pubxml
 *.publishproj
 
 # Microsoft Azure Web App publish settings. Comment the next line if you want to
@@ -412,6 +412,9 @@ bin-obj/Debug-windows-x86_64/PMMBootstrapper/PMMBootstrapper.tlog/CL.command.1.t
 *.out
 *.app
 
+# JetBrains Rider
+.idea/
+
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
@@ -423,3 +426,5 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+**/GithubSymbols

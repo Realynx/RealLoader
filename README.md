@@ -1,29 +1,65 @@
-# PalworldManagedModFramework
+# RealLoader 🎷🐛
 
-A framework for loading mods created with C++ and C# for Pal World
-<br>
+[![Github License](https://img.shields.io/github/license/Realynx/RealLoader.svg)](LICENSE.md)
+[![CodeFactor](https://www.codefactor.io/repository/github/Realynx/RealLoader/badge)](https://www.codefactor.io/repository/github/Realynx/RealLoader)
 
-# How to Build
+### Unreal Engine modding tools, framework, and mod orchestration.
 
-![Static Badge](https://img.shields.io/badge/REQUIRED-darkred)
+- RealLoader is a framework for loading, and orchestrating mod's created in various languages for unreal engine.
 
-Regardless of the platform [DotNet SDK 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is required for compilation.
+## Branch Build Status
 
-[CMake](https://cmake.org/download/) (min ver of 3.22) is required for compilation on Linux.
+| Branch                                                                                | Status                                                                                                                                                                                                                                                 |
+|---------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Master](https://github.com/Realynx/RealLoader/tree/master)       | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=master)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=master)       |
+| [Testing](https://github.com/Realynx/RealLoader/tree/testing)     | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=testing)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=testing)     |
+| [Developer](https://github.com/Realynx/RealLoader/tree/developer) | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=developer)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=developer) |
 
-[Visual Studio](https://visualstudio.microsoft.com/downloads/) (2022 or beyond is recommended) is required for compilation on Windows 10.
+# Building from Source
 
-![Static Badge](https://img.shields.io/badge/Linux-orange)<br>
-In the root dir, run the command `cmake . && cmake --build .`
+### Please read the following articles before contributing.
 
-Optionly when calling `cmake .` you can pass a `-dotnet-sdk="path"` after the . to override the default for where dotnet is located on your system.
+- Contributing
+- Code of Conduct
+- Editorconfig Style Rules
+- Roadmap
 
-![Static Badge](https://img.shields.io/badge/Linux_default_Path_for_Dotnet_SDK:-orange) ```/usr/share/dotnet```
+> [!NOTE]
+> The following required dependencies must be met in order to compile from source. Dotnet runtime is required to run the mod framework on every location.
+
+## Dependencies
+
+- ### [.NET 9+ Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)
+
+## How to Build
+
+1. Install the [.NET 9+ SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
+
+2. Install [CMake 3.22+](https://cmake.org/download/)
+ 
+3. Install [Visual Studio 2022+](https://visualstudio.microsoft.com/downloads/) with the <b>Desktop development with C++</b> package
+
+4. Clone the repo
+    ```bash
+    git clone https://github.com/Realynx/RealLoader
+    ```
+5. Change directory to `Build`
+    ```sh
+    cd ./Build
+    ```
+
+6. Run the build script
+
+    - ![Windows Badge](https://img.shields.io/badge/Windows-blue)
+         ```sh
+         Build.bat
+         ```
+    - ![Linux Badge](https://img.shields.io/badge/Linux-green)
+        ```sh
+        ./Build.sh
+        ```
 
 
-(Note: The Bootstrapper is not needed for Linux Servers, only the CLR Host)
-
-![Static Badge](https://img.shields.io/badge/Windows-blue)<br>
-In the root dir, run `BuildProjects.bat`, it will compile distribution builds for the Bootstrapper and CLRHost and place them in ```GithubSymbols\Windows```. DotNet assemblies will be generated and placed in ```GithubSymbols\Net```
-
-![Static Badge](https://img.shields.io/badge/Windows_default_Path_for_Dotnet_SDK:-abcdef) `C:\\ProgramFiles\\dotnet`
+# Resources
+> [!TIP]
+> You can view example mods under [Client Mod Ex](Mods/ExampleMod), [Server Mod Ex](Mods/ExampleServerMod), and [DI Mod Ex](Mods)  
