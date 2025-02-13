@@ -153,8 +153,7 @@ namespace CLR {
 		inline void SetAppContextBase(const char_t* configPath) {
 
 			//calculate and set up the base directory for the app context
-			RealLoader::Util::RealString baseAppContextDir = std::filesystem::path(configPath).parent_path().string();
-			SetCLRProperty(STR("APP_CONTEXT_BASE_DIRECTORY"), baseAppContextDir);
+			SetCLRProperty(STR("APP_CONTEXT_BASE_DIRECTORY"), RealLoader::Util::RealString(std::filesystem::path(configPath).parent_path().string()));
 		}
 
 		//function pointer types for handling DLLs and their managed code
