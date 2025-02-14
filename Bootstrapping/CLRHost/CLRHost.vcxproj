@@ -56,7 +56,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\..\GithubSymbols\Windows\</OutDir>
+    <OutDir>..\..\bin\Windows\</OutDir>
     <TargetName>CLRHost</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
@@ -90,7 +90,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(NetHostLib);%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>..\..\GithubSymbols\Windows\CLRHost.lib</ImportLibrary>
+      <ImportLibrary>
+      </ImportLibrary>
     </Link>
     <PreBuildEvent>
       <Command>@echo off
@@ -174,6 +175,9 @@ exit /b 0
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
