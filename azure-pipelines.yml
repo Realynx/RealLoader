@@ -160,4 +160,4 @@ stages:
             $(System.ArtifactsDirectory)/ManagedModFramework.zip
             $(System.ArtifactsDirectory)/windows_artifacts/Windows/Bootstrapper.exe
             $(System.ArtifactsDirectory)/windows_artifacts/Windows/CLRHost.dll
-            $(System.ArtifactsDirectory)/linux_artifacts/GithubSymbols/Linux/libCLRHost.so
+            $(System.ArtifactsDirectory)/linux_artifacts/bin/Linux/libCLRHost.so
