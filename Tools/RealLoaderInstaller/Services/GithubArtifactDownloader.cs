@@ -46,7 +46,7 @@ namespace RealLoaderInstaller.Services {
             archive.ExtractToDirectory(tempdir.FullName, true);
 
             Directory.Delete(extractPath, true);
-            Directory.Move(Path.Combine(tempdir.FullName, "Release", "net8.0"), extractPath);
+            Directory.Move(Path.Combine(tempDir.FullName, "Release", "net9.0"), extractPath);
 
             tempdir.Delete(true);
         }
