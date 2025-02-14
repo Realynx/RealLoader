@@ -1,7 +1,4 @@
-﻿using GeneratedSdk.Game.Pal.Blueprint.Character.Base.BP_PlayerBase;
-using GeneratedSdk.Script.Engine;
-
-using RealLoaderFramework.Sdk.Attributes;
+﻿using RealLoaderFramework.Sdk.Attributes;
 using RealLoaderFramework.Sdk.Interfaces;
 using RealLoaderFramework.Sdk.Logging;
 using RealLoaderFramework.Sdk.Services.EngineServices;
@@ -56,8 +53,8 @@ namespace ExampleMod {
         [HookEngineEvent("BP_Player_Female_C::CanJumpInternal")]
         public unsafe void JumpEvent(UnrealEvent unrealEvent, ExecuteOriginalCallback executeOriginalCallback) {
             try {
-                var bitchPlayer = UObjectFactory.CreateProxy<BP_Player_Female_C>(unrealEvent.Instance);
-                bitchPlayer.Jump();
+                //var bitchPlayer = UObjectFactory.CreateProxy<BP_Player_Female_C>(unrealEvent.Instance);
+                //bitchPlayer.Jump();
 
                 _logger.Debug("Bitch Jumpin 🧨🧨🧨🧨🎈🎈🎃🎃🎃🎃📎🖇📏📐✂🗃🗄🗑📌📌📊📊📊📊📊");
             }
