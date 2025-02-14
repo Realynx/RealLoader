@@ -1,10 +1,17 @@
-# RealLoader 🎷🐛
-
 [![Github License](https://img.shields.io/github/license/Realynx/RealLoader.svg)](LICENSE.md)
 [![CodeFactor](https://www.codefactor.io/repository/github/Realynx/RealLoader/badge)](https://www.codefactor.io/repository/github/Realynx/RealLoader)
 
-# **RealLoader: Unreal Engine Modding Framework**
+## Branch Build Status
 
+| Branch                                                                                | Status                                                                                                                                                                                                                                                 |
+|---------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Master](https://github.com/Realynx/RealLoader/tree/master)       | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=master)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=2&branchName=master)       |
+| [Testing](https://github.com/Realynx/RealLoader/tree/testing)     | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=testing)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=2&branchName=testing)     |
+| [Poofy Feature Branch](https://github.com/Realynx/RealLoader/tree/poofyfeatures) | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=PoofyFeatures)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=2&branchName=PoofyFeatures) |
+
+
+# **RealLoader: Unreal Engine Modding Framework** 🎷🐛
+ 
 **RealLoader** is a powerful framework for loading and orchestrating mods created in various languages for **Unreal Engine**. It primarily supports **C#** for developing mods and provides a streamlined modding SDK with essential tools.
 
 ## **Key Features**
@@ -30,23 +37,14 @@
   - Supports enabling, disabling, and configuring mods dynamically.  
 
 
-## Branch Build Status
-
-| Branch                                                                                | Status                                                                                                                                                                                                                                                 |
-|---------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Master](https://github.com/Realynx/RealLoader/tree/master)       | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=master)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=2&branchName=master)       |
-| [Testing](https://github.com/Realynx/RealLoader/tree/testing)     | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=testing)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=2&branchName=testing)     |
-| [Poofy Feature Branch](https://github.com/Realynx/RealLoader/tree/poofyfeatures) | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=PoofyFeatures)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=2&branchName=PoofyFeatures) |
-
-
 # Building from Source
 > [!NOTE]
 > The following required dependencies must be met in order to compile from source. Dotnet runtime is required to run the mod framework on every location.
 
-## Dependencies
-- ### [.NET 9+ Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)
+### Dependencies
+- [.NET 9+ Runtime](https://dotnet.microsoft.com/en-us/download/dotnet)
 
-## How to Build
+### How to Build
 > [!TIP]
 > All build symbols are configured to go to `/bin` in the root directory.
 
