@@ -34,7 +34,7 @@ target_link_libraries(${PROJECT_NAME} "${NETHOST_LIB}")
 add_compile_definitions("__linux__")
 
 # Sets output directory
-set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/GithubSymbols/Linux")
+set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Linux")
 
 # Use GCC for Linux
 set(CMAKE_C_COMPILER "gcc")

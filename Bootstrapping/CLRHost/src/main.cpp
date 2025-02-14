@@ -6,6 +6,7 @@ DLL entry point for running C#
 
 #include <thread>
 #include <filesystem>
+#include <atomic>
 
 //finds the desired folder and returns the relative path
 static inline PalMM::Util::String FindDotnetDependencyFolderPath_Relative(const char* folderName) {

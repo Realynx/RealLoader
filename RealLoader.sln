@@ -11,8 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{390BBE98
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bootstrapping", "Bootstrapping", "{B164371C-D190-4C74-A268-5B253130D3ED}"
 	ProjectSection(SolutionItems) = preProject
-		FindNethost.sh = FindNethost.sh
 		Bootstrapping\FindNethost.ps1 = Bootstrapping\FindNethost.ps1
+		Bootstrapping\FindNethost.sh = Bootstrapping\FindNethost.sh
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0094465C-5CA6-41C0-96D3-94E1AEBFE529}"
