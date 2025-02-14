@@ -12,7 +12,7 @@ namespace RealLoaderInstaller.Services.Uninstaller {
         }
 
         public async Task UninstallFiles(InstallerOptions installerOptions) {
-            var win64Folder = GetWin64Folder(installerOptions.InstallLocation);
+            var win64Folder = Path.Combine(installerOptions.InstallLocation, "Pal", "Binaries", "Win64");
             var dotnetDependenciesFolder = Path.Combine(win64Folder, "RealLoaderFramework");
 
             AnsiConsole.WriteLine($"Removing nethost.dll...");
@@ -33,15 +33,6 @@ namespace RealLoaderInstaller.Services.Uninstaller {
             Directory.Delete(dotnetDependenciesFolder, true);
 
             AnsiConsole.WriteLine($"Modloader Uninstalled!");
-        }
-
-        private string GetWin64Folder(string rootFolder) {
-            var win64directory = Directory.EnumerateDirectories(rootFolder, "*", SearchOption.AllDirectories)
-                .SingleOrDefault(i => i.EndsWith(Path.Combine("Binaries", "Win64")));
-
-            return win64directory is null
-                ? throw new DirectoryNotFoundException("Could not find Win64 folder.")
-                : win64directory;
         }
     }
 }
