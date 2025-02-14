@@ -93,7 +93,7 @@
       </ImportLibrary>
     </Link>
     <PreBuildEvent>
-      <Command>powershell -ExecutionPolicy Bypass -File "$(ProjectDir)..\GetNetHostEnvironmentVariable.ps1"</Command>
+      <Command>powershell -ExecutionPolicy Bypass -File "$(ProjectDir)..\FindNethost.ps1"</Command>
     </PreBuildEvent>
     <PreLinkEvent>
       <Command>

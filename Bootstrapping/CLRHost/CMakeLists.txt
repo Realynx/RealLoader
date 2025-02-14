@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.22) #CMake ver
+cmake_minimum_required(VERSION 3.22) # CMake version
 
 # CLR Host
 project(CLRHost)
 
-# Sets the project
+# Set the project
 set(CMAKE_SYSTEM_NAME Linux)
 
 # Create the executable
@@ -14,28 +14,27 @@ ADD_LIBRARY(${PROJECT_NAME} SHARED
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Find the most recent .NETCore.App.Host.linux-x64 version
-file(GLOB NETCORE_VERSIONS "/usr/share/dotnet/packs/Microsoft.NETCore.App.Host.linux-x64/*")
-list(SORT NETCORE_VERSIONS)
-list(REVERSE NETCORE_VERSIONS)
-list(GET NETCORE_VERSIONS 0 LATEST_NETCORE)
+# Sets the output name
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME CLRHost)
 
-# Ensure a valid path was found
-if(NOT LATEST_NETCORE)
-    message(FATAL_ERROR "Could not find Microsoft.NETCore.App.Host.linux-x64 in /usr/share/dotnet/packs/")
-endif()
-
-# Set include directories
+# Set the include directories
 target_include_directories(${PROJECT_NAME} PRIVATE "src" "../Common/Cpp")
 
-# Link the most recent .NET host library
-target_link_libraries(${PROJECT_NAME} "${LATEST_NETCORE}/runtimes/linux-x64/native/libnethost.a")
+# Invoke the bash script to find the correct library path
+execute_process(
+    COMMAND bash "${CMAKE_SOURCE_DIR}/find_nethost.sh"
+    OUTPUT_VARIABLE NETHOST_LIB
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
-# Define a Linux macro for build
+# Link library
+target_link_libraries(${PROJECT_NAME} "${NETHOST_LIB}")
+
+# Defines a Linux Macro for build
 add_compile_definitions("__linux__")
 
-# Set output directory
-set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Linux")
+# Sets output directory
+set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/GithubSymbols/Linux")
 
 # Use GCC for Linux
 set(CMAKE_C_COMPILER "gcc")
