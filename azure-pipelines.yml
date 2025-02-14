@@ -69,12 +69,12 @@ stages:
     #     configuration: 'Release'
     #     msbuildArguments: '/target:Rebuild /PublishProfile=Release'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Build RealLoader Solution'
-    inputs:
-      command: 'build'
-      projects: '$(Build.SourcesDirectory)/RealLoader.sln'
-      arguments: '--configuration Release'
+    - task: DotNetCoreCLI@2
+      displayName: 'Build RealLoader Solution'
+      inputs:
+        command: 'build'
+        projects: '$(Build.SourcesDirectory)/RealLoader.sln'
+        arguments: '--configuration Release'
 
 
     - task: DotNetCoreCLI@2
