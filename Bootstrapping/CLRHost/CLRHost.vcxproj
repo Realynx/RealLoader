@@ -88,7 +88,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)Bootstrapping/nethost.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)../nethost.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>
       </ImportLibrary>
     </Link>
@@ -124,7 +124,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SolutionDir)Bootstrapping/nethost.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)../nethost.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>..\bin\Windows\CLRHost.lib</ImportLibrary>
     </Link>
     <PreBuildEvent>
@@ -151,7 +151,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(SolutionDir)Bootstrapping/nethost.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)../nethost.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>..\bin\Windows\CLRHost.lib</ImportLibrary>
     </Link>
     <PreBuildEvent>
