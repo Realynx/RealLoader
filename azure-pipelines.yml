@@ -54,7 +54,7 @@ stages:
     - task: MSBuild@1
       displayName: 'Build C++ Windows Solution'
       inputs:
-        solution: '$(Build.SourcesDirectory)/Bootstrapping/*.vcxproj'
+        solution: '$(Build.SourcesDirectory)/Bootstrapping/**/*.vcxproj'
         msbuildArchitecture: 'x64'
         platform: 'x64'
         configuration: 'Release'
