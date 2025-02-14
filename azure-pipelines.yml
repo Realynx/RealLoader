@@ -10,27 +10,26 @@ variables:
 
 
 stages:
-- stage: UnitTesting
-  displayName: 'Run all unit tests.'
-  jobs:
-  - job: DotnetTesting
-    displayName: 'Test the .NET code'
-    pool:
-      name: 'Windows'
-    steps:
-    - task: DotNetCoreCLI@2
-      displayName: 'Restoring nuget packages'
-      inputs:
-        command: 'restore'
-        projects: '$(Build.SourcesDirectory)/RealLoader.sln'
+# - stage: UnitTesting
+#   displayName: 'Run all unit tests.'
+#   jobs:
+#   - job: DotnetTesting
+#     displayName: 'Test the .NET code'
+#     pool:
+#       name: 'Windows'
+#     steps:
+#     - task: DotNetCoreCLI@2
+#       displayName: 'Restoring nuget packages'
+#       inputs:
+#         command: 'restore'
+#         projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
-    # - task: DotNetCoreCLI@2
-    #   displayName: 'Running dotnet unit tests'
-    #   inputs:
-    #     command: 'test'
-    #     projects: '$(Build.SourcesDirectory)/RealLoader.sln'
+#     - task: DotNetCoreCLI@2
+#       displayName: 'Running dotnet unit tests'
+#       inputs:
+#         command: 'test'
+#         projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
-# - ${{ if or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/developer')), eq(variables['Build.SourceBranch'], 'refs/heads/testing')) }}:
 - stage: Build
   displayName: 'Build all artifacts for windows and linux'
   jobs:
@@ -71,7 +70,7 @@ stages:
       displayName: 'Publish individual .NET projects'
 
     - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact: drop'
+      displayName: 'Publish Local Artifact: windows_artifacts'
       condition: eq(variables['isMasterBranch'], true)
       inputs:
         PathtoPublish: '$(Build.SourcesDirectory)/bin'
@@ -108,7 +107,7 @@ stages:
         cmakeArgs: '--build $(Build.SourcesDirectory)/build'
 
     - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact: drop'
+      displayName: 'Publish Local Artifact: linux_artifacts'
       condition: eq(variables['isMasterBranch'], true)
       inputs:
         PathtoPublish: '$(Build.SourcesDirectory)/build'
