@@ -37,7 +37,7 @@
 | [Master](https://github.com/Realynx/RealLoader/tree/master)       | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=master)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=master)       |
 | [Testing](https://github.com/Realynx/RealLoader/tree/testing)     | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=testing)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=testing)     |
 | [Developer](https://github.com/Realynx/RealLoader/tree/developer) | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=developer)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=developer) |
-| [Poofy Feature Branch](https://github.com/Realynx/RealLoader/tree/PoofyFeatures) | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=PoofyFeatures)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=PoofyFeatures) |
+| [Poofy Feature Branch](https://github.com/Realynx/RealLoader/tree/poofyfeatures) | [![Build Status](https://dev.azure.com/RealLoader/RealLoader%20Development/_apis/build/status%2FRealynx.RealLoader?branchName=poofyfeatures)](https://dev.azure.com/RealLoader/RealLoader%20Development/_build/latest?definitionId=1&branchName=poofyfeatures) |
 
 # Building from Source
 
