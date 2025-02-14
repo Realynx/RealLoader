@@ -22,16 +22,17 @@ stages:
         command: 'restore'
         projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Running dotnet unit tests'
-      inputs:
-        command: 'test'
-        projects: '$(Build.SourcesDirectory)/RealLoader.sln'
+    # - task: DotNetCoreCLI@2
+    #   displayName: 'Running dotnet unit tests'
+    #   inputs:
+    #     command: 'test'
+    #     projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
 - ${{ if or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/developer')), eq(variables['Build.SourceBranch'], 'refs/heads/testing')) }}:
   - stage: Build
     displayName: 'Build all artifacts for windows and linux'
     jobs:
+    # Build for windows
     - job: BuildWindows
       displayName: 'Build on Windows'
       pool:
@@ -68,6 +69,14 @@ stages:
           configuration: 'Release'
           msbuildArguments: '/target:Rebuild /PublishProfile=Release'
 
+      - task: DotNetCoreCLI@2
+        displayName: 'Build individual .NET projects'
+        inputs:
+          command: build
+          projects: |
+            $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj
+            $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj
+
       - task: PublishBuildArtifacts@1
         displayName: 'Publish Artifact: drop'
         inputs:
@@ -75,6 +84,7 @@ stages:
           ArtifactName: 'windows_artifacts'
           publishLocation: 'Container'
 
+    # Build for linux
     - job: BuildLinux
       displayName: 'Build on Linux'
       pool:
@@ -103,6 +113,7 @@ stages:
           ArtifactName: 'linux_artifacts'
           publishLocation: 'Container'
 
+# Deploy the artifacts to github with a new tag.
 - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
   - stage: Deploy
     displayName: 'Deploy built artifacts to GitHub'

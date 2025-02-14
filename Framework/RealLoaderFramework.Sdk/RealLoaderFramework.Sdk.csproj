@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <RootNamespace>RealLoaderFramework.Sdk</RootNamespace>
+    <BaseOutputPath>..\..\bin\RealLoaderFramework.Sdk</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
