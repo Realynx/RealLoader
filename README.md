@@ -40,14 +40,6 @@
 
 
 # Building from Source
-
-### Please read the following articles before contributing.
-
-- Contributing
-- Code of Conduct
-- Editorconfig Style Rules
-- Roadmap
-
 > [!NOTE]
 > The following required dependencies must be met in order to compile from source. Dotnet runtime is required to run the mod framework on every location.
 
@@ -85,3 +77,10 @@ For Cli-only Based Builder (like windows core) you can use these installers from
 # Resources
 > [!TIP]
 > You can view example mods under [Client Mod Ex](Mods/ExampleMod), [Server Mod Ex](Mods/ExampleServerMod), and [DI Mod Ex](Mods)  
+
+## Please read the following articles before contributing.
+
+- Contributing
+- Code of Conduct
+- Editorconfig Style Rules
+- Roadmap
