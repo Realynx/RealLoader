@@ -46,6 +46,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6522F3F9-A6CB-42DA-9FE6-1A580BFABD0F}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
+		CMakeLists.txt = CMakeLists.txt
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
