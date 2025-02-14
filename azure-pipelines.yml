@@ -61,11 +61,11 @@ stages:
         msbuildArguments: '/target:Rebuild'
 
     - script: |
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderInstaller
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderGuiInstaller
-        dotnet publish $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/DotNetSdkBuilderMod
-        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFramework
-        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFrameworkSdk
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderInstaller --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderGuiInstaller --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/DotNetSdkBuilderMod --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFramework --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFrameworkSdk --no-restore
       displayName: 'Publish individual .NET projects'
 
     - task: PublishBuildArtifacts@1
