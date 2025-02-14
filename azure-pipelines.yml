@@ -55,8 +55,6 @@ stages:
       displayName: 'Build C++ Windows Solution'
       inputs:
         solution: '$(Build.SourcesDirectory)/RealLoader.sln'
-        msbuildArchitecture: 'x64'
-        platform: 'x64'
         configuration: 'Release'
         msbuildArguments: '/target:Rebuild'
 
