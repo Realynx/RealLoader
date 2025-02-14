@@ -150,7 +150,7 @@ stages:
         displayName: 'Create GitHub Release'
         inputs:
           action: 'create'
-          gitHubConnection: 'PoofimafoxPAT'
+          gitHubConnection: 'Realynx'
           repository: 'Realynx/RealLoader'
           tagSource: 'gitTag'
           tagPattern: 'v[0-9]+.[0-9]+.[0-9]+'
