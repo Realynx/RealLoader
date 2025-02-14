@@ -68,7 +68,7 @@ All build symbols are configured to go to `/bin` in the root directory.
 
   
 - ![Linux Badge](https://img.shields.io/badge/Linux-green)
-    1. Install the [.NET 9+ SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
+    1. Install the [.NET 9+ SDK](https://dotnet.microsoft.com/en-us/download/dotnet) | `choco install visualstudio2022buildtools`
     2. Install [CMake 3.22+](https://cmake.org/download/)
     3. Run Cmake from root directory.
         ```sh

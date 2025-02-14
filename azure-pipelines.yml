@@ -51,44 +51,30 @@ stages:
         command: 'restore'
         projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
-    # - task: MSBuild@1
-    #   displayName: 'Build C++ Windows Solution'
-    #   inputs:
-    #     solution: '$(Build.SourcesDirectory)/RealLoader.sln'
-    #     msbuildArchitecture: 'x64'
-    #     platform: 'x64'
-    #     configuration: 'Dist'
-    #     msbuildArguments: '/target:Rebuild'
-
-    # - task: MSBuild@1
-    #   displayName: 'Build RealLoader Solution'
-    #   inputs:
-    #     solution: '$(Build.SourcesDirectory)/RealLoader.sln'
-    #     msbuildArchitecture: 'x64'
-    #     platform: 'x64'
-    #     configuration: 'Release'
-    #     msbuildArguments: '/target:Rebuild /PublishProfile=Release'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'Build RealLoader Solution'
+    - task: MSBuild@1
+      displayName: 'Build C++ Windows Solution'
       inputs:
-        command: 'build'
-        projects: '$(Build.SourcesDirectory)/RealLoader.sln'
-        arguments: '--configuration Release'
-
+        solution: '$(Build.SourcesDirectory)/RealLoader.sln'
+        msbuildArchitecture: 'x64'
+        platform: 'x64'
+        configuration: 'Dist'
+        msbuildArguments: '/target:Rebuild'
 
     - task: DotNetCoreCLI@2
       displayName: 'Build individual .NET projects'
       inputs:
         command: build
         projects: |
+          $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj
+          $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj
+          $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj
           $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj
           $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: drop'
       inputs:
-        PathtoPublish: '$(Build.SourcesDirectory)/GithubSymbols'
+        PathtoPublish: '$(Build.SourcesDirectory)/bin'
         ArtifactName: 'windows_artifacts'
         publishLocation: 'Container'
 
