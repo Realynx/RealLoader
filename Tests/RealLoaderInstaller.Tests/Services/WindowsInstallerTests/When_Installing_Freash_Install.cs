@@ -11,7 +11,7 @@ namespace RealLoaderInstaller.Tests.Services.WindowsInstallerTests {
             TestableImplementation.InstallFiles(_installerOptions);
         }
 
-        //[Fact]
+        [Fact]
         public void Was_Mods_Folder_Created() {
             try {
                 var modsFolder = Path.Combine(_installerOptions.InstallLocation!, "ClrMods");
@@ -22,7 +22,7 @@ namespace RealLoaderInstaller.Tests.Services.WindowsInstallerTests {
             }
         }
 
-        //[Fact]
+        [Fact]
         public void Was_Executable_Renamed() {
             try {
                 var renamedExecutable = Path.Combine(_palWin64Folder, "Game-Palworld-Win64-Shipping.exe");
@@ -33,7 +33,7 @@ namespace RealLoaderInstaller.Tests.Services.WindowsInstallerTests {
             }
         }
 
-        //[Fact]
+        [Fact]
         public void Was_Framework_Install_Dir_Created() {
             try {
                 var realLoaderFrameworkFolder = Path.Combine(_palWin64Folder, "RealLoaderFramework");

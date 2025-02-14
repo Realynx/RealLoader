@@ -12,7 +12,7 @@ namespace RealLoaderInstaller.Tests.Services.LinuxInstallerTests {
             TestableImplementation.InstallFiles(_installerOptions);
         }
 
-        //[Fact]
+        [Fact]
         public void Was_Mods_Folder_Created() {
             try {
                 var modsFolder = Path.Combine(_installerOptions.InstallLocation!, "ClrMods");
@@ -24,7 +24,7 @@ namespace RealLoaderInstaller.Tests.Services.LinuxInstallerTests {
             }
         }
 
-        //[Fact]
+        [Fact]
         public void Was_Framework_Install_Dir_Created() {
             try {
                 var realLoaderFrameworkFolder = Path.Combine(_palLinuxFolder, "RealLoaderFramework");
