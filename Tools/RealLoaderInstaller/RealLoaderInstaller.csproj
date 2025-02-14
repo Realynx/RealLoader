@@ -9,7 +9,6 @@
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<RootNamespace>RealLoaderInstaller</RootNamespace>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<BaseOutputPath>..\..\bin\RealLoaderInstaller</BaseOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -9,7 +9,6 @@
     <PlatformTarget>x64</PlatformTarget>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <BaseOutputPath>..\..\bin\ExampleMod</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

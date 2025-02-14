@@ -9,7 +9,6 @@
     <InvariantGlobalization>true</InvariantGlobalization>
     <UserSecretsId>975f052d-5911-40e0-9108-a392def3aef4</UserSecretsId>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <BaseOutputPath>..\..\bin\UnrealCoreObjectApiSourceGen</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

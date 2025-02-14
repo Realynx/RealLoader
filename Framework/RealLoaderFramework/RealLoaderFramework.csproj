@@ -11,7 +11,6 @@
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<RootNamespace>RealLoaderFramework</RootNamespace>
-		<BaseOutputPath>..\..\bin\RealLoaderFramework</BaseOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
