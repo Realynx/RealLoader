@@ -54,7 +54,9 @@ stages:
     - task: MSBuild@1
       displayName: 'Build C++ Windows Solution'
       inputs:
-        solution: '$(Build.SourcesDirectory)/RealLoader.sln'
+        Project: '$(Build.SourcesDirectory)/Bootstrapping/*.vcxproj'
+        msbuildArchitecture: 'x64'
+        platform: 'x64'
         configuration: 'Release'
         msbuildArguments: '/target:Rebuild'
 
@@ -158,4 +160,4 @@ stages:
             $(System.ArtifactsDirectory)/ManagedModFramework.zip
             $(System.ArtifactsDirectory)/windows_artifacts/Windows/Bootstrapper.exe
             $(System.ArtifactsDirectory)/windows_artifacts/Windows/CLRHost.dll
-            $(System.ArtifactsDirectory)/linux_artifacts/bin/Linux/libCLRHost.so
+            $(System.ArtifactsDirectory)/linux_artifacts/GithubSymbols/Linux/libCLRHost.so
