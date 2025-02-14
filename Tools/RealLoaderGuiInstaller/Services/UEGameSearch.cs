@@ -138,9 +138,27 @@ namespace RealLoaderGuiInstaller.Services {
 
                     var matchedExe = subKey.GetValue("MatchedExeFullPath") as string;
 
-                    if (!string.IsNullOrEmpty(matchedExe) && matchedExe.Contains("Win64") && File.Exists(matchedExe)
-                        && new FileInfo(matchedExe).Directory?.Parent?.Parent?.Parent?.FullName is { } installPath) {
-                        installPaths.Add(installPath);
+                    if (string.IsNullOrEmpty(matchedExe) || !File.Exists(matchedExe)) {
+                        continue;
+                    }
+
+                    var fullDirectoryPath = Path.GetDirectoryName(matchedExe);
+                    if (fullDirectoryPath is null || !fullDirectoryPath.EndsWith(Path.Combine("Binaries", "Win64"))) {
+                        continue;
+                    }
+
+                    var parent = new DirectoryInfo(fullDirectoryPath).Parent?.Parent;
+                    if (parent is null) {
+                        continue;
+                    }
+
+                    if (Directory.Exists(Path.Combine(parent.FullName, "Engine"))) {
+                        installPaths.Add(parent.FullName);
+                    }
+
+                    parent = parent.Parent;
+                    if (parent is not null && Directory.Exists(Path.Combine(parent.FullName, "Engine"))) {
+                        installPaths.Add(parent.FullName);
                     }
                 }
             }
