@@ -63,7 +63,7 @@ stages:
     - task: DotNetCoreCLI@2
       displayName: 'Build individual .NET projects'
       inputs:
-        command: build
+        command: publish
         projects: |
           $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj
           $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj
