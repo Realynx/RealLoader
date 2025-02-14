@@ -7,6 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <BaseOutputPath>..\..\bin\RealLoaderGuiInstaller</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
