@@ -60,17 +60,13 @@ stages:
         configuration: 'Release'
         msbuildArguments: '/target:Rebuild'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Build individual .NET projects'
-      inputs:
-        command: publish
-        publishWebProjects: false
-        projects: |
-          $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj
-          $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj
-          $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj
-          $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj
-          $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj
+    - script: |
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderInstaller
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderGuiInstaller
+        dotnet publish $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/DotNetSdkBuilderMod
+        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFramework
+        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFrameworkSdk
+        displayName: 'Build individual .NET projects with raw dotnet publish'
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: drop'
