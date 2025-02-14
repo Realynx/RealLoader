@@ -17,7 +17,4 @@
     <ClInclude Include="src\hostfxr.h" />
     <ClInclude Include="src\nethost.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Text Include="CMakeLists.txt" />
-  </ItemGroup>
 </Project>
