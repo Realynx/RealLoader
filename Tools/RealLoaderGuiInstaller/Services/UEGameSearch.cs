@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection.PortableExecutable;
@@ -9,26 +8,23 @@ using Microsoft.Win32;
 
 namespace RealLoaderGuiInstaller.Services {
     internal static class UEGameSearch {
-        private static readonly EnumerationOptions _recursiveEnumerationOptions = new() { RecurseSubdirectories = true };
-
         public static string[] FindUEGames() {
             // TODO: make this cross plat compatible, this will prbly require DI services and interfaces.
-            var potentialUePaths = GetPotentialUEPaths();
+            var installedWindowsSoftware = GetPotentialUEPaths();
 
             var ueGames = new List<string>();
-            foreach (var softwareDir in potentialUePaths) {
+            foreach (var softwareDir in installedWindowsSoftware) {
                 var foundExecutables = Directory.EnumerateFiles(softwareDir, "*.exe").ToArray();
-
-                // TODO: Some UE games have multiple alias executables/launchers
-                // TODO: Some UE games don't have alias executables e.g. Killing Floor 2
                 if (foundExecutables.Length != 1) {
                     continue;
                 }
 
                 var aliasExecutable = foundExecutables.Single();
+                //var UEProjectName = aliasExecutable.Split(".")[0];
 
                 // TODO: Not all UE games end with "Win64-Shipping.exe" e.g. Rocket League
-                var win64Path = Directory.EnumerateFiles(softwareDir, "*.exe", _recursiveEnumerationOptions)
+                var enumerationOptions = new EnumerationOptions { RecurseSubdirectories = true };
+                var win64Path = Directory.EnumerateFiles(softwareDir, "*", enumerationOptions)
                     .SingleOrDefault(i => i.EndsWith("Win64-Shipping.exe"));
 
                 if (win64Path is null || !File.Exists(win64Path)) {
@@ -76,20 +72,11 @@ namespace RealLoaderGuiInstaller.Services {
             return false;
         }
 
+        [SupportedOSPlatform("windows")]
         private static string[] GetPotentialUEPaths() {
             var installPaths = new HashSet<string>();
 
-            if (OperatingSystem.IsWindows()) {
-                GetWindowsUninstallerGames(installPaths);
-                GetWindowsGameBarGames(installPaths);
-            }
-
-            return installPaths.ToArray();
-        }
-
-        [SupportedOSPlatform("windows")]
-        private static void GetWindowsUninstallerGames(HashSet<string> installPaths)
-        {
+            // TODO: When users relocate a game through steam, the uninstaller reg key is not updated
             string[] registryKeys = [
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
                 @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall",
@@ -115,35 +102,8 @@ namespace RealLoaderGuiInstaller.Services {
                     }
                 }
             }
-        }
 
-        [SupportedOSPlatform("windows")]
-        private static void GetWindowsGameBarGames(HashSet<string> installPaths)
-        {
-            string[] registryKeys = [
-                @"System\GameConfigStore\Children"
-            ];
-
-            foreach (var keyPath in registryKeys) {
-                using var key = Registry.CurrentUser.OpenSubKey(keyPath);
-                if (key == null) {
-                    continue;
-                }
-
-                foreach (var subKeyName in key.GetSubKeyNames()) {
-                    using var subKey = key.OpenSubKey(subKeyName);
-                    if (subKey == null) {
-                        continue;
-                    }
-
-                    var matchedExe = subKey.GetValue("MatchedExeFullPath") as string;
-
-                    if (!string.IsNullOrEmpty(matchedExe) && matchedExe.Contains("Win64") && File.Exists(matchedExe)
-                        && new FileInfo(matchedExe).Directory?.Parent?.Parent?.Parent?.FullName is { } installPath) {
-                        installPaths.Add(installPath);
-                    }
-                }
-            }
+            return installPaths.ToArray();
         }
     }
 }
