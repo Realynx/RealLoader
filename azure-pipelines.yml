@@ -51,23 +51,31 @@ stages:
         command: 'restore'
         projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
-    - task: MSBuild@1
-      displayName: 'Build C++ Windows Solution'
-      inputs:
-        solution: '$(Build.SourcesDirectory)/RealLoader.sln'
-        msbuildArchitecture: 'x64'
-        platform: 'x64'
-        configuration: 'Dist'
-        msbuildArguments: '/target:Rebuild'
+    # - task: MSBuild@1
+    #   displayName: 'Build C++ Windows Solution'
+    #   inputs:
+    #     solution: '$(Build.SourcesDirectory)/RealLoader.sln'
+    #     msbuildArchitecture: 'x64'
+    #     platform: 'x64'
+    #     configuration: 'Dist'
+    #     msbuildArguments: '/target:Rebuild'
 
-    - task: MSBuild@1
-      displayName: 'Build RealLoader Solution'
-      inputs:
-        solution: '$(Build.SourcesDirectory)/RealLoader.sln'
-        msbuildArchitecture: 'x64'
-        platform: 'x64'
-        configuration: 'Release'
-        msbuildArguments: '/target:Rebuild /PublishProfile=Release'
+    # - task: MSBuild@1
+    #   displayName: 'Build RealLoader Solution'
+    #   inputs:
+    #     solution: '$(Build.SourcesDirectory)/RealLoader.sln'
+    #     msbuildArchitecture: 'x64'
+    #     platform: 'x64'
+    #     configuration: 'Release'
+    #     msbuildArguments: '/target:Rebuild /PublishProfile=Release'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build RealLoader Solution'
+    inputs:
+      command: 'build'
+      projects: '$(Build.SourcesDirectory)/RealLoader.sln'
+      arguments: '--configuration Release'
+
 
     - task: DotNetCoreCLI@2
       displayName: 'Build individual .NET projects'
