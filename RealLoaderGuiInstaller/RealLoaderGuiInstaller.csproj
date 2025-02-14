@@ -23,6 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RealLoaderInstaller\RealLoaderInstaller.csproj" />
+    <ProjectReference Include="..\Tools\RealLoaderInstaller\RealLoaderInstaller.csproj" />
   </ItemGroup>
 </Project>
