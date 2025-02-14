@@ -14,7 +14,7 @@ stages:
   - job: DotnetTesting
     displayName: 'Test the .NET code'
     pool:
-      name: 'Windows'
+      name: 'Linux'
     steps:
     - task: DotNetCoreCLI@2
       displayName: 'Restoring nuget packages'
