@@ -90,7 +90,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(NetHostLib);%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>..\..\GithubSymbols\Windows\CLRHost.lib</ImportLibrary>
+      <ImportLibrary>
+      </ImportLibrary>
     </Link>
     <PreBuildEvent>
       <Command>@echo off
