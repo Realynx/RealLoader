@@ -35,7 +35,7 @@ target_link_libraries(${PROJECT_NAME} "${LATEST_NETCORE}/runtimes/linux-x64/nati
 add_compile_definitions("__linux__")
 
 # Set output directory
-set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Linux")
+set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/GithubSymbols/Linux")
 
 # Use GCC for Linux
 set(CMAKE_C_COMPILER "gcc")
