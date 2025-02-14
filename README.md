@@ -63,12 +63,12 @@ All build symbols are configured to go to `/bin` in the root directory.
     ```
 
 - ![Windows Badge](https://img.shields.io/badge/Windows-blue)
-    1. Install [Visual Studio 2022+](https://visualstudio.microsoft.com/downloads/) with the <b>Desktop development with C++</b> package.
+    1. Install [Visual Studio 2022+](https://visualstudio.microsoft.com/downloads/) with the <b>Desktop development with C++</b> package. | `choco install visualstudio2022buildtools`
     2. Open the solution in IDE and build solution.   
 
   
 - ![Linux Badge](https://img.shields.io/badge/Linux-green)
-    1. Install the [.NET 9+ SDK](https://dotnet.microsoft.com/en-us/download/dotnet) | `choco install visualstudio2022buildtools`
+    1. Install the [.NET 9+ SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
     2. Install [CMake 3.22+](https://cmake.org/download/)
     3. Run Cmake from root directory.
         ```sh

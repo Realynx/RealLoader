@@ -41,7 +41,6 @@
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <Import Project="$(ProjectDir)dotnet_path.props" Condition="Exists('$(ProjectDir)dotnet_path.props')" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -89,35 +88,21 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(NetHostLib);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)Bootstrapping/nethost.lib%(NewNetHostLib);%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>
       </ImportLibrary>
     </Link>
     <PreBuildEvent>
-      <Command>@echo off
-set "PROP_FILE=$(ProjectDir)dotnet_path.props"
-
-:: Find the latest version directory
-for /f "delims=" %%i in ('dir /b /ad "C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x64" ^| sort /r') do (
-    set "NET_VERSION=%%i"
-    goto :found
-)
-echo ERROR: No .NET Core host pack found! &amp; exit /b 1
-
-:found
-(
-echo ^&lt;?xml version="1.0" encoding="utf-8"?^&gt;
-echo ^&lt;Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"^&gt;
-echo     ^&lt;PropertyGroup^&gt;
-echo         ^&lt;NetHostLib^&gt;C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x64\%NET_VERSION%\runtimes\win-x64\native\nethost.lib^&lt;/NetHostLib^&gt;
-echo     ^&lt;/PropertyGroup^&gt;
-echo ^&lt;/Project^&gt;
-) &gt; "%PROP_FILE%"
-
-echo Generated dotnet_path.props file: %PROP_FILE%
-exit /b 0
-</Command>
+      <Command>powershell -ExecutionPolicy Bypass -File "$(ProjectDir)..\GetNetHostEnvironmentVariable.ps1"</Command>
     </PreBuildEvent>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

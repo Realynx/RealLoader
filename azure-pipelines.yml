@@ -57,7 +57,7 @@ stages:
         solution: '$(Build.SourcesDirectory)/RealLoader.sln'
         msbuildArchitecture: 'x64'
         platform: 'x64'
-        configuration: 'Dist'
+        configuration: 'Release'
         msbuildArguments: '/target:Rebuild'
 
     - task: DotNetCoreCLI@2
