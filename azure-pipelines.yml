@@ -64,6 +64,7 @@ stages:
       displayName: 'Build individual .NET projects'
       inputs:
         command: publish
+        publishWebProjects: false
         projects: |
           $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj
           $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj
