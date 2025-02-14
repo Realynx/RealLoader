@@ -13,10 +13,13 @@ find_dotnet_pack() {
 
 DOTNET_PACK_DIR=$(find_dotnet_pack)
 
+LATEST_VERSION=""
+NET_VERSION=""
+
 # Loop through directories and extract numeric versions
-for dir in "$DOTNET_PACKS_DIR"/*/; do
+for dir in "$DOTNET_PACK_DIR"/*/; do
     dir=$(basename "$dir")
-    
+
     # Ensure valid version format (only digits and dots)
     if [[ "$dir" =~ ^[0-9][0-9.]*$ ]]; then
         # Parse version into sortable format
@@ -29,19 +32,31 @@ for dir in "$DOTNET_PACKS_DIR"/*/; do
 
         SORTABLE_VERSION="$MAJOR.$MINOR.$PATCH.$BUILD"
 
-        if [[ "$SORTABLE_VERSION" > "$LATEST_VERSION" ]]; then
+        if [[ -z "$LATEST_VERSION" || "$SORTABLE_VERSION" > "$LATEST_VERSION" ]]; then
             LATEST_VERSION="$SORTABLE_VERSION"
             NET_VERSION="$dir"
         fi
     fi
 done
 
+# Ensure a version was found
 if [[ -z "$NET_VERSION" ]]; then
+    echo "No valid .NET Core host pack found!" >&2
     exit 1
 fi
 
-SOURCE_FILE="$DOTNET_PACKS_DIR/$NET_VERSION/runtimes/linux-x64/native/libnethost.a"
+# Find the runtime directory dynamically
+RUNTIME_DIR=$(find "$DOTNET_PACK_DIR/$NET_VERSION/runtimes/" -maxdepth 1 -type d | grep -v "/runtimes/$" | head -n 1)
+if [[ -z "$RUNTIME_DIR" ]]; then
+    echo "No valid runtime directory found!" >&2
+    exit 1
+fi
+
+SOURCE_FILE="$RUNTIME_DIR/native/libnethost.a"
+
+# Ensure source file exists
 if [[ ! -f "$SOURCE_FILE" ]]; then
+    echo "libnethost.a not found in the expected location!" >&2
     exit 1
 fi
 
