@@ -43,19 +43,8 @@ namespace RealLoaderGuiInstaller {
             RealLoaderInstaller.Program.Main(["-l", $"{gamePath}"]);
         }
 
-        public void UnInstall(string gamePath) {
-            AllocConsole();
-
-            Console.WriteLine($"UnInstalling RealLoader to '{gamePath}'");
-            RealLoaderInstaller.Program.Main(["-l", $"{gamePath}", "--uninstall"]);
-        }
-
         public void InstallButton() {
             Install(SelectedGamePath);
-        }
-
-        public void UnInstallButton() {
-            UnInstall(SelectedGamePath);
         }
 
         public void RaisePropertyChanging(PropertyChangingEventArgs args) {
