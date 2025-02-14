@@ -28,97 +28,97 @@ stages:
     #     command: 'test'
     #     projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
-- ${{ if or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/developer')), eq(variables['Build.SourceBranch'], 'refs/heads/testing')) }}:
-  - stage: Build
-    displayName: 'Build all artifacts for windows and linux'
-    jobs:
-    # Build for windows
-    - job: BuildWindows
-      displayName: 'Build on Windows'
-      pool:
-        name: 'Windows'
-      steps:
-      - task: UseDotNet@2
-        displayName: 'Use .NET Core sdk'
-        inputs:
-          packageType: sdk
-          version: 9.x
-          installationPath: $(Agent.ToolsDirectory)/dotnet
+# - ${{ if or(or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/developer')), eq(variables['Build.SourceBranch'], 'refs/heads/testing')) }}:
+- stage: Build
+  displayName: 'Build all artifacts for windows and linux'
+  jobs:
+  # Build for windows
+  - job: BuildWindows
+    displayName: 'Build on Windows'
+    pool:
+      name: 'Windows'
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk'
+      inputs:
+        packageType: sdk
+        version: 9.x
+        installationPath: $(Agent.ToolsDirectory)/dotnet
 
-      - task: DotNetCoreCLI@2
-        displayName: 'Restoring nuget packages'
-        inputs:
-          command: 'restore'
-          projects: '$(Build.SourcesDirectory)/RealLoader.sln'
+    - task: DotNetCoreCLI@2
+      displayName: 'Restoring nuget packages'
+      inputs:
+        command: 'restore'
+        projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
-      - task: MSBuild@1
-        displayName: 'Build C++ Windows Solution'
-        inputs:
-          solution: '$(Build.SourcesDirectory)/RealLoader.sln'
-          msbuildArchitecture: 'x64'
-          platform: 'x64'
-          configuration: 'Dist'
-          msbuildArguments: '/target:Rebuild'
+    - task: MSBuild@1
+      displayName: 'Build C++ Windows Solution'
+      inputs:
+        solution: '$(Build.SourcesDirectory)/RealLoader.sln'
+        msbuildArchitecture: 'x64'
+        platform: 'x64'
+        configuration: 'Dist'
+        msbuildArguments: '/target:Rebuild'
 
-      - task: MSBuild@1
-        displayName: 'Build RealLoader Solution'
-        inputs:
-          solution: '$(Build.SourcesDirectory)/RealLoader.sln'
-          msbuildArchitecture: 'x64'
-          platform: 'x64'
-          configuration: 'Release'
-          msbuildArguments: '/target:Rebuild /PublishProfile=Release'
+    - task: MSBuild@1
+      displayName: 'Build RealLoader Solution'
+      inputs:
+        solution: '$(Build.SourcesDirectory)/RealLoader.sln'
+        msbuildArchitecture: 'x64'
+        platform: 'x64'
+        configuration: 'Release'
+        msbuildArguments: '/target:Rebuild /PublishProfile=Release'
 
-      - task: DotNetCoreCLI@2
-        displayName: 'Build individual .NET projects'
-        inputs:
-          command: build
-          projects: |
-            $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj
-            $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj
+    - task: DotNetCoreCLI@2
+      displayName: 'Build individual .NET projects'
+      inputs:
+        command: build
+        projects: |
+          $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj
+          $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj
 
-      - task: PublishBuildArtifacts@1
-        displayName: 'Publish Artifact: drop'
-        inputs:
-          PathtoPublish: '$(Build.SourcesDirectory)/GithubSymbols'
-          ArtifactName: 'windows_artifacts'
-          publishLocation: 'Container'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: drop'
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/GithubSymbols'
+        ArtifactName: 'windows_artifacts'
+        publishLocation: 'Container'
 
-    # Build for linux
-    - job: BuildLinux
-      displayName: 'Build on Linux'
-      pool:
-        name: 'Linux'
-      steps:
-      - task: UseDotNet@2
-        displayName: 'Use .NET Core sdk'
-        inputs:
-          packageType: sdk
-          version: 9.x
-          installationPath: $(Agent.ToolsDirectory)/dotnet
+  # Build for linux
+  - job: BuildLinux
+    displayName: 'Build on Linux'
+    pool:
+      name: 'Linux'
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk'
+      inputs:
+        packageType: sdk
+        version: 9.x
+        installationPath: $(Agent.ToolsDirectory)/dotnet
 
-      - task: DotNetCoreCLI@2
-        displayName: 'Restoring nuget packages'
-        inputs:
-          command: 'restore'
-          projects: '$(Build.SourcesDirectory)/RealLoader.sln'
+    - task: DotNetCoreCLI@2
+      displayName: 'Restoring nuget packages'
+      inputs:
+        command: 'restore'
+        projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
-      - task: CMake@1
-        displayName: 'CMake Configure'
-        inputs:
-          cmakeArgs: '$(Build.SourcesDirectory)'
+    - task: CMake@1
+      displayName: 'CMake Configure'
+      inputs:
+        cmakeArgs: '$(Build.SourcesDirectory)'
 
-      - task: CMake@1
-        displayName: 'CMake Build'
-        inputs:
-          cmakeArgs: '--build $(Build.SourcesDirectory)/build'
+    - task: CMake@1
+      displayName: 'CMake Build'
+      inputs:
+        cmakeArgs: '--build $(Build.SourcesDirectory)/build'
 
-      - task: PublishBuildArtifacts@1
-        displayName: 'Publish Artifact: drop'
-        inputs:
-          PathtoPublish: '$(Build.SourcesDirectory)/build'
-          ArtifactName: 'linux_artifacts'
-          publishLocation: 'Container'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: drop'
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/build'
+        ArtifactName: 'linux_artifacts'
+        publishLocation: 'Container'
 
 # Deploy the artifacts to github with a new tag.
 - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
