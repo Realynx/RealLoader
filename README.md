@@ -64,12 +64,12 @@ All build symbols are configured to go to `/bin` in the root directory.
 
 - ![Windows Badge](https://img.shields.io/badge/Windows-blue)
     1. Install [Visual Studio 2022+](https://visualstudio.microsoft.com/downloads/) with the <b>Desktop development with C++</b> package.  
-    > [!TIP] 
-    > For Cli Based Builder: [Installer Packages Page](https://learn.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio?view=vs-2022) or use [Direct Link](https://aka.ms/vs/17/release/vs_buildtools.exe)
-    >```
-    >.\vs_buildtools.exe --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --quiet --wait
-    >```
-    2. Open the solution in IDE and build solution.  
+    You can install this using the visual studio installer  
+    For Cli-only Based Builder (like windows core) you can use these installers from [Installer Packages Page](https://learn.microsoft.com/en-us/visualstudio/install/use-command-line-parameters-to-install-visual-studio?view=vs-2022) or use [Direct Link](https://aka.ms/vs/17/release/vs_buildtools.exe)
+        ```
+        .\vs_buildtools.exe --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --quiet --wait
+        ```
+    2. Open the solution in IDE and build solution.   
 
   
 - ![Linux Badge](https://img.shields.io/badge/Linux-green)
