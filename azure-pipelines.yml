@@ -6,6 +6,8 @@ variables:
   minor: $[counter(variables['major'], 10)]
   build: $[counter(variables['minor'], 1000)]
   version: $[format('{0}.{1}.{2}', variables.major, variables.minor, variables.build)]
+  isMasterBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+
 
 stages:
 - stage: UnitTesting
@@ -70,6 +72,7 @@ stages:
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: drop'
+      condition: eq(variables['isMasterBranch'], true)
       inputs:
         PathtoPublish: '$(Build.SourcesDirectory)/bin'
         ArtifactName: 'windows_artifacts'
@@ -106,13 +109,14 @@ stages:
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: drop'
+      condition: eq(variables['isMasterBranch'], true)
       inputs:
         PathtoPublish: '$(Build.SourcesDirectory)/build'
         ArtifactName: 'linux_artifacts'
         publishLocation: 'Container'
 
 # Deploy the artifacts to github with a new tag.
-- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+- ${{ if eq(variables['isMasterBranch'], true) }}:
   - stage: Deploy
     displayName: 'Deploy built artifacts to GitHub'
     dependsOn: Build
