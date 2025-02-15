@@ -138,9 +138,6 @@ stages:
         name: 'Linux'
       steps:
       - script: |
-          git config --global user.email "bot@realynx.com"
-          git config --global user.name "RealynxBot"
-
           # Ensure we have the latest commits
           git fetch --unshallow
           git fetch --tags
