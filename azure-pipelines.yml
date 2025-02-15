@@ -6,23 +6,24 @@ variables:
   minor: $[counter(variables['major'], 10)]
   build: $[counter(variables['minor'], 1000)]
   version: $[format('{0}.{1}.{2}', variables.major, variables.minor, variables.build)]
-  isMasterBranch: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  isMasterBranch: $[eq(variables['Build.SourceBranchName'], 'master')]
+
 
 
 stages:
-# - stage: UnitTesting
-#   displayName: 'Run all unit tests.'
-#   jobs:
-#   - job: DotnetTesting
-#     displayName: 'Test the .NET code'
-#     pool:
-#       name: 'Windows'
-#     steps:
-#     - task: DotNetCoreCLI@2
-#       displayName: 'Restoring nuget packages'
-#       inputs:
-#         command: 'restore'
-#         projects: '$(Build.SourcesDirectory)/RealLoader.sln'
+- stage: UnitTesting
+  displayName: 'Run all unit tests.'
+  jobs:
+  - job: DotnetTesting
+    displayName: 'Test the .NET code'
+    pool:
+      name: 'Windows'
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'Restoring nuget packages'
+      inputs:
+        command: 'restore'
+        projects: '$(Build.SourcesDirectory)/RealLoader.sln'
 
 #     - task: DotNetCoreCLI@2
 #       displayName: 'Running dotnet unit tests'
