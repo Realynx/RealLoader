@@ -139,14 +139,14 @@ stages:
       steps:
       - script: |
           git config --global user.email "bot@realynx.com"
-          git config --global user.name "Realynx CI/CD Bot"
+          git config --global user.name "RealynxBot"
 
           # Ensure we have the latest commits
           git fetch --unshallow
           git fetch --tags
 
           # Create or update the nightly-build tag
-          git tag -fa nightly-build -m "Nightly Build"
+          git tag -a nightly-build HEAD -m "Nightly Build"
           git push --force origin nightly-build
         displayName: 'Tag the head commit for this deployment'
 
