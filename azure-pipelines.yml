@@ -138,24 +138,17 @@ stages:
         name: 'Linux'
       steps:
       - script: |
-          mv $(Build.SourcesDirectory)/build/bin $(Build.SourcesDirectory)/bin
           git config --global user.email "bot@realynx.com"
           git config --global user.name "Realynx CI/CD Bot"
 
-          # Ensure we're on the correct branch
-          git checkout $(Build.SourceBranchName)
-
-          # Fetch latest commits and tags
+          # Ensure we have the latest commits
+          git fetch --unshallow
           git fetch --tags
 
-          # Delete existing tag if it exists
-          git tag -d nightly-build || true
-          git push origin :refs/tags/nightly-build || true
-
-          # Create and push the updated tag
-          git tag nightly-build
-          git push origin nightly-build
-        displayName: 'Publish individual .NET projects'
+          # Create or update the nightly-build tag
+          git tag -fa nightly-build -m "Nightly Build"
+          git push --force origin nightly-build
+        displayName: 'Tag the head commit for this deployment'
 
       - task: DownloadBuildArtifacts@0
         displayName: 'Download Windows Artifacts'
