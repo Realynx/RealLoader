@@ -219,11 +219,11 @@ stages:
             assetUploadMode: 'replace'
             isPreRelease: true
             assets: |
-            $(System.ArtifactsDirectory)/Win-RealLoaderInstaller.zip
-            $(System.ArtifactsDirectory)/Lin-RealLoaderInstaller.zip
-            $(System.ArtifactsDirectory)/RealLoaderFramework.zip
-            $(System.ArtifactsDirectory)/WindowsArtifacts.zip
-            $(System.ArtifactsDirectory)/LinuxArtifacts.zip
-            $(System.ArtifactsDirectory)/windows_artifacts/DotNetSdkBuilderMod/publish/DotNetSdkBuilderMod.dll
-            $(System.ArtifactsDirectory)/windows_artifacts/RealLoaderFramework.Sdk/publish/RealLoaderFramework.Sdk.dll
+                $(System.ArtifactsDirectory)/Win-RealLoaderInstaller.zip
+                $(System.ArtifactsDirectory)/Lin-RealLoaderInstaller.zip
+                $(System.ArtifactsDirectory)/RealLoaderFramework.zip
+                $(System.ArtifactsDirectory)/WindowsArtifacts.zip
+                $(System.ArtifactsDirectory)/LinuxArtifacts.zip
+                $(System.ArtifactsDirectory)/windows_artifacts/DotNetSdkBuilderMod/publish/DotNetSdkBuilderMod.dll
+                $(System.ArtifactsDirectory)/windows_artifacts/RealLoaderFramework.Sdk/publish/RealLoaderFramework.Sdk.dll
             
