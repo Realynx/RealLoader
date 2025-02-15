@@ -158,12 +158,12 @@ stages:
         displayName: 'Publish individual .NET projects'
 
       - task: DownloadBuildArtifacts@0
-      displayName: 'Download Windows Artifacts'
-      inputs:
-          buildType: 'current'
-          downloadType: 'single'
-          artifactName: 'windows_artifacts'
-          downloadPath: '$(System.ArtifactsDirectory)'
+        displayName: 'Download Windows Artifacts'
+        inputs:
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'windows_artifacts'
+            downloadPath: '$(System.ArtifactsDirectory)'
 
       - task: DownloadBuildArtifacts@0
         displayName: 'Download Linux Artifacts'
@@ -219,11 +219,11 @@ stages:
             assetUploadMode: 'replace'
             isPreRelease: true
             assets: |
-            $(System.ArtifactsDirectory)/Win-RealLoaderInstaller.zip
-            $(System.ArtifactsDirectory)/Lin-RealLoaderInstaller.zip
-            $(System.ArtifactsDirectory)/RealLoaderFramework.zip
-            $(System.ArtifactsDirectory)/WindowsArtifacts.zip
-            $(System.ArtifactsDirectory)/LinuxArtifacts.zip
-            $(System.ArtifactsDirectory)/windows_artifacts/DotNetSdkBuilderMod/publish/DotNetSdkBuilderMod.dll
-            $(System.ArtifactsDirectory)/windows_artifacts/RealLoaderFramework.Sdk/publish/RealLoaderFramework.Sdk.dll
+                $(System.ArtifactsDirectory)/Win-RealLoaderInstaller.zip
+                $(System.ArtifactsDirectory)/Lin-RealLoaderInstaller.zip
+                $(System.ArtifactsDirectory)/RealLoaderFramework.zip
+                $(System.ArtifactsDirectory)/WindowsArtifacts.zip
+                $(System.ArtifactsDirectory)/LinuxArtifacts.zip
+                $(System.ArtifactsDirectory)/windows_artifacts/DotNetSdkBuilderMod/publish/DotNetSdkBuilderMod.dll
+                $(System.ArtifactsDirectory)/windows_artifacts/RealLoaderFramework.Sdk/publish/RealLoaderFramework.Sdk.dll
             
