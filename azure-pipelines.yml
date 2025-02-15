@@ -137,9 +137,29 @@ stages:
       pool:
         name: 'Linux'
       steps:
+      - script: |
+          mv $(Build.SourcesDirectory)/build/bin $(Build.SourcesDirectory)/bin
+          git config --global user.email "bot@realynx.com"
+          git config --global user.name "Realynx CI/CD Bot"
+
+          # Ensure we're on the correct branch
+          git checkout $(Build.SourceBranchName)
+
+          # Fetch latest commits and tags
+          git fetch --tags
+
+          # Delete existing tag if it exists
+          git tag -d nightly-build || true
+          git push origin :refs/tags/nightly-build || true
+
+          # Create and push the updated tag
+          git tag nightly-build
+          git push origin nightly-build
+        displayName: 'Publish individual .NET projects'
+
       - task: DownloadBuildArtifacts@0
-        displayName: 'Download Windows Artifacts'
-        inputs:
+      displayName: 'Download Windows Artifacts'
+      inputs:
           buildType: 'current'
           downloadType: 'single'
           artifactName: 'windows_artifacts'
@@ -148,57 +168,57 @@ stages:
       - task: DownloadBuildArtifacts@0
         displayName: 'Download Linux Artifacts'
         inputs:
-          buildType: 'current'
-          downloadType: 'single'
-          artifactName: 'linux_artifacts'
-          downloadPath: '$(System.ArtifactsDirectory)'
+            buildType: 'current'
+            downloadType: 'single'
+            artifactName: 'linux_artifacts'
+            downloadPath: '$(System.ArtifactsDirectory)'
 
       - task: ArchiveFiles@2
         displayName: 'Package Framework Files'
         inputs:
-          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/RealLoaderFramework/publish'
-          archiveType: 'zip'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/RealLoaderFramework.zip'
+            rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/RealLoaderFramework/publish'
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/RealLoaderFramework.zip'
 
       - task: ArchiveFiles@2
         displayName: 'Package Windows Installer'
         inputs:
-          rootFolderOrFile: '$(System.ArtifactsDirectory)/windows_artifacts/RealLoaderGuiInstaller/publish/win-x64/'
-          archiveType: 'zip'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/Win-RealLoaderInstaller.zip'
+            rootFolderOrFile: '$(System.ArtifactsDirectory)/windows_artifacts/RealLoaderGuiInstaller/publish/win-x64/'
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/Win-RealLoaderInstaller.zip'
 
       - task: ArchiveFiles@2
         displayName: 'Package Windows Artifacts'
         inputs:
-          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/Windows'
-          archiveType: 'zip'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/WindowsArtifacts.zip'
+            rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/Windows'
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/WindowsArtifacts.zip'
 
       - task: ArchiveFiles@2
         displayName: 'Package Linux Installer'
         inputs:
-          rootFolderOrFile: '$(System.ArtifactsDirectory)/linux_artifacts/RealLoaderGuiInstaller/publish/'
-          archiveType: 'zip'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/Lin-RealLoaderInstaller.zip'
+            rootFolderOrFile: '$(System.ArtifactsDirectory)/linux_artifacts/RealLoaderGuiInstaller/publish/'
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/Lin-RealLoaderInstaller.zip'
 
       - task: ArchiveFiles@2
         displayName: 'Package Linux Artifacts'
         inputs:
-          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/linux_artifacts/Linux'
-          archiveType: 'zip'
-          archiveFile: '$(Build.ArtifactStagingDirectory)/LinuxArtifacts.zip'
+            rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/linux_artifacts/Linux'
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/LinuxArtifacts.zip'
 
       - task: GitHubRelease@1
         displayName: 'Create GitHub Release'
         inputs:
-          action: 'create'
-          gitHubConnection: 'Realynx'
-          repository: 'Realynx/RealLoader'
-          tag: 'nightly-build'
-          title: 'CI Release $(version)-ci'
-          assetUploadMode: 'replace'
-          isPreRelease: true
-          assets: |
+            action: 'create'
+            gitHubConnection: 'Realynx'
+            repository: 'Realynx/RealLoader'
+            tag: 'nightly-build'
+            title: 'CI Release $(version)-ci'
+            assetUploadMode: 'replace'
+            isPreRelease: true
+            assets: |
             $(System.ArtifactsDirectory)/Win-RealLoaderInstaller.zip
             $(System.ArtifactsDirectory)/Lin-RealLoaderInstaller.zip
             $(System.ArtifactsDirectory)/RealLoaderFramework.zip
