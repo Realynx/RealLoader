@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <Reference Include="GeneratedSdk">
-      <HintPath>$(ModsBuildFolder)\..\Pal\Binaries\Win64\Sdk\source\GeneratedSdk\bin\Debug\net8.0\GeneratedSdk.dll</HintPath>
+      <HintPath>$(ModsBuildFolder)\..\Pal\Binaries\Win64\Sdk\source\GeneratedSdk\bin\Debug\net9.0\GeneratedSdk.dll</HintPath>
     </Reference>
   </ItemGroup>
 

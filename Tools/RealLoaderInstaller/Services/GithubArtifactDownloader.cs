@@ -24,7 +24,6 @@ namespace RealLoaderInstaller.Services {
         }
 
         public async Task<byte[]> DownloadGithubReleaseAsync(string githubFileName) {
-
             var httpRequest = new HttpRequestMessage(HttpMethod.Get, githubFileName);
             var httpFileResponse = await _httpClient.SendAsync(httpRequest);
 
@@ -40,35 +39,37 @@ namespace RealLoaderInstaller.Services {
             var zipFileBytes = await DownloadGithubReleaseAsync(FRAMEWORK_ZIP);
             await File.WriteAllBytesAsync(FRAMEWORK_ZIP, zipFileBytes);
 
-            var tempdir = Directory.CreateTempSubdirectory();
+            var tempDir = Directory.CreateTempSubdirectory();
 
             using var archive = ZipFile.OpenRead(FRAMEWORK_ZIP);
-            archive.ExtractToDirectory(tempdir.FullName, true);
+            archive.ExtractToDirectory(tempDir.FullName, true);
 
             Directory.Delete(extractPath, true);
-            Directory.Move(Path.Combine(tempdir.FullName, "Release", "net8.0"), extractPath);
+            Directory.Move(Path.Combine(tempDir.FullName, "Release", "net9.0"), extractPath);
 
-            tempdir.Delete(true);
+            tempDir.Delete(true);
         }
 
         public async Task<bool> IsOutOfDate(string assemblyImage) {
             var assemblyVersionInfo = FileVersionInfo.GetVersionInfo(assemblyImage);
             if (!Version.TryParse(assemblyVersionInfo.ProductVersion, out var assemblyVersion)) {
-                AnsiConsole.WriteLine($"Failed to check identify current installed version.");
+                AnsiConsole.WriteLine("Failed to check identify current installed version.");
                 return true;
             }
 
             var githubVersionString = await GetLatestVersion();
-            var githubVersion = Version.Parse(githubVersionString.TrimStart('v', 'V'));
+            var githubVersion = Version.Parse(githubVersionString.AsSpan().TrimStart("vV"));
+
             return assemblyVersion < githubVersion;
         }
 
         public async Task<string> GetLatestVersion() {
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, string.Empty);
-            var response = await _httpClient.SendAsync(httpRequestMessage);
+            using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, string.Empty);
+            using var response = await _httpClient.SendAsync(httpRequestMessage);
+            response.EnsureSuccessStatusCode();
 
-            var redirectLocation = response.RequestMessage.RequestUri.ToString();
-            var versionString = redirectLocation.Substring(redirectLocation.LastIndexOf("/") + 1);
+            var redirectLocation = response.RequestMessage!.RequestUri!.ToString();
+            var versionString = redirectLocation.Substring(redirectLocation.LastIndexOf('/') + 1);
 
             return versionString;
         }

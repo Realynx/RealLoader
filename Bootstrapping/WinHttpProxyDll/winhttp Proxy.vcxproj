@@ -28,7 +28,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <OutDir>..\..\GithubSymbols\Windows\</OutDir>
+    <OutDir>..\..\bin\Windows\</OutDir>
     <TargetName>winhttp</TargetName>
     <TargetExt>.dll</TargetExt>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
