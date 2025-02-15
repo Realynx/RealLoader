@@ -205,6 +205,7 @@ stages:
         displayName: 'Create GitHub Release'
         inputs:
             action: 'create'
+            tagSource: 'userSpecifiedTag'
             gitHubConnection: 'Realynx'
             repository: 'Realynx/RealLoader'
             tag: 'nightly-build'
