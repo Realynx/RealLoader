@@ -64,8 +64,8 @@ stages:
         # Installer -> GUInstaller
         # RealLoaderFramework.Sdk -> RealLoaderFramework
     - script: |
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release-Windows --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release-Windows --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release-Windows
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release-Windows
         dotnet publish $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj -p:PublishProfile=Release --no-restore
         dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj -p:PublishProfile=Release --no-restore
         dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release --no-restore
@@ -110,8 +110,8 @@ stages:
 
     - script: |
         mv $(Build.SourcesDirectory)/build/bin $(Build.SourcesDirectory)/bin
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release-Linux --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release-Linux --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release-Linux
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release-Linux
         dotnet publish $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj -p:PublishProfile=Release --no-restore
         dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj -p:PublishProfile=Release --no-restore
         dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release --no-restore
@@ -163,28 +163,28 @@ stages:
       - task: ArchiveFiles@2
         displayName: 'Package Windows Installer'
         inputs:
-          rootFolderOrFile: '$(System.ArtifactsDirectory)/windows_artifacts/bin/RealLoaderGuiInstaller/publish/win-x64/'
+          rootFolderOrFile: '$(System.ArtifactsDirectory)/windows_artifacts/RealLoaderGuiInstaller/publish/win-x64/'
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/Win-RealLoaderInstaller.zip'
 
       - task: ArchiveFiles@2
         displayName: 'Package Windows Artifacts'
         inputs:
-          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/bin/Windows'
+          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/Windows'
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/WindowsArtifacts.zip'
 
       - task: ArchiveFiles@2
         displayName: 'Package Linux Installer'
         inputs:
-          rootFolderOrFile: '$(System.ArtifactsDirectory)/linux_artifacts/bin/RealLoaderGuiInstaller/publish/'
+          rootFolderOrFile: '$(System.ArtifactsDirectory)/linux_artifacts/RealLoaderGuiInstaller/publish/'
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/Lin-RealLoaderInstaller.zip'
 
       - task: ArchiveFiles@2
         displayName: 'Package Linux Artifacts'
         inputs:
-          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/linux_artifacts/bin/Linux'
+          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/linux_artifacts/Linux'
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/LinuxArtifacts.zip'
 
