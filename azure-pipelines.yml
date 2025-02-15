@@ -61,12 +61,15 @@ stages:
         configuration: 'Release'
         msbuildArguments: '/target:Rebuild'
 
+        # The Installers must be published in this order; 
+        # Installer -> GUInstaller
+        # RealLoaderFramework.Sdk -> RealLoaderFramework
     - script: |
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderInstaller --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderGuiInstaller --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release-Windows -o $(Build.ArtifactStagingDirectory)/RealLoaderInstaller --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release-Windows -o $(Build.ArtifactStagingDirectory)/RealLoaderGuiInstaller --no-restore
         dotnet publish $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/DotNetSdkBuilderMod --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFramework --no-restore
         dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFrameworkSdk --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFramework --no-restore
       displayName: 'Publish individual .NET projects'
 
     - task: PublishBuildArtifacts@1
@@ -106,11 +109,19 @@ stages:
       inputs:
         cmakeArgs: '--build $(Build.SourcesDirectory)/build'
 
+    - script: |
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release-Linux -o $(Build.ArtifactStagingDirectory)/RealLoaderInstaller --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release-Linux -o $(Build.ArtifactStagingDirectory)/RealLoaderGuiInstaller --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/DotNetSdkBuilderMod --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFrameworkSdk --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFramework --no-restore
+      displayName: 'Publish individual .NET projects'
+
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Local Artifact: linux_artifacts'
       condition: eq(variables['isMasterBranch'], true)
       inputs:
-        PathtoPublish: '$(Build.SourcesDirectory)/build'
+        PathtoPublish: '$(Build.SourcesDirectory)/build/bin'
         ArtifactName: 'linux_artifacts'
         publishLocation: 'Container'
 
@@ -142,10 +153,39 @@ stages:
           downloadPath: '$(System.ArtifactsDirectory)'
 
       - task: ArchiveFiles@2
+        displayName: 'Package Framework Files'
         inputs:
-          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/Net/RealLoaderFramework/Release'
+          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/RealLoaderFramework/publish'
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/RealLoaderFramework.zip'
+
+      - task: ArchiveFiles@2
+        displayName: 'Package Windows Installer'
+        inputs:
+          rootFolderOrFile: '$(System.ArtifactsDirectory)/windows_artifacts/bin/RealLoaderGuiInstaller/publish/win-x64/'
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/Win-RealLoaderInstaller.zip'
+
+      - task: ArchiveFiles@2
+        displayName: 'Package Windows Artifacts'
+        inputs:
+          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/bin/Windows'
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/WindowsArtifacts.zip'
+
+      - task: ArchiveFiles@2
+        displayName: 'Package Linux Installer'
+        inputs:
+          rootFolderOrFile: '$(System.ArtifactsDirectory)/linux_artifacts/bin/RealLoaderGuiInstaller/publish/'
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/Lin-RealLoaderInstaller.zip'
+
+      - task: ArchiveFiles@2
+        displayName: 'Package Linux Artifacts'
+        inputs:
+          rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/linux_artifacts/bin/Linux'
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/LinuxArtifacts.zip'
 
       - task: GitHubRelease@1
         displayName: 'Create GitHub Release'
@@ -153,11 +193,16 @@ stages:
           action: 'create'
           gitHubConnection: 'Realynx'
           repository: 'Realynx/RealLoader'
-          tagSource: 'gitTag'
-          tagPattern: 'v[0-9]+.[0-9]+.[0-9]+'
-          title: 'Release $(version)-ci'
+          tag: 'nightly-build'
+          title: 'CI Release $(version)-ci'
+          assetUploadMode: 'replace'
+          isPreRelease: true
           assets: |
-            $(System.ArtifactsDirectory)/ManagedModFramework.zip
-            $(System.ArtifactsDirectory)/windows_artifacts/Windows/Bootstrapper.exe
-            $(System.ArtifactsDirectory)/windows_artifacts/Windows/CLRHost.dll
-            $(System.ArtifactsDirectory)/linux_artifacts/GithubSymbols/Linux/libCLRHost.so
+            $(System.ArtifactsDirectory)/Win-RealLoaderInstaller.zip
+            $(System.ArtifactsDirectory)/Lin-RealLoaderInstaller.zip
+            $(System.ArtifactsDirectory)/RealLoaderFramework.zip
+            $(System.ArtifactsDirectory)/WindowsArtifacts.zip
+            $(System.ArtifactsDirectory)/LinuxArtifacts.zip
+            $(System.ArtifactsDirectory)/windows_artifacts/DotNetSdkBuilderMod/publish/DotNetSdkBuilderMod.dll
+            $(System.ArtifactsDirectory)/windows_artifacts/RealLoaderFramework.Sdk/publish/RealLoaderFramework.Sdk.dll
+            

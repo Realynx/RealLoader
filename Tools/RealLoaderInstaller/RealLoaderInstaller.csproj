@@ -5,11 +5,12 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
-		<PublishAot>true</PublishAot>
+		<PublishAot>False</PublishAot>
 		<InvariantGlobalization>true</InvariantGlobalization>
 		<RootNamespace>RealLoaderInstaller</RootNamespace>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<BaseOutputPath>..\..\bin\RealLoaderInstaller</BaseOutputPath>
+		<PlatformTarget>x64</PlatformTarget>
 	</PropertyGroup>
 
 	<ItemGroup>
