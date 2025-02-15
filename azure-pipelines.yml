@@ -137,6 +137,9 @@ stages:
       pool:
         name: 'Linux'
       steps:
+      - checkout: self
+        persistCredentials: true
+
       - script: |
           # Ensure we have the latest commits
           git fetch --unshallow
