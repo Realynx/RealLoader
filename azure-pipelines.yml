@@ -8,8 +8,6 @@ variables:
   version: $[format('{0}.{1}.{2}', variables.major, variables.minor, variables.build)]
   isMasterBranch: $[eq(variables['Build.SourceBranchName'], 'master')]
 
-
-
 stages:
 - stage: UnitTesting
   displayName: 'Run all unit tests.'
@@ -126,8 +124,9 @@ stages:
         ArtifactName: 'linux_artifacts'
         publishLocation: 'Container'
 
-# Deploy the artifacts to github with a new tag.
-- ${{ if eq(variables['isMasterBranch'], true) }}:
+
+
+- ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
   - stage: Deploy
     displayName: 'Deploy built artifacts to GitHub'
     dependsOn: Build
