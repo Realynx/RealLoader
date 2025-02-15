@@ -1,3 +1,5 @@
+# RealLoader is early in development and not fully implemented/functional yet.
+
 [![Github License](https://img.shields.io/github/license/Realynx/RealLoader.svg)](LICENSE.md)
 [![CodeFactor](https://www.codefactor.io/repository/github/Realynx/RealLoader/badge)](https://www.codefactor.io/repository/github/Realynx/RealLoader)
 
