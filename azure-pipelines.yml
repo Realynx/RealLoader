@@ -64,11 +64,11 @@ stages:
         # Installer -> GUInstaller
         # RealLoaderFramework.Sdk -> RealLoaderFramework
     - script: |
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release-Windows -o $(Build.ArtifactStagingDirectory)/RealLoaderInstaller --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release-Windows -o $(Build.ArtifactStagingDirectory)/RealLoaderGuiInstaller --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/DotNetSdkBuilderMod --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFrameworkSdk --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFramework --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release-Windows --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release-Windows --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj -p:PublishProfile=Release --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj -p:PublishProfile=Release --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release --no-restore
       displayName: 'Publish individual .NET projects'
 
     - task: PublishBuildArtifacts@1
@@ -109,18 +109,19 @@ stages:
         cmakeArgs: '--build $(Build.SourcesDirectory)/build'
 
     - script: |
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release-Linux -o $(Build.ArtifactStagingDirectory)/RealLoaderInstaller --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release-Linux -o $(Build.ArtifactStagingDirectory)/RealLoaderGuiInstaller --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/DotNetSdkBuilderMod --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFrameworkSdk --no-restore
-        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release -o $(Build.ArtifactStagingDirectory)/RealLoaderFramework --no-restore
+        mv $(Build.SourcesDirectory)/build/bin $(Build.SourcesDirectory)/bin
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderInstaller/RealLoaderInstaller.csproj -p:PublishProfile=Release-Linux --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Tools/RealLoaderGuiInstaller/RealLoaderGuiInstaller.csproj -p:PublishProfile=Release-Linux --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Mods/DotNetSdkBuilderMod/DotNetSdkBuilderMod.csproj -p:PublishProfile=Release --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework.Sdk/RealLoaderFramework.Sdk.csproj -p:PublishProfile=Release --no-restore
+        dotnet publish $(Build.SourcesDirectory)/Framework/RealLoaderFramework/RealLoaderFramework.csproj -p:PublishProfile=Release --no-restore
       displayName: 'Publish individual .NET projects'
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Local Artifact: linux_artifacts'
       condition: eq(variables['isMasterBranch'], true)
       inputs:
-        PathtoPublish: '$(Build.SourcesDirectory)/build/bin'
+        PathtoPublish: '$(Build.SourcesDirectory)/bin'
         ArtifactName: 'linux_artifacts'
         publishLocation: 'Container'
 
