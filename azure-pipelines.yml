@@ -207,10 +207,17 @@ stages:
             archiveType: 'zip'
             archiveFile: '$(Build.ArtifactStagingDirectory)/LinuxArtifacts.zip'
 
-      - task: GitHubRelease@1
-        displayName: 'Edit GitHub Release'
+      - task: GithubRelease@1
+        displayName: 'Delete GitHub Release'
         inputs:
-            action: 'edit'
+            gitHubConnection: 'Realynx'
+            action: delete
+            tag: 'nightly-build'
+
+      - task: GitHubRelease@1
+        displayName: 'Create GitHub Release'
+        inputs:
+            action: 'create'
             tagSource: 'userSpecifiedTag'
             gitHubConnection: 'Realynx'
             repository: 'Realynx/RealLoader'
