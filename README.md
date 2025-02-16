@@ -11,6 +11,9 @@
 
 
 # **RealLoader** 🎷🐛
+> [!TIP]
+>Remember to launch your game with -modded flag (usualy done in steam), otherwise the mod framework will run in bypass-mode allowing you to play un modded by default.
+
 ### Unreal Engine Modding Framework
  
 **RealLoader** is a powerful framework for loading and orchestrating mods created in various languages for **Unreal Engine**. It primarily supports **C#** for developing mods and provides a streamlined modding SDK with essential tools.
