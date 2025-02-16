@@ -209,6 +209,7 @@ stages:
 
       - task: GithubRelease@1
         displayName: 'Delete GitHub Release'
+        continueOnError: true
         inputs:
             gitHubConnection: 'Realynx'
             action: delete
