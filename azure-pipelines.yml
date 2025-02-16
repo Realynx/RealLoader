@@ -166,17 +166,23 @@ stages:
             artifactName: 'linux_artifacts'
             downloadPath: '$(System.ArtifactsDirectory)'
 
+      - script: |
+            mv '$(Build.ArtifactStagingDirectory)/windows_artifacts/RealLoaderFramework/publish' '$(Build.ArtifactStagingDirectory)/windows_artifacts/RealLoaderFramework/Framework'
+            mv '$(System.ArtifactsDirectory)/windows_artifacts/RealLoaderGuiInstaller/publish/win-x64' '$(System.ArtifactsDirectory)/windows_artifacts/RealLoaderGuiInstaller/publish/RealLoaderInstaller'
+            mv '$(System.ArtifactsDirectory)/linux_artifacts/RealLoaderGuiInstaller/publish' '$(System.ArtifactsDirectory)/linux_artifacts/RealLoaderGuiInstaller/RealLoaderInstaller'
+        displayName: 'Publish individual .NET projects'
+
       - task: ArchiveFiles@2
         displayName: 'Package Framework Files'
         inputs:
-            rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/RealLoaderFramework/publish'
+            rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/windows_artifacts/RealLoaderFramework/Framework'
             archiveType: 'zip'
             archiveFile: '$(Build.ArtifactStagingDirectory)/RealLoaderFramework.zip'
 
       - task: ArchiveFiles@2
         displayName: 'Package Windows Installer'
         inputs:
-            rootFolderOrFile: '$(System.ArtifactsDirectory)/windows_artifacts/RealLoaderGuiInstaller/publish/win-x64/'
+            rootFolderOrFile: '$(System.ArtifactsDirectory)/windows_artifacts/RealLoaderGuiInstaller/publish/RealLoaderInstaller'
             archiveType: 'zip'
             archiveFile: '$(Build.ArtifactStagingDirectory)/Win-RealLoaderInstaller.zip'
 
@@ -190,7 +196,7 @@ stages:
       - task: ArchiveFiles@2
         displayName: 'Package Linux Installer'
         inputs:
-            rootFolderOrFile: '$(System.ArtifactsDirectory)/linux_artifacts/RealLoaderGuiInstaller/publish/'
+            rootFolderOrFile: '$(System.ArtifactsDirectory)/linux_artifacts/RealLoaderGuiInstaller/RealLoaderInstaller'
             archiveType: 'zip'
             archiveFile: '$(Build.ArtifactStagingDirectory)/Lin-RealLoaderInstaller.zip'
 
@@ -209,7 +215,7 @@ stages:
             gitHubConnection: 'Realynx'
             repository: 'Realynx/RealLoader'
             tag: 'nightly-build'
-            title: 'CI Release $(version)-ci'
+            title: 'Nightly Release $(version)-ci'
             assetUploadMode: 'replace'
             isPreRelease: true
             assets: |
@@ -219,5 +225,4 @@ stages:
                 $(System.ArtifactsDirectory)/WindowsArtifacts.zip
                 $(System.ArtifactsDirectory)/LinuxArtifacts.zip
                 $(System.ArtifactsDirectory)/windows_artifacts/DotNetSdkBuilderMod/publish/DotNetSdkBuilderMod.dll
-                $(System.ArtifactsDirectory)/windows_artifacts/RealLoaderFramework.Sdk/publish/RealLoaderFramework.Sdk.dll
             
