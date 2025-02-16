@@ -208,9 +208,9 @@ stages:
             archiveFile: '$(Build.ArtifactStagingDirectory)/LinuxArtifacts.zip'
 
       - task: GitHubRelease@1
-        displayName: 'Create GitHub Release'
+        displayName: 'Edit GitHub Release'
         inputs:
-            action: 'create'
+            action: 'edit'
             tagSource: 'userSpecifiedTag'
             gitHubConnection: 'Realynx'
             repository: 'Realynx/RealLoader'
