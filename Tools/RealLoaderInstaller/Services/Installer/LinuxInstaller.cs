@@ -40,7 +40,7 @@ namespace RealLoaderInstaller.Services.Installer {
 
             AnsiConsole.WriteLine("Installing new files...");
             var clrHostLocation = Path.Combine(dotnetDependenciesFolder, "CLRHost.dll");
-            await _modFileService.InstallNewFiles(dotnetDependenciesFolder, clrHostLocation);
+            // await _modFileService.InstallNewFiles(dotnetDependenciesFolder, clrHostLocation);
 
             AnsiConsole.WriteLine("Editing server launch script...");
             var launchScript = Path.Combine(installerOptions.InstallLocation, "PalServer.sh");

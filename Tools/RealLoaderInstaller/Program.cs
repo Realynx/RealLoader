@@ -48,7 +48,8 @@ namespace RealLoaderInstaller {
                 .AddSingleton<InstallerOptions>()
                 .AddSingleton<IModBackupService, ModBackupService>()
                 .AddSingleton<IModFileService, ModFileService>()
-                .AddSingleton<IGithubArtifactDownloader, GithubArtifactDownloader>();
+                .AddSingleton<IGithubArtifactDownloader, GithubArtifactDownloader>()
+                .AddSingleton<IGithubArchiveManager, GithubArchiveManager>();
 
             serviceDescriptors
                 .AddHttpClient<IGithubArtifactDownloader, GithubArtifactDownloader>(client => {

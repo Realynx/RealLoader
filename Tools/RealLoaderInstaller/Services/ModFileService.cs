@@ -13,13 +13,6 @@ namespace RealLoaderInstaller.Services {
             _installerOptions = installerOptions;
         }
 
-        public async Task InstallNewFiles(string dotnetDependenciesFolder, string clrHost) {
-            AnsiConsole.WriteLine("Downloading Github Artifacts...");
-
-            await _githubArtifactDownloader.UnzipFrameworkPackage(dotnetDependenciesFolder);
-            await WriteGithubFile(clrHost, "CLRHost.dll");
-        }
-
         public async Task WriteGithubFile(string localLocation, string githubFilename) {
             var fileBytes = await _githubArtifactDownloader.DownloadGithubReleaseAsync(githubFilename);
             await File.WriteAllBytesAsync(localLocation, fileBytes);
