@@ -8,11 +8,6 @@ using Spectre.Console;
 
 namespace RealLoaderInstaller.Services {
     public class GithubArtifactDownloader : IGithubArtifactDownloader {
-        internal const string FRAMEWORK_ZIP = "ManagedModFramework.zip";
-        internal const string WINHTTP_PROXY = "winhttp.dll";
-        internal const string CLR_HOST_WINDOWS = "CLRHost.dll";
-        internal const string CLR_HOST_LINUX = "libCLRHost.so";
-
         private readonly HttpClient _httpClient;
         private readonly InstallerOptions _installerOptions;
 
@@ -20,7 +15,7 @@ namespace RealLoaderInstaller.Services {
             _httpClient = httpClient;
             _installerOptions = installerOptions;
 
-            _httpClient.BaseAddress = new Uri($"{_installerOptions.RemoteSource}/releases/latest/download/");
+            _httpClient.BaseAddress = new Uri($"{_installerOptions.RemoteSource}/releases/download/nightly-build/");
         }
 
         public async Task<byte[]> DownloadGithubReleaseAsync(string githubFileName) {
@@ -33,21 +28,6 @@ namespace RealLoaderInstaller.Services {
 
             var httpFileBytes = await httpFileResponse.Content.ReadAsByteArrayAsync();
             return httpFileBytes;
-        }
-
-        public async Task UnzipFrameworkPackage(string extractPath) {
-            var zipFileBytes = await DownloadGithubReleaseAsync(FRAMEWORK_ZIP);
-            await File.WriteAllBytesAsync(FRAMEWORK_ZIP, zipFileBytes);
-
-            var tempDir = Directory.CreateTempSubdirectory();
-
-            using var archive = ZipFile.OpenRead(FRAMEWORK_ZIP);
-            archive.ExtractToDirectory(tempDir.FullName, true);
-
-            Directory.Delete(extractPath, true);
-            Directory.Move(Path.Combine(tempDir.FullName, "Release", "net9.0"), extractPath);
-
-            tempDir.Delete(true);
         }
 
         public async Task<bool> IsOutOfDate(string assemblyImage) {
