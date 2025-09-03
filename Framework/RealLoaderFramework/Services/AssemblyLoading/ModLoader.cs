@@ -1,4 +1,7 @@
-﻿using RealLoaderFramework.Models;
+﻿
+using Microsoft.Extensions.Hosting;
+
+using RealLoaderFramework.Models;
 using RealLoaderFramework.Models.Config;
 using RealLoaderFramework.Sdk.Attributes;
 using RealLoaderFramework.Sdk.Interfaces;
@@ -9,7 +12,7 @@ using RealLoaderFramework.Services.Interfaces;
 using RealLoaderFramework.Services.SandboxDI.Interfaces;
 
 namespace RealLoaderFramework.Services.AssemblyLoading {
-    internal class ModLoader : IModLoader {
+    internal class ModLoader : IModLoader, IHostedService {
         private readonly ILogger _logger;
         private readonly IAssemblyDiscovery _assemblyDiscovery;
         private readonly ModLoaderConfig _modLoaderConfig;
@@ -26,6 +29,16 @@ namespace RealLoaderFramework.Services.AssemblyLoading {
             _runtimeInstaller = runtimeInstaller;
             _sandboxDIService = sandboxDIService;
             _globalObjectsTracker = globalObjectsTracker;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken) {
+            LoadMods();
+
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken) {
+            return Task.CompletedTask;
         }
 
         public void LoadMods() {

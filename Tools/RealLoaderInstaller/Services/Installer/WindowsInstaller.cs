@@ -9,7 +9,7 @@ using Spectre.Console;
 namespace RealLoaderInstaller.Services.Installer {
     [SupportedOSPlatform("windows")]
     public class WindowsInstaller : IInstaller {
-        private const string DOTNET_LOCAL_PACKS = @"C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Host.win-x64";
+        private const string DOTNET_LOCAL_PACKS = @"Microsoft.NETCore.App.Host.win-x64";
         private const string NET_HOST = "nethost.dll";
 
         private readonly IGithubArtifactDownloader _githubArtifactDownloader;
@@ -88,6 +88,7 @@ namespace RealLoaderInstaller.Services.Installer {
 
         private string GetWin64Folder(string rootFolder) {
             var win64directory = Directory.EnumerateDirectories(rootFolder, "*", SearchOption.AllDirectories)
+                .Where(i => !i.Contains("Engine"))
                 .SingleOrDefault(i => i.EndsWith(Path.Combine("Binaries", "Win64")));
 
             return win64directory is null
@@ -102,17 +103,26 @@ namespace RealLoaderInstaller.Services.Installer {
         }
 
         private string FindNewestNetPackPath() {
-            if (!Directory.Exists(DOTNET_LOCAL_PACKS)) {
-                throw new DotnetNotInstalledException("Dotnet was not found on this platform! Please download the latest LTS version from here: https://dotnet.microsoft.com/en-us/download/dotnet");
+            var dotnetRoot = Environment.GetEnvironmentVariable("DOTNET_ROOT") ??
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet");
+
+            var packsDir = Path.Combine(dotnetRoot, "packs", DOTNET_LOCAL_PACKS);
+            if (!Directory.Exists(packsDir)) {
+                Console.WriteLine("Runtime packs not found.");
+                return string.Empty;
             }
 
-            var newestSemiVersion = Directory
-                .GetDirectories(DOTNET_LOCAL_PACKS, "*.*.*")
-                .Select(i => i.Substring(i.LastIndexOf('\\') + 1))
-                .Select(Version.Parse)
-                .Max();
+            var latestPack = Directory.GetDirectories(packsDir)
+                .Select(Path.GetFileName)
+                .Where(i => Version.TryParse(i, out _))
+                .OrderByDescending(Version.Parse)
+                .FirstOrDefault();
 
-            return $"{DOTNET_LOCAL_PACKS}\\{newestSemiVersion}";
+            if (string.IsNullOrWhiteSpace(latestPack)) {
+                return string.Empty;
+            }
+
+            return Path.Combine(packsDir, latestPack);
         }
     }
 }

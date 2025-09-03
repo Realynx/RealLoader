@@ -2,6 +2,11 @@
 using RealLoaderFramework.Sdk.Services.EngineServices.Interfaces;
 
 namespace RealLoaderFramework.Sdk.Services.EngineServices.Windows {
+    /*
+     * Make other classes with an attribute for their engine version,
+     * make them all inherit IEnginePattern, This will allow setting up the proper service during DI startup.
+     */
+
     public class WindowsEnginePattern : IEnginePattern {
         [MachineCodePattern("48 8D 05 ? ? ? ? | EB 13 48 8D 0D ? ? ? ? E8 ? ? ? ? C6 05 ? ? ? ? ? 0F 10", PatternType.IP_RelativeOffset_32)]
         public nint PNamePoolData { get; set; }

@@ -7,7 +7,7 @@ namespace RealLoaderFramework.Services.AssemblyLoading {
         public static IServiceCollection SetupReflectionModLoader(this IServiceCollection serviceDescriptors) {
             serviceDescriptors
                 .AddSingleton<IAssemblyDiscovery, AssemblyDiscovery>()
-                .AddSingleton<IModLoader, ModLoader>();
+                .AddHostedService<ModLoader>();
 
             return serviceDescriptors;
         }

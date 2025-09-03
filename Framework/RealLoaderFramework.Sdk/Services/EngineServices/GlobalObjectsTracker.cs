@@ -46,21 +46,6 @@ namespace RealLoaderFramework.Sdk.Services.EngineServices {
             _logger.Debug("Synchronized Object Pool");
         }
 
-        /// <summary>
-        /// Fires for server.
-        /// </summary>
-        /// <param name="unrealEvent"></param>
-        [EngineEvent("^PalStaticLogCollector::OnEndedWorldAutoSave")]
-        public unsafe void OnEndedWorldAutoSave(UnrealEvent unrealEvent) {
-            _synchronized = true;
-            if (_synchronized) {
-                return;
-            }
-
-            SynchroniseObjectPool();
-            _logger.Debug("Synchronized Object Pool");
-        }
-
         public unsafe void SynchroniseObjectPool() {
             var currentObjects = _globalObjects.EnumerateObjects();
 

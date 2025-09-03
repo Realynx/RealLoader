@@ -32,13 +32,12 @@ namespace RealLoaderFramework {
             var loggerInstance = host.Services.GetRequiredService<ILogger>();
             loggerInstance.Debug("DI Container Setup!");
 
+            host.Run();
+
             ConsoleExtensions.SetWindowAlwaysOnTop(loggerInstance);
 
-            var modLoader = host.Services.GetRequiredService<IModLoader>();
-            modLoader.LoadMods();
-
             loggerInstance.Info("Mods running, fully loaded.");
-            for (;;)
+            for (; ; )
                 Console.ReadLine();
         }
     }
